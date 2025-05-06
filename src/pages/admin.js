@@ -1,146 +1,106 @@
-import React, { useState } from "react";
+
+import React, { useState } from 'react';
 import {
   Box,
+  Stepper,
+  Step,
+  StepLabel,
   Button,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Grid,
-} from "@mui/material";
+  Typography,
+  Paper
+} from '@mui/material';
+import MultiSelectWithAdd from './step_1';
+import Step_2 from './step_2';
 
-const fieldTypes = ["checkbox", "radio", "dropdown", "textField"];
+const steps = [
+  'Create Master Work Types',
+  'Delivery Work Types',
+  'Delivery Work Type Categories',
+  'Create Ticket Delivery',
+  'Create Non Ticket Delivery',
+  'Create Non Ticket Non Delivery',
+  'Application Development Projects'
+];
 
-const getFieldComponent = (field, fieldIndex, handleFieldChange) => {
-  switch (field.type) {
-    case "checkbox":
-    case "radio":
-      return (
-        <TextField
-          label="Work Type"
-          value={field.label || ""}
-          onChange={(e) => handleFieldChange(fieldIndex, { label: e.target.value })}
-          fullWidth
-          margin="normal"
-        />
-      );
-    case "textField":
-      return (
-        <TextField
-          label="Groupname"
-          value={field.label || ""}
-          onChange={(e) => handleFieldChange(fieldIndex, { label: e.target.value })}
-          fullWidth
-          margin="normal"
-        />
-      );
-    case "dropdown":
-      return (
-        <>
-          <TextField
-            label="Category"
-            value={field.category || ""}
-            onChange={(e) => handleFieldChange(fieldIndex, { category: e.target.value })}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Sub-category (comma separated)"
-            value={field.subCategory || ""}
-            onChange={(e) => handleFieldChange(fieldIndex, { subCategory: e.target.value })}
-            fullWidth
-            margin="normal"
-          />
-        </>
-      );
+const StepContent = ({ step,onSaveSuccess }) => {
+  switch (step) {
+    case 0:
+      return <MultiSelectWithAdd onSaveSuccess={onSaveSuccess} />
+    case 1:
+      return  <Step_2/> 
+    case 2:
+      return <Typography>Step 3: Assign Roles</Typography>;
+    case 3:
+      return <Typography>Step 4: Configure Forms</Typography>;
+    case 4:
+      return <Typography>Step 5: Review Fields</Typography>;
+    case 5:
+      return <Typography>Step 6: Map Workflows</Typography>;
+    case 6:
+      return <Typography>Step 7: Assign Permissions</Typography>;
+    case 7:
+      return <Typography>Step 8: Finalize & Submit</Typography>;
     default:
-      return null;
+      return <Typography>Unknown step</Typography>;
   }
 };
 
-const FormBlock = ({ index, data, handleBlockChange }) => {
-  const handleAddFieldClick = () => {
-    const updatedFields = [...(data.fields || []), { type: "" }];
-    handleBlockChange(index, { ...data, fields: updatedFields });
-  };
-
-  const handleFieldTypeChange = (fieldIndex, type) => {
-    const updatedFields = [...data.fields];
-    updatedFields[fieldIndex] = { ...updatedFields[fieldIndex], type };
-    handleBlockChange(index, { ...data, fields: updatedFields });
-  };
-
-  const handleFieldChange = (fieldIndex, changes) => {
-    const updatedFields = [...data.fields];
-    updatedFields[fieldIndex] = { ...updatedFields[fieldIndex], ...changes };
-    handleBlockChange(index, { ...data, fields: updatedFields });
-  };
-
-  return (
-    <Box border={1} borderRadius={2} padding={2} margin={1} width={"100%"}>
-      
-      {(data.fields || []).map((field, fieldIndex) => (
-        <Box key={fieldIndex} marginTop={2}>
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Select Field Type</InputLabel>
-            <Select
-              value={field.type || ""}
-              onChange={(e) => handleFieldTypeChange(fieldIndex, e.target.value)}
-              label="Select Field Type"
-            >
-              {fieldTypes.map((type) => (
-                <MenuItem key={type} value={type}>
-                  {type}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          {getFieldComponent(field, fieldIndex, handleFieldChange)}
-        </Box>
-      ))}
-      <Button variant="outlined" onClick={handleAddFieldClick}>
-        Add Field
-      </Button>
-    </Box>
-  );
-};
-
 const DynamicFormUI = () => {
-  const [blocks, setBlocks] = useState([{ fields: [] }]);
+  const [activeStep, setActiveStep] = useState(0);
+  const [step,setStep] = useState(0);
+ 
 
-  const addBlock = () => {
-    setBlocks([...blocks, { fields: [] }]);
+  const handleNext = () => {
+    setActiveStep((prevStep) => prevStep + 1);
+  };
+  const handleSaveSuccess = () => {
+    setStep(1); 
+    handleNext(); 
   };
 
-  const handleBlockChange = (index, updatedBlock) => {
-    const updatedBlocks = [...blocks];
-    updatedBlocks[index] = updatedBlock;
-    setBlocks(updatedBlocks);
+  const handleBack = () => {
+    setActiveStep((prevStep) => prevStep - 1);
   };
 
-  const handleSave = () => {
-    console.log("All Field Data:", blocks);
+  const handleReset = () => {
+    setActiveStep(0);
   };
+
   return (
-    <Box padding={4}>
-      <Grid container spacing={2}>
-        {blocks.map((block, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <FormBlock index={index} data={block} handleBlockChange={handleBlockChange} />
-          </Grid>
+    <Box sx={{ width: '100%', padding: 4 }}>
+      <Stepper activeStep={activeStep} alternativeLabel>
+        {steps.map((label, index) => (
+          <Step key={index}>
+            <StepLabel>{label}</StepLabel>
+          </Step>
         ))}
-      </Grid>
-      <Box display="flex" justifyContent="center" marginTop={2}>
-        <Button variant="contained" onClick={addBlock} sx={{ marginRight: 2 }}>
-          Add Block
-        </Button>
-        <Button variant="contained" color="success" onClick={handleSave}>
-          Save
-        </Button>
-      </Box>
+      </Stepper>
+
+      <Paper elevation={3} sx={{ padding: 3, marginTop: 4 }}>
+        {activeStep === steps.length ? (
+          <>
+            <Typography variant="h6" gutterBottom>
+              All steps completed!
+            </Typography>
+            <Button onClick={handleReset}>Reset</Button>
+          </>
+        ) : (
+          <>
+            <StepContent step={activeStep} onSaveSuccess={handleSaveSuccess}/>
+            <Box sx={{ marginTop: 2 }}>
+              <Button disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 2 }}>
+                Back
+              </Button>
+              <Button variant="contained" onClick={handleNext}>
+                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+              </Button>
+            </Box>
+          </>
+        )}
+      </Paper>
     </Box>
   );
-};
+}; 
 
 export default DynamicFormUI;
+
