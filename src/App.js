@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import HeaderSidebarLayout from "../src/layout/layout";
+
 
 // Lazy load pages
 const Home = lazy(() => import("./pages/home"));
@@ -12,7 +12,7 @@ const Login = lazy(() => import("./authentication/signIn"));
 const ForgotPasswordPage = lazy(() => import("./authentication/forgotPassword"));
 const AMData = lazy(() => import("./pages/admin"));
 const NTND = lazy(() => import("./pages/NTND"));
-const NTD = lazy(() => import("./pages/NTD"));
+const AMSNonTicketDelivery = lazy(() => import("./pages/NTD"));
 const AD = lazy(() => import("./pages/AD"));
 const AM = lazy(() => import("./pages/AM"));
 
@@ -26,17 +26,17 @@ const App = () => {
         <Route path= "forgot-password" element={<ForgotPasswordPage/>} />
         <Route  path="register" element={<SignUp />} />
           {/* Common layout for all pages */}
-          <Route path="/" element={<HeaderSidebarLayout />}>
+          {/* <Route path="/" element={<HeaderSidebarLayout />}> */}
             <Route  path="home" element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path= "contact" element={<Contact/>} />
             <Route path= "clock-view" element={<ClockView/>} />
             <Route path= "ntnd" element={<NTND/>} />
-            <Route path= "ntd" element={<NTD/>} />
+            <Route path= "ntd" element={<AMSNonTicketDelivery/>} />
             <Route path= "ad" element={<AD/>} /> 
              <Route path= "am" element={<AM/>} />
             <Route path= "admin" element={<AMData/>} />
-          </Route>
+          {/* </Route> */}
         </Routes>
       {/* </Suspense> */}
     </Router>

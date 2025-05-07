@@ -20,29 +20,13 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const nonTicketCategoryOptions = [
-  'Planning',
-  'Execution',
-  'Review',
-  'Reporting'
+  'Casual Leave',
+  'Paid Leave',
+  'Sick Leave',
+  'Public Holiday',
+  'Optional Holiday'
 ];
 
-const nonTicketSubCategoryMap = {
-  Planning: ['Team Management', 'Resource Allocation'],
-  Execution: ['Development', 'Deployment'],
-  Review: ['Milestone Review', 'Code Review'],
-  Reporting: ['Weekly Report', 'Final Report']
-};
-
-const nonTicketWorkItemMap = {
-  'Team Management': ['Domain Lead Activities', 'Team Scheduling'],
-  'Resource Allocation': ['Assign Roles', 'Track Resources'],
-  Development: ['Frontend Tasks', 'Backend Tasks'],
-  Deployment: ['Staging Deployment', 'Production Deployment'],
-  'Milestone Review': ['SNO Integration Activities', 'Client Feedback Review'],
-  'Code Review': ['PR Review', 'Bug Fix Review'],
-  'Weekly Report': ['SR & CSM', 'Support Summary'],
-  'Final Report': ['Summary Presentation', 'Retrospective']
-};
 
 const isValidTime = (value) => /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(value);
 
@@ -69,7 +53,7 @@ const WorkItemCard = ({ index, data, onChange, onDelete }) => {
       }}
     >
       <FormControl required fullWidth variant="outlined">
-        <InputLabel shrink>Non Ticket Delivery Work Category</InputLabel>
+        <InputLabel shrink>Type of Leave</InputLabel>
         <Select
           name="category"
           value={data.category}
@@ -82,40 +66,6 @@ const WorkItemCard = ({ index, data, onChange, onDelete }) => {
           ))}
         </Select>
       </FormControl>
-
-      {showRestFields && (
-        <FormControl required fullWidth variant="outlined">
-          <InputLabel shrink>Non Ticket Delivery Work Sub-Category</InputLabel>
-          <Select
-            name="subCategory"
-            value={data.subCategory}
-            onChange={handleChange}
-            label="Non Ticket Delivery Work Sub-Category"
-            notched
-          >
-            {(nonTicketSubCategoryMap[data.category] || []).map((option, i) => (
-              <MenuItem key={i} value={option}>{option}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      )}
-
-      {showRestFields && (
-        <FormControl required fullWidth variant="outlined">
-          <InputLabel shrink>Non Ticket Delivery Work Item</InputLabel>
-          <Select
-            name="workItem"
-            value={data.workItem}
-            onChange={handleChange}
-            label="Non Ticket Delivery Work Item"
-            notched
-          >
-            {(nonTicketWorkItemMap[data.subCategory] || []).map((option, i) => (
-              <MenuItem key={i} value={option}>{option}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      )}
 
       {showRestFields && (
         <TextField
@@ -158,11 +108,11 @@ const WorkItemCard = ({ index, data, onChange, onDelete }) => {
   );
 };
 
-const AMSNonTicketDelivery = () => {
+const Timeoff = () => {
   const [items, setItems] = useState([
-    { category: '', subCategory: '', workItem: '', time: '', comments: '' },
-    { category: '', subCategory: '', workItem: '', time: '', comments: '' },
-    { category: '', subCategory: '', workItem: '', time: '', comments: '' }
+    { category: '', time: '', comments: '' },
+    { category: '', time: '', comments: '' },
+    { category: '', time: '', comments: '' }
   ]);
 
   const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
@@ -176,7 +126,7 @@ const AMSNonTicketDelivery = () => {
   };
 
   const handleAddItem = () => {
-    setItems([...items, { category: '', subCategory: '', workItem: '', time: '', comments: '' }]);
+    setItems([...items, { category: '',time: '', comments: '' }]);
   };
 
   const handleDeleteItem = (index) => {
@@ -187,8 +137,6 @@ const AMSNonTicketDelivery = () => {
   const isItemValid = (item) => {
     return (
       item.category &&
-      item.subCategory &&
-      item.workItem &&
       isValidTime(item.time) &&
       item.comments.trim() !== ''
     );
@@ -215,7 +163,7 @@ const AMSNonTicketDelivery = () => {
 
   return (
     <Box sx={{ p: 4 }}>
-      <Typography variant="h6" mb={2}>AMS Non Ticket Delivery</Typography>
+      <Typography variant="h6" mb={2}>Time Off</Typography>
 
       <Box sx={{ display: 'flex', overflowX: 'auto', gap: 2 }}>
         {items.map((item, index) => (
@@ -252,8 +200,6 @@ const AMSNonTicketDelivery = () => {
             <Box key={index} mb={2}>
               <Typography variant="subtitle1"><strong>Entry {index + 1}</strong></Typography>
               <Typography>Category: {item.category}</Typography>
-              <Typography>Sub Category: {item.subCategory}</Typography>
-              <Typography>Work Item: {item.workItem}</Typography>
               <Typography>Time: {item.time}</Typography>
               <Typography>Comments: {item.comments}</Typography>
             </Box>
@@ -269,4 +215,4 @@ const AMSNonTicketDelivery = () => {
   );
 };
 
-export default AMSNonTicketDelivery;
+export default Timeoff;
