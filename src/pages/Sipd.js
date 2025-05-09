@@ -64,7 +64,7 @@ const WorkItemCard = ({ index, data, onChange, onDelete }) => {
         gap: 2,
         p: 2,
         m: 1,
-        minWidth: 400,
+        minWidth: 250,
         backgroundColor: 'white',
         position: 'relative'
       }}
@@ -171,8 +171,6 @@ const WorkItemCard = ({ index, data, onChange, onDelete }) => {
 const Sipd = () => {
   const [items, setItems] = useState([
     { category: '', subCategory: '', workItem: '', taskType: '', time: '', comments: '', burntHours: '2', remainingHours: '3', estimatedHours: '5', toBook: '', approvalNeeded: false },
-    { category: '', subCategory: '', workItem: '', taskType: '', time: '', comments: '', burntHours: '2', remainingHours: '3', estimatedHours: '5', toBook: '', approvalNeeded: false },
-    { category: '', subCategory: '', workItem: '', taskType: '', time: '', comments: '', burntHours: '2', remainingHours: '3', estimatedHours: '5', toBook: '', approvalNeeded: false }
   ]);
   const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
   const [savedData, setSavedData] = useState([]);
@@ -216,7 +214,7 @@ const Sipd = () => {
 
   return (
     <Box sx={{ p: 4 }}>
-      <Typography variant="h6" mb={2}>SI Project Delivery</Typography>
+      <Typography variant="h6" mb={2}></Typography>
 
       <Box sx={{ display: 'flex', overflowX: 'auto', gap: 2 }}>
         {items.map((item, index) => (
@@ -231,7 +229,6 @@ const Sipd = () => {
       </Box>
 
       <Box mt={2} sx={{ display: 'flex', gap: 2 }}>
-        <Button variant="contained" onClick={handleAddItem}>Add Item</Button>
         <Button variant="contained" color="success" onClick={handleSave}>Save / Send Approval</Button>
       </Box>
 

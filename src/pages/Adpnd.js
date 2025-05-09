@@ -62,7 +62,7 @@ const WorkItemCard = ({ index, data, onChange, onDelete }) => {
         gap: 2,
         p: 2,
         m: 1,
-        minWidth: 300,
+        minWidth: 250,
         backgroundColor: 'white',
         position: 'relative'
       }}
@@ -160,8 +160,6 @@ const WorkItemCard = ({ index, data, onChange, onDelete }) => {
 const Adpnd = () => {
   const [items, setItems] = useState([
     { category: '', subCategory: '', workItem: '', time: '', comments: '' },
-    { category: '', subCategory: '', workItem: '', time: '', comments: '' },
-    { category: '', subCategory: '', workItem: '', time: '', comments: '' }
   ]);
 
   const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
@@ -220,7 +218,7 @@ const Adpnd = () => {
 
   return (
     <Box sx={{ p: 4 }}>
-      <Typography variant="h6" mb={2}>AD Project Non Delivery</Typography>
+      <Typography variant="h6" mb={2}></Typography>
 
       <Box sx={{ display: 'flex', overflowX: 'auto', gap: 2 }}>
         {items.map((item, index) => (
@@ -235,7 +233,6 @@ const Adpnd = () => {
       </Box>
 
       <Box mt={2} sx={{ display: 'flex', gap: 2 }}>
-        <Button variant="contained" onClick={handleAddItem}>Add Item</Button>
         <Button variant="contained" color="success" onClick={handleSave}>Save</Button>
       </Box>
 

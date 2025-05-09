@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Box,
@@ -6,14 +6,18 @@ import {
   Checkbox,
   FormControlLabel,
   Stack,
+  Card,
+  CardContent,
+  Typography,
+  IconButton,
+  Radio,
+  RadioGroup,
   FormControl,
-  FormLabel,
-  FormGroup,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  FormGroup
 } from "@mui/material";
+import { Close as CloseIcon } from "@mui/icons-material";
+
+// Import your components
 import AM from "./AM";
 import AD from "./AD";
 import AMSNonTicketDelivery from "./NTD";
@@ -24,284 +28,237 @@ import Adpnd from "./Adpnd";
 import Sipd from "./Sipd";
 import Sipnd from "./Sipnd";
 
-// Button sets for support and project
-const supportButtons = ["AM Ticket Delivery", "AD Ticket Delivery", "AMS Non Ticket Delivery", "AMS Non Ticket Non Delivery", "Time Off"];
-const projectButtons = ["AD Project Delivery","AD Project Non Delivery","SI Project Delivery", "SI Project Non Delivery", "Time Off"];
-const bothButtons = ["AM Ticket Delivery", "AD Ticket Delivery", "AMS Non Ticket Delivery", "AMS Non Ticket Non Delivery","AD Project Delivery","AD Project Non Delivery","SI Project Delivery", "SI Project Non Delivery", "Time Off"];
+// Button sets
+const supportButtons = [
+  "AM Ticket Delivery",
+  "AD Ticket Delivery",
+  "AMS Non Ticket Delivery",
+  "AMS Non Ticket Non Delivery",
+  "Time Off"
+];
+const projectButtons = [
+  "AD Project Delivery",
+  "AD Project Non Delivery",
+  "SI Project Delivery",
+  "SI Project Non Delivery",
+  "Time Off"
+];
+const bothButtons = [...new Set([...supportButtons, ...projectButtons])];
 
-// Calculate Friday based on start date
-function getFriday(dateStr) {
-  if (!dateStr) return "";
+// Helpers
+function getMondayAndFriday(dateStr) {
+  if (!dateStr) return { monday: "", friday: "" };
   const date = new Date(dateStr);
   const day = date.getDay();
-  // Calculate Monday of this week
   const diffToMonday = date.getDate() - ((day + 6) % 7);
   const monday = new Date(date.setDate(diffToMonday));
-  // Friday is 4 days after Monday
   const friday = new Date(monday);
   friday.setDate(monday.getDate() + 4);
-  return friday.toISOString().split("T")[0];
+  return {
+    monday: monday.toISOString().split("T")[0],
+    friday: friday.toISOString().split("T")[0],
+  };
 }
 
-// Calculate Monday based on start date
-function getMonday(dateStr) {
-  const date = new Date(dateStr);
-  const day = date.getDay();
-  const diff = date.getDate() - ((day + 6) % 7);
-  return new Date(date.setDate(diff));
+function formatOrdinal(n) {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
-// Format date for display in checkbox/radio labels
 function formatDate(date) {
-  const day = date.toLocaleDateString("en-US", { weekday: "short" });
-  const d = date.getDate();
-  const month = date.toLocaleDateString("en-US", { month: "short" });
-  return `${day} (${d} ${month})`;
+  const d = new Date(date);
+  const day = formatOrdinal(d.getDate());
+  const month = d.toLocaleString("default", { month: "long" });
+  const weekday = d.toLocaleString("default", { weekday: "long" });
+  return `${day} ${month} (${weekday})`;
+}
+
+function getDatesInRange(start, end) {
+  const dateArray = [];
+  let currentDate = new Date(start);
+  const endDate = new Date(end);
+  while (currentDate <= endDate) {
+    dateArray.push(new Date(currentDate));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  return dateArray;
 }
 
 export default function ClockView() {
-  // Store the selected start date
   const [startDate, setStartDate] = useState("");
-  // Flags to show support and/or project checkboxes
-  const [showOptions, setShowOptions] = useState({
-    support: false,
-    project: false,
-  });
-  // Store the selected days as an array of date strings
-  const [selectedDays, setSelectedDays] = useState([]);
-  // Store the selected task button (AM, AD, etc.)
+  const [endDate, setEndDate] = useState("");
+  const [showOptions, setShowOptions] = useState({ support: false, project: false });
   const [selectedButton, setSelectedButton] = useState("");
-  // Control dialog visibility for JSON popup
-  const [openDialog, setOpenDialog] = useState(false);
+  const [cards, setCards] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(""); // For radio selection
+  const [selectedDates, setSelectedDates] = useState({}); // For checkbox selection
 
-  // Calculate Friday date based on startDate
-  const fridayOfWeek = getFriday(startDate);
+  useEffect(() => {
+    if (startDate) {
+      const { monday, friday } = getMondayAndFriday(startDate);
+      setStartDate(monday);
+      setEndDate(friday);
+    }
+  }, [startDate]);
 
-  // Toggle support/project checkboxes
-  const handleCheckboxChange = (type) => {
-    setShowOptions((prev) => ({
-      ...prev,
-      [type]: !prev[type],
-    }));
-    setSelectedButton(""); // Reset selected task when toggling
-    setSelectedDays([]); // Reset selected days as well
+  const handleCheckboxChange = (option) => {
+    if (option === "Time Off") {
+      setShowOptions({ support: false, project: false, timeoff: true });
+      setCards([{ name: "Time Off", component: <Timeoff />, id: Date.now() }]);
+    } else {
+      setShowOptions((prev) => ({ ...prev, [option]: !prev[option], timeoff: false }));
+      if (option !== "timeoff") {
+        setCards((prev) => prev.filter((card) => card.name !== "Time Off"));
+      }
+    }
   };
 
-  // Calculate all weekdays (Monday to Friday) from startDate
-  const mondayDate = startDate ? getMonday(startDate) : null;
-  const weekDates = mondayDate
-    ? [...Array(5)].map((_, i) => {
-        const d = new Date(mondayDate);
-        d.setDate(d.getDate() + i);
-        return d;
-      })
-    : [];
-
-  // Determine which buttons to show based on support/project selection
-  let buttonsToShow = [];
-  if (showOptions.support && showOptions.project) {
-    buttonsToShow = bothButtons;
-  } else if (showOptions.support) {
-    buttonsToShow = supportButtons;
-  } else if (showOptions.project) {
-    buttonsToShow = projectButtons;
-  }
-
-  // Handle clicking on a task button (AM, AD, etc.)
   const handleButtonClick = (btn) => {
     setSelectedButton(btn);
-    setSelectedDays([]); // clear previous days selection when task changes
+    setCards((prevCards) => [
+      ...prevCards,
+      { name: btn, component: renderSelectedComponent(btn), id: Date.now() },
+    ]);
   };
 
-  const renderSelectedComponent = () => {
-    switch (selectedButton) {
-      case 'AM Ticket Delivery':
-        return <AM />;
-      case 'AD Ticket Delivery':
-        return <AD/>;
-      case 'AMS Non Ticket Delivery':
-        return <AMSNonTicketDelivery />;
-      case 'AMS Non Ticket Non Delivery':
-        return <NTNDPage />;
-      case 'Time Off':
-        return<Timeoff/>;
-      case 'AD Project Delivery':
-        return<Adpd/>;
-      case 'SI Project Delivery':
-        return<Sipd/>;
-      case 'AD Project Non Delivery':
-        return<Adpnd/>;
-      case 'SI Project Non Delivery':
-        return<Sipnd/>;
-              default:
-        return null;
+  const renderSelectedComponent = (btn) => {
+    switch (btn) {
+      case 'AM Ticket Delivery': return <AM />;
+      case 'AD Ticket Delivery': return <AD />;
+      case 'AMS Non Ticket Delivery': return <AMSNonTicketDelivery />;
+      case 'AMS Non Ticket Non Delivery': return <NTNDPage />;
+      case 'Time Off': return <Timeoff />;
+      case 'AD Project Delivery': return <Adpd />;
+      case 'SI Project Delivery': return <Sipd />;
+      case 'AD Project Non Delivery': return <Adpnd />;
+      case 'SI Project Non Delivery': return <Sipnd />;
+      default: return null;
     }
   };
 
-  // Check if selectedButton is AD or VACATION (use checkboxes for days)
-  const daysUseCheckboxes = selectedButton === "PROJECTS" || selectedButton === "VACATION";
-
-  // Day selection handler
-  const handleDayChange = (dateStr) => {
-    if (daysUseCheckboxes) {
-      // multiple selection (checkboxes)
-      if (selectedDays.includes(dateStr)) {
-        setSelectedDays(selectedDays.filter((d) => d !== dateStr));
-      } else {
-        setSelectedDays([...selectedDays, dateStr]);
-      }
-    } else {
-      // single selection (radio buttons)
-      setSelectedDays([dateStr]);
-    }
+  const handleCardDelete = (id) => {
+    setCards((prevCards) => prevCards.filter((card) => card.id !== id));
   };
 
-  // Handle form submission: show the selected data as JSON in a popup
-
-  // Handle start date change to adjust to Monday of the week
-  const handleStartDateChange = (e) => {
-    const selectedDate = e.target.value;
-    const mondayDate = getMonday(selectedDate);
-    const formattedMondayDate = mondayDate.toISOString().split("T")[0]; // Format as YYYY-MM-DD
-    setStartDate(formattedMondayDate);
-  };
+  const isSupport = showOptions.support;
+  const isProjectOrTimeOff = showOptions.project || showOptions.timeoff;
+  const allDates = startDate && endDate ? getDatesInRange(startDate, endDate) : [];
 
   return (
-    <Box sx={{ padding: 4 }}>
+    <Box sx={{ padding: 4, overflowY: "auto" }}>
       <Stack direction="row" spacing={4} sx={{ marginTop: 4 }}>
         <TextField
           label="Start Date"
           type="date"
           InputLabelProps={{ shrink: true }}
           value={startDate}
-          onChange={handleStartDateChange}
+          onChange={(e) => setStartDate(e.target.value)}
         />
         <TextField
           label="End Date"
           type="date"
           InputLabelProps={{ shrink: true }}
-          value={fridayOfWeek}
+          value={endDate}
           disabled
         />
       </Stack>
 
-      {/* Support and Project checkboxes */}
       <Box sx={{ marginTop: 2 }}>
         <FormControlLabel
-          control={
-            <Checkbox
-              checked={showOptions.support}
-              onChange={() => handleCheckboxChange("support")}
-            />
-          }
+          control={<Checkbox checked={showOptions.support} onChange={() => handleCheckboxChange("support")} />}
           label="Support"
         />
         <FormControlLabel
-          control={
-            <Checkbox
-              checked={showOptions.project}
-              onChange={() => handleCheckboxChange("project")}
-            />
-          }
+          control={<Checkbox checked={showOptions.project} onChange={() => handleCheckboxChange("project")} />}
           label="Project"
+        />
+        <FormControlLabel
+          control={<Checkbox checked={showOptions.timeoff || false} onChange={() => handleCheckboxChange("Time Off")} />}
+          label="Time Off"
         />
       </Box>
 
-      {/* Task buttons */}
-      {(showOptions.support || showOptions.project) && (
-        <>
-          <Stack direction="row" spacing={2} sx={{ marginTop: 2, flexWrap: "auto", height:"auto",width:"auto" }}>
-            {buttonsToShow.map((btn) => (
-              <Button
-                key={btn}
-                variant={selectedButton === btn ? "contained" : "outlined"}
-                color={selectedButton === btn ? "primary" : "inherit"}
-                onClick={() => handleButtonClick(btn)}
-              >
-                {btn}
-              </Button>
-            ))}
-          </Stack>
+      {/* Date Selectors Row */}
+      <Box sx={{ marginTop: 3, display: "flex", overflowX: "auto", gap: 4 }}>
+        {allDates.map((date, index) => {
+          const label = formatDate(date);
+          return (
+            <Box key={index} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              {isSupport ? (
+                <Radio
+                  checked={selectedDate === label}
+                  onChange={() => setSelectedDate(label)}
+                />
+              ) : isProjectOrTimeOff ? (
+                <Checkbox
+                  checked={selectedDates[label] || false}
+                  onChange={(e) =>
+                    setSelectedDates((prev) => ({
+                      ...prev,
+                      [label]: e.target.checked,
+                    }))
+                  }
+                />
+              ) : null}
+              <Typography variant="body2">{label}</Typography>
+            </Box>
+          );
+        })}
+      </Box>
 
-          {/* Days selection: checkboxes or radio based on selectedButton */}
-          {weekDates.length > 0 && selectedButton != false && (
-            <FormControl component="fieldset" sx={{ marginTop: 4 }}>
-              <FormLabel component="legend">Select Days</FormLabel>
-              <FormGroup row>
-                {weekDates.map((date, i) => {
-                  const dateStr = date.toDateString();
-                  const isChecked = selectedDays.includes(dateStr);
-
-                  return (
-                    <FormControlLabel
-                      key={i}
-                      control={
-                        daysUseCheckboxes ? (
-                          <Checkbox
-                            checked={isChecked}
-                            onChange={() => handleDayChange(dateStr)}
-                          />
-                        ) : (
-                          <input
-                            type="radio"
-                            name="dayRadio"
-                            checked={isChecked}
-                            onChange={() => handleDayChange(dateStr)}
-                            style={{ marginRight: 8 }}
-                          />
-                        )
-                      }
-                      label={formatDate(date)}
-                    />
-                  );
-                })}
-              </FormGroup>
-            </FormControl>
-          )}
-
-          {/* Submit button */}
-          {/* <Button variant="contained" color="primary" onClick={handleSubmit} sx={{ marginTop: 4 }}>
-            Submit
-          </Button> */}
-        </>
-      )}
-
-      {/* Dialog popup to show JSON of selected data */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          Selected Data
+      {/* Buttons */}
+      <Stack direction="row" spacing={2} sx={{ marginTop: 4, flexWrap: "wrap" }}>
+        {(showOptions.support && showOptions.project
+          ? bothButtons
+          : showOptions.support
+          ? supportButtons
+          : showOptions.project
+          ? projectButtons
+          : []
+        ).map((btn) => (
           <Button
-            onClick={() => setOpenDialog(false)}
-            color="primary"
-            variant="text"
-            sx={{ minWidth: "auto", padding: 0 }}
+            key={btn}
+            variant={selectedButton === btn ? "contained" : "outlined"}
+            onClick={() => handleButtonClick(btn)}
           >
-            X
+            {btn}
           </Button>
-        </DialogTitle>
-        <DialogContent dividers>
-          <pre>
-            {JSON.stringify(
-              {
-                startDate,
-                endDate: fridayOfWeek,
-                supportSelected: showOptions.support,
-                projectSelected: showOptions.project,
-                selectedTask: selectedButton || null,
-                selectedDays,
-              },
-              null,
-              2
-            )}
-          </pre>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {renderSelectedComponent()}
+        ))}
+      </Stack>
+
+      {/* Cards Row */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          gap: 2,
+          marginTop: 4,
+          overflowX: "auto",
+        }}
+      >
+        {cards.map((card) => (
+          <Card
+            key={card.id}
+            sx={{
+              width: 500,
+              position: "relative",
+              flexShrink: 0,
+            }}
+          >
+            <CardContent>
+              <Typography variant="h6">{card.name}</Typography>
+              {card.component}
+            </CardContent>
+            <IconButton
+              sx={{ position: "absolute", top: 8, right: 8 }}
+              onClick={() => handleCardDelete(card.id)}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Card>
+        ))}
+      </Box>
     </Box>
   );
 }

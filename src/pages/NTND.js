@@ -1,328 +1,274 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
-  Container,
   TextField,
+  Select,
   MenuItem,
-  Box,
-  Typography,
+  FormControl,
+  InputLabel,
   Button,
-  IconButton,
-  Tooltip,
+  Box,
+  Paper,
+  Typography,
   Snackbar,
   Alert,
-} from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
- 
-// Time format validation (24-hour HH:MM)
-const isValidTime = (time) => {
-  return /^([01]\d|2[0-3]):([0-5]\d)$/.test(time);
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+
+const nonTicketCategoryOptions = ['Planning', 'Execution', 'Review', 'Reporting'];
+
+const nonTicketSubCategoryMap = {
+  Planning: ['Team Management', 'Resource Allocation'],
+  Execution: ['Development', 'Deployment'],
+  Review: ['Milestone Review', 'Code Review'],
+  Reporting: ['Weekly Report', 'Final Report']
 };
- 
-const initialForm = {
-  workItem: "",
-  category: "",
-  subCategory: "",
-  time: "",
-  comments: "",
+
+const nonTicketWorkItemMap = {
+  'Team Management': ['Domain Lead Activities', 'Team Scheduling'],
+  'Resource Allocation': ['Assign Roles', 'Track Resources'],
+  Development: ['Frontend Tasks', 'Backend Tasks'],
+  Deployment: ['Staging Deployment', 'Production Deployment'],
+  'Milestone Review': ['SNO Integration Activities', 'Client Feedback Review'],
+  'Code Review': ['PR Review', 'Bug Fix Review'],
+  'Weekly Report': ['SR & CSM', 'Support Summary'],
+  'Final Report': ['Summary Presentation', 'Retrospective']
 };
- 
-const workItemCategoryMap = {
-  "Non Ticket Non Delivery -Others": [
-    "Non Ticket Non Delivery-Others - SME Trainer",
-    "Non Ticket Non Delivery-Others - KT Giver",
-    "Non Ticket Non Delivery-Others - KT Recipient",
-  ],
-  "Non Ticket Non Delivery -Idle": [
-    "Non Ticket Non Delivery-Idle - No access available",
-    "Non Ticket Non Delivery-Idle - Lack of work",
-    "Non Ticket Non Delivery-Idle - Connectivity issues",
-  ],
+
+// ✅ Decimal hour format validation
+const isValidTime = (value) => {
+  const num = parseFloat(value);
+  return !isNaN(num) && num >= 0 && num <= 24;
 };
- 
-const NTND = () => {
-  const [forms, setForms] = useState([
-    { ...initialForm },
-    { ...initialForm },
-    { ...initialForm },
-  ]);
- 
-  const [subCategoryMap, setSubCategoryMap] = useState({});
- 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
- 
-  const handleChange = (index, e) => {
+
+const WorkItemCard = ({ index, data, onChange, onDelete }) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    const updatedForms = [...forms];
-    updatedForms[index] = {
-      ...updatedForms[index],
-      [name]: value,
-    };
- 
-    if (name === "workItem") {
-      updatedForms[index].category = "";
-      updatedForms[index].subCategory = "";
-    }
- 
-    if (name === "category") {
-      updatedForms[index].subCategory = "";
-    }
- 
-    setForms(updatedForms);
+    onChange(index, { ...data, [name]: value });
   };
- 
-  const handleAddForm = () => {
-    setForms([...forms, { ...initialForm }]);
-  };
- 
-  const handleDeleteForm = (index) => {
-    if (forms.length <= 3) {
-      setSnackbar({
-        open: true,
-        message: "Minimum of 3 entries required.",
-        severity: "warning",
-      });
-      return;
-    }
-    const updatedForms = forms.filter((_, i) => i !== index);
-    setForms(updatedForms);
-  };
- 
-  const handleSubmit = (e) => {
-    e.preventDefault();
- 
-    const validForms = forms.filter(
-      (form) =>
-        form.workItem &&
-        form.category &&
-        form.time &&
-        isValidTime(form.time)
-    );
- 
-    if (validForms.length === 0) {
-      setSnackbar({
-        open: true,
-        message: "Please fill at least one complete entry.",
-        severity: "warning",
-      });
-      return;
-    }
- 
-    const parsedForms = validForms.map((form, i) => {
-      const [hours, minutes] = form.time.split(":").map(Number);
-      return {
-        entry: i + 1,
-        workItem: form.workItem,
-        category: form.category,
-        subCategory: form.subCategory,
-        time: form.time,
-        comments: form.comments,
-        hours,
-        minutes,
-      };
-    });
-    console.log("Submitted JSON Data:", JSON.stringify(parsedForms, null, 2));
- 
-    const formattedOutput = parsedForms
-      .map(
-        (entry) =>
-          `Entry ${entry.entry}:\n  Work Item: ${entry.workItem}\n  Category: ${entry.category}\n  Sub-Category: ${entry.subCategory || "N/A"}\n  Time: ${entry.time} (H:${entry.hours}, M:${entry.minutes})\n  Comments: ${entry.comments}`
-      )
-      .join("\n\n");
- 
-    window.alert("Submitted Data:\n\n" + formattedOutput);
- 
-    setSnackbar({
-      open: true,
-      message: "Form submitted successfully!",
-      severity: "success",
-    });
-  };
- 
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
- 
+
+  const showRestFields = !!data.category;
+
   return (
-    <Container maxWidth="xl">
-      <Box mt={4}>
-        <form onSubmit={handleSubmit}>
-          <Box
-            sx={{
-              display: "flex",
-              overflowX: "auto",
-              gap: 2,
-              py: 2,
-              px: 1,
-              mb: 2,
-            }}
-          >
-            {forms.map((formData, index) => (
-              <Box
-                key={index}
-                minWidth={260}
-                maxWidth={300}
-                flexShrink={0}
-                p={1.5}
-                sx={{
-                  background: "#f9f9f9",
-                  borderRadius: 2,
-                  boxShadow: 1,
-                  position: "relative",
-                }}
-              >
-                {forms.length > 3 && index >= 3 && (
-                  <Tooltip title="Delete Entry">
-                    <IconButton
-                      size="small"
-                      sx={{ position: "absolute", top: 4, right: 4 }}
-                      onClick={() => handleDeleteForm(index)}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                )}
- 
-                <Typography variant="subtitle1" mb={1}>
-                  AMS Non Ticket Non Delivery - {index + 1}
-                </Typography>
- 
-                <TextField
-                  label="Non Ticket Non Delivery Work Category"
-                  name="workItem"
-                  fullWidth
-                  margin="dense"
-                  size="small"
-                  select
-                  value={formData.workItem}
-                  onChange={(e) => handleChange(index, e)}
-                >
-                  <MenuItem value="">
-                    <em>Select</em>
-                  </MenuItem>
-                  {Object.keys(workItemCategoryMap).map((workItemKey) => (
-                    <MenuItem key={workItemKey} value={workItemKey}>
-                      {workItemKey}
-                    </MenuItem>
-                  ))}
-                </TextField>
- 
-                {formData.workItem && (
-                  <>
-                   <TextField
-                      label="Non Ticket Delivery Work Sub-Category"
-                      name="subCategory"
-                      fullWidth
-                      margin="dense"
-                      size="small"
-                      select
-                      value={formData.subCategory}
-                      onChange={(e) => handleChange(index, e)}
-                    >
-                      <MenuItem value="">
-                        <em>Select</em>
-                      </MenuItem>
-                      {(subCategoryMap[formData.category] || []).map(
-                        (subCatOption, i) => (
-                          <MenuItem key={i} value={subCatOption}>
-                            {subCatOption}
-                          </MenuItem>
-                        )
-                      )}
-                    </TextField>
- 
-                    <TextField
-                      label="Non Ticket Non Delivery Work Item"
-                      name="category"
-                      fullWidth
-                      margin="dense"
-                      size="small"
-                      select
-                      value={formData.category}
-                      onChange={(e) => handleChange(index, e)}
-                    >
-                      <MenuItem value="">
-                        <em>Select</em>
-                      </MenuItem>
-                      {workItemCategoryMap[formData.workItem]?.map(
-                        (categoryOption) => (
-                          <MenuItem key={categoryOption} value={categoryOption}>
-                            {categoryOption}
-                          </MenuItem>
-                        )
-                      )}
-                    </TextField>
- 
-                   
-                    <TextField
-                      label="Time (HH:MM)"
-                      name="time"
-                      type="text"
-                      placeholder="00:00"
-                      size="small"
-                      margin="dense"
-                      fullWidth
-                      value={formData.time}
-                      onChange={(e) => handleChange(index, e)}
-                      error={
-                        formData.time !== "" && !isValidTime(formData.time)
-                      }
-                      helperText={
-                        formData.time !== "" && !isValidTime(formData.time)
-                          ? "Please enter time in HH:MM 24-hour format"
-                          : ""
-                      }
-                    />
- 
-                    <TextField
-                      label="Comments"
-                      name="comments"
-                      fullWidth
-                      multiline
-                      rows={2}
-                      margin="dense"
-                      size="small"
-                      value={formData.comments}
-                      onChange={(e) => handleChange(index, e)}
-                    />
-                  </>
-                )}
-              </Box>
-            ))}
-          </Box>
- 
-          <Box mt={1}>
-            <Button variant="outlined" onClick={handleAddForm} sx={{ mr: 1 }}>
-              Add Entry
-            </Button>
-            <Button type="submit" variant="contained" color="primary">
-              Save
-            </Button>
-          </Box>
-        </form>
- 
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={3000}
-          onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+    <Paper
+      elevation={4}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
+        p: 2,
+        m: 1,
+        minWidth: 250,
+        backgroundColor: 'white',
+        position: 'relative'
+      }}
+    >
+      <FormControl required fullWidth variant="outlined">
+        <InputLabel shrink>Non Ticket Delivery Work Category</InputLabel>
+        <Select
+          name="category"
+          value={data.category}
+          onChange={handleChange}
+          label="Non Ticket Delivery Work Category"
+          notched
         >
-          <Alert
-            onClose={handleCloseSnackbar}
-            severity={snackbar.severity}
-            sx={{ width: "100%" }}
+          {nonTicketCategoryOptions.map((option, i) => (
+            <MenuItem key={i} value={option}>{option}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      {showRestFields && (
+        <FormControl required fullWidth variant="outlined">
+          <InputLabel shrink>Non Ticket Delivery Work Sub-Category</InputLabel>
+          <Select
+            name="subCategory"
+            value={data.subCategory}
+            onChange={handleChange}
+            label="Non Ticket Delivery Work Sub-Category"
+            notched
           >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
-      </Box>
-    </Container>
+            {(nonTicketSubCategoryMap[data.category] || []).map((option, i) => (
+              <MenuItem key={i} value={option}>{option}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      )}
+
+      {showRestFields && (
+        <FormControl required fullWidth variant="outlined">
+          <InputLabel shrink>Non Ticket Delivery Work Item</InputLabel>
+          <Select
+            name="workItem"
+            value={data.workItem}
+            onChange={handleChange}
+            label="Non Ticket Delivery Work Item"
+            notched
+          >
+            {(nonTicketWorkItemMap[data.subCategory] || []).map((option, i) => (
+              <MenuItem key={i} value={option}>{option}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      )}
+
+      {showRestFields && (
+        <TextField
+          label="Time (e.g. 1.5)"
+          name="time"
+          value={data.time}
+          onChange={handleChange}
+          required
+          placeholder="e.g., 1.5"
+          error={data.time && !isValidTime(data.time)}
+          helperText={
+            data.time && !isValidTime(data.time)
+              ? 'Please enter valid decimal hours (e.g., 1.5)'
+              : ''
+          }
+        />
+      )}
+
+      {showRestFields && (
+        <TextField
+          label="Comments"
+          name="comments"
+          value={data.comments}
+          onChange={handleChange}
+          required
+          multiline
+          minRows={2}
+        />
+      )}
+
+      {showRestFields && index >= 3 && (
+        <IconButton
+          onClick={() => onDelete(index)}
+          sx={{ position: 'absolute', top: 10, right: 10 }}
+        >
+          <DeleteIcon />
+        </IconButton>
+      )}
+    </Paper>
   );
 };
- 
+
+const NTND = () => {
+  const [items, setItems] = useState([
+    { category: '', subCategory: '', workItem: '', time: '', comments: '' },
+  ]);
+
+  const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
+  const [savedData, setSavedData] = useState([]);
+  const [showDialog, setShowDialog] = useState(false);
+
+  const handleItemChange = (index, newData) => {
+    const updated = [...items];
+    updated[index] = newData;
+    setItems(updated);
+  };
+
+  const handleAddItem = () => {
+    setItems([...items, { category: '', subCategory: '', workItem: '', time: '', comments: '' }]);
+  };
+
+  const handleDeleteItem = (index) => {
+    const updated = items.filter((_, i) => i !== index);
+    setItems(updated);
+  };
+
+  const isItemValid = (item) => {
+    return (
+      item.category &&
+      item.subCategory &&
+      item.workItem &&
+      isValidTime(item.time) &&
+      item.comments.trim() !== ''
+    );
+  };
+
+  const handleSave = () => {
+    const validItems = items.filter(isItemValid);
+    const hasInvalidTime = items.some(item => item.time && !isValidTime(item.time));
+
+    if (hasInvalidTime) {
+      setAlert({ open: true, message: 'Invalid time format in one or more items', severity: 'error' });
+      return;
+    }
+
+    const totalHours = validItems.reduce((sum, item) => sum + parseFloat(item.time || 0), 0);
+    if (totalHours > 9) {
+      setAlert({ open: true, message: 'Exceeded Time Limit (Max 9 hours)', severity: 'error' });
+      return;
+    }
+
+    if (validItems.length === 0) {
+      setAlert({ open: true, message: 'Please complete at least one valid entry.', severity: 'error' });
+      return;
+    }
+
+    setSavedData(validItems);
+    setShowDialog(true);
+    setAlert({ open: true, message: 'Data saved successfully!', severity: 'success' });
+  };
+
+  return (
+    <Box sx={{ p: 4 }}>
+      <Typography variant="h6" mb={2}></Typography>
+
+      <Box sx={{ display: 'flex', overflowX: 'auto', gap: 2 }}>
+        {items.map((item, index) => (
+          <WorkItemCard
+            key={index}
+            index={index}
+            data={item}
+            onChange={handleItemChange}
+            onDelete={handleDeleteItem}
+          />
+        ))}
+      </Box>
+
+      <Box mt={2} sx={{ display: 'flex', gap: 2 }}>
+        <Button variant="contained" color="success" onClick={handleSave}>Save</Button>
+      </Box>
+
+      <Snackbar
+        open={alert.open}
+        autoHideDuration={3000}
+        onClose={() => setAlert({ ...alert, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity={alert.severity} sx={{ width: '100%' }}>
+          {alert.message}
+        </Alert>
+      </Snackbar>
+
+      <Dialog open={showDialog} onClose={() => setShowDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Saved Data</DialogTitle>
+        <DialogContent dividers>
+          {savedData.map((item, index) => (
+            <Box key={index} mb={2}>
+              <Typography variant="subtitle1"><strong>Entry {index + 1}</strong></Typography>
+              <Typography>Category: {item.category}</Typography>
+              <Typography>Sub Category: {item.subCategory}</Typography>
+              <Typography>Work Item: {item.workItem}</Typography>
+              <Typography>Time: {item.time}</Typography>
+              <Typography>Comments: {item.comments}</Typography>
+            </Box>
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowDialog(false)} color="primary" variant="contained">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+};
+
 export default NTND;
- 
- 

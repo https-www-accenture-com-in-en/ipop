@@ -19,16 +19,15 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const nonTicketCategoryOptions = [
-  'Casual Leave',
-  'Paid Leave',
-  'Sick Leave',
-  'Public Holiday',
-  'Optional Holiday'
-];
+const nonTicketCategoryOptions = ['Paid Leave', 'Causual leave', 'Matinory Leave', 'Sick Leave', 'Unpaid Leave'];
 
 
-const isValidTime = (value) => /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(value);
+
+// ✅ Decimal hour format validation
+const isValidTime = (value) => {
+  const num = parseFloat(value);
+  return !isNaN(num) && num >= 0 && num <= 24;
+};
 
 const WorkItemCard = ({ index, data, onChange, onDelete }) => {
   const handleChange = (e) => {
@@ -47,7 +46,7 @@ const WorkItemCard = ({ index, data, onChange, onDelete }) => {
         gap: 2,
         p: 2,
         m: 1,
-        minWidth: 300,
+        minWidth: 250,
         backgroundColor: 'white',
         position: 'relative'
       }}
@@ -58,7 +57,7 @@ const WorkItemCard = ({ index, data, onChange, onDelete }) => {
           name="category"
           value={data.category}
           onChange={handleChange}
-          label="Non Ticket Delivery Work Category"
+          label="Type of Leave"
           notched
         >
           {nonTicketCategoryOptions.map((option, i) => (
@@ -66,19 +65,18 @@ const WorkItemCard = ({ index, data, onChange, onDelete }) => {
           ))}
         </Select>
       </FormControl>
-
       {showRestFields && (
         <TextField
-          label="Time (HH:MM)"
+          label="Time (e.g. 1.5)"
           name="time"
           value={data.time}
           onChange={handleChange}
           required
-          placeholder="e.g., 01:30"
+          placeholder="e.g., 1.5"
           error={data.time && !isValidTime(data.time)}
           helperText={
             data.time && !isValidTime(data.time)
-              ? 'Please enter time in HH:MM 24-hour format'
+              ? 'Please enter valid decimal hours (e.g., 1.5)'
               : ''
           }
         />
@@ -110,9 +108,7 @@ const WorkItemCard = ({ index, data, onChange, onDelete }) => {
 
 const Timeoff = () => {
   const [items, setItems] = useState([
-    { category: '', time: '', comments: '' },
-    { category: '', time: '', comments: '' },
-    { category: '', time: '', comments: '' }
+    { category: '',time: '', comments: '' },
   ]);
 
   const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
@@ -126,7 +122,7 @@ const Timeoff = () => {
   };
 
   const handleAddItem = () => {
-    setItems([...items, { category: '',time: '', comments: '' }]);
+    setItems([...items, { category: '', time: '', comments: '' }]);
   };
 
   const handleDeleteItem = (index) => {
@@ -137,6 +133,8 @@ const Timeoff = () => {
   const isItemValid = (item) => {
     return (
       item.category &&
+      item.subCategory &&
+      item.workItem &&
       isValidTime(item.time) &&
       item.comments.trim() !== ''
     );
@@ -148,6 +146,12 @@ const Timeoff = () => {
 
     if (hasInvalidTime) {
       setAlert({ open: true, message: 'Invalid time format in one or more items', severity: 'error' });
+      return;
+    }
+
+    const totalHours = validItems.reduce((sum, item) => sum + parseFloat(item.time || 0), 0);
+    if (totalHours > 9) {
+      setAlert({ open: true, message: 'Exceeded Time Limit (Max 9 hours)', severity: 'error' });
       return;
     }
 
@@ -163,7 +167,7 @@ const Timeoff = () => {
 
   return (
     <Box sx={{ p: 4 }}>
-      <Typography variant="h6" mb={2}>Time Off</Typography>
+      <Typography variant="h6" mb={2}></Typography>
 
       <Box sx={{ display: 'flex', overflowX: 'auto', gap: 2 }}>
         {items.map((item, index) => (
@@ -199,7 +203,7 @@ const Timeoff = () => {
           {savedData.map((item, index) => (
             <Box key={index} mb={2}>
               <Typography variant="subtitle1"><strong>Entry {index + 1}</strong></Typography>
-              <Typography>Category: {item.category}</Typography>
+              <Typography>Type of Leave: {item.category}</Typography>
               <Typography>Time: {item.time}</Typography>
               <Typography>Comments: {item.comments}</Typography>
             </Box>

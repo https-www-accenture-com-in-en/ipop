@@ -19,12 +19,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const nonTicketCategoryOptions = [
-  'Planning',
-  'Execution',
-  'Review',
-  'Reporting'
-];
+const nonTicketCategoryOptions = ['Planning', 'Execution', 'Review', 'Reporting'];
 
 const nonTicketSubCategoryMap = {
   Planning: ['Team Management', 'Resource Allocation'],
@@ -44,7 +39,11 @@ const nonTicketWorkItemMap = {
   'Final Report': ['Summary Presentation', 'Retrospective']
 };
 
-const isValidTime = (value) => /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(value);
+// ✅ Decimal hour format validation
+const isValidTime = (value) => {
+  const num = parseFloat(value);
+  return !isNaN(num) && num >= 0 && num <= 24;
+};
 
 const WorkItemCard = ({ index, data, onChange, onDelete }) => {
   const handleChange = (e) => {
@@ -63,7 +62,7 @@ const WorkItemCard = ({ index, data, onChange, onDelete }) => {
         gap: 2,
         p: 2,
         m: 1,
-        minWidth: 300,
+        minWidth: 250,
         backgroundColor: 'white',
         position: 'relative'
       }}
@@ -119,16 +118,16 @@ const WorkItemCard = ({ index, data, onChange, onDelete }) => {
 
       {showRestFields && (
         <TextField
-          label="Time (HH:MM)"
+          label="Time (e.g. 1.5)"
           name="time"
           value={data.time}
           onChange={handleChange}
           required
-          placeholder="e.g., 01:30"
+          placeholder="e.g., 1.5"
           error={data.time && !isValidTime(data.time)}
           helperText={
             data.time && !isValidTime(data.time)
-              ? 'Please enter time in HH:MM 24-hour format'
+              ? 'Please enter valid decimal hours (e.g., 1.5)'
               : ''
           }
         />
@@ -158,11 +157,9 @@ const WorkItemCard = ({ index, data, onChange, onDelete }) => {
   );
 };
 
-const Sipnd = () => {
+const Sipnd= () => {
   const [items, setItems] = useState([
     { category: '', subCategory: '', workItem: '', time: '', comments: '' },
-    { category: '', subCategory: '', workItem: '', time: '', comments: '' },
-    { category: '', subCategory: '', workItem: '', time: '', comments: '' }
   ]);
 
   const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
@@ -203,6 +200,12 @@ const Sipnd = () => {
       return;
     }
 
+    const totalHours = validItems.reduce((sum, item) => sum + parseFloat(item.time || 0), 0);
+    if (totalHours > 9) {
+      setAlert({ open: true, message: 'Exceeded Time Limit (Max 9 hours)', severity: 'error' });
+      return;
+    }
+
     if (validItems.length === 0) {
       setAlert({ open: true, message: 'Please complete at least one valid entry.', severity: 'error' });
       return;
@@ -215,7 +218,7 @@ const Sipnd = () => {
 
   return (
     <Box sx={{ p: 4 }}>
-      <Typography variant="h6" mb={2}>SI Project Non Delivery</Typography>
+      <Typography variant="h6" mb={2}></Typography>
 
       <Box sx={{ display: 'flex', overflowX: 'auto', gap: 2 }}>
         {items.map((item, index) => (
@@ -230,7 +233,6 @@ const Sipnd = () => {
       </Box>
 
       <Box mt={2} sx={{ display: 'flex', gap: 2 }}>
-        <Button variant="contained" onClick={handleAddItem}>Add Item</Button>
         <Button variant="contained" color="success" onClick={handleSave}>Save</Button>
       </Box>
 

@@ -107,7 +107,7 @@ function TicketForm({ title, canDelete, onDelete }) {
         borderRadius: 1,
         boxShadow: 1,
         flex: '0 0 30%',
-        minWidth: 300,
+        minWidth: 400,
         position: 'relative',
       }}
     >
@@ -248,7 +248,7 @@ function TicketForm({ title, canDelete, onDelete }) {
 }
 
 const AM = () => {
-  const [forms, setForms] = useState([{ id: 1 }, { id: 2 }, { id: 3 }]);
+  const [forms, setForms] = useState([{ id: 1 }]);
 
   const addForm = () => {
     setForms((prev) => [...prev, { id: prev.length + 1 }]);
@@ -260,7 +260,7 @@ const AM = () => {
 
   return (
     <Box sx={{ p: 1 }}>
-      <Typography variant="h6" mb={2}>AM Ticket Delivery</Typography>
+      <Typography variant="h6" mb={2}></Typography>
 
       <Box sx={{ display: 'flex', gap: 1, overflowX: 'auto', p: 1 }}>
         {forms.map((form, index) => (
@@ -272,9 +272,6 @@ const AM = () => {
           />
         ))}
       </Box>
-      <Button variant="contained" size="small" onClick={addForm} sx={{ mb: 1 }}>
-               Add Ticket
-             </Button>
     </Box>
   );
 };
