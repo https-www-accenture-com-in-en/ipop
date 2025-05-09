@@ -158,7 +158,7 @@ const WorkItemCard = ({ index, data, onChange, onDelete }) => {
   );
 };
 
-const AMSNonTicketDelivery = () => {
+const Sipnd = () => {
   const [items, setItems] = useState([
     { category: '', subCategory: '', workItem: '', time: '', comments: '' },
     { category: '', subCategory: '', workItem: '', time: '', comments: '' },
@@ -215,7 +215,7 @@ const AMSNonTicketDelivery = () => {
 
   return (
     <Box sx={{ p: 4 }}>
-      <Typography variant="h6" mb={2}>AMS Non Ticket Delivery</Typography>
+      <Typography variant="h6" mb={2}>SI Project Non Delivery</Typography>
 
       <Box sx={{ display: 'flex', overflowX: 'auto', gap: 2 }}>
         {items.map((item, index) => (
@@ -269,4 +269,4 @@ const AMSNonTicketDelivery = () => {
   );
 };
 
-export default AMSNonTicketDelivery;
+export default Sipnd;

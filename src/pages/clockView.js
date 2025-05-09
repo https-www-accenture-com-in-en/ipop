@@ -1,8 +1,5 @@
 import React, { useState } from "react";
 import {
-  AppBar,
-  Toolbar,
-  Typography,
   Button,
   Box,
   TextField,
@@ -19,13 +16,18 @@ import {
 } from "@mui/material";
 import AM from "./AM";
 import AD from "./AD";
-import NTD from "./NTD";
+import AMSNonTicketDelivery from "./NTD";
 import NTNDPage from "./NTND";
+import Timeoff from "./Timeoff";
+import Adpd from "./Adpd";
+import Adpnd from "./Adpnd";
+import Sipd from "./Sipd";
+import Sipnd from "./Sipnd";
 
 // Button sets for support and project
-const supportButtons = ["AM", "AD", "NTD", "NTND", "VACATION"];
-const projectButtons = ["NTD", "NTND", "PROJECTS", "VACATION"];
-const bothButtons = ["AM", "AD", "NTD", "NTND", "PROJECTS", "VACATION"];
+const supportButtons = ["AM Ticket Delivery", "AD Ticket Delivery", "AMS Non Ticket Delivery", "AMS Non Ticket Non Delivery", "Time Off"];
+const projectButtons = ["AD Project Delivery","AD Project Non Delivery","SI Project Delivery", "SI Project Non Delivery", "Time Off"];
+const bothButtons = ["AM Ticket Delivery", "AD Ticket Delivery", "AMS Non Ticket Delivery", "AMS Non Ticket Non Delivery","AD Project Delivery","AD Project Non Delivery","SI Project Delivery", "SI Project Non Delivery", "Time Off"];
 
 // Calculate Friday based on start date
 function getFriday(dateStr) {
@@ -113,15 +115,25 @@ export default function ClockView() {
 
   const renderSelectedComponent = () => {
     switch (selectedButton) {
-      case 'AM':
+      case 'AM Ticket Delivery':
         return <AM />;
-      case 'AD':
+      case 'AD Ticket Delivery':
         return <AD/>;
-      case 'NTD':
-        return <NTD />;
-      case 'NTND':
+      case 'AMS Non Ticket Delivery':
+        return <AMSNonTicketDelivery />;
+      case 'AMS Non Ticket Non Delivery':
         return <NTNDPage />;
-      default:
+      case 'Time Off':
+        return<Timeoff/>;
+      case 'AD Project Delivery':
+        return<Adpd/>;
+      case 'SI Project Delivery':
+        return<Sipd/>;
+      case 'AD Project Non Delivery':
+        return<Adpnd/>;
+      case 'SI Project Non Delivery':
+        return<Sipnd/>;
+              default:
         return null;
     }
   };
@@ -145,9 +157,6 @@ export default function ClockView() {
   };
 
   // Handle form submission: show the selected data as JSON in a popup
-  const handleSubmit = () => {
-    setOpenDialog(true);
-  };
 
   // Handle start date change to adjust to Monday of the week
   const handleStartDateChange = (e) => {
@@ -201,7 +210,7 @@ export default function ClockView() {
       {/* Task buttons */}
       {(showOptions.support || showOptions.project) && (
         <>
-          <Stack direction="row" spacing={2} sx={{ marginTop: 2, flexWrap: "wrap" }}>
+          <Stack direction="row" spacing={2} sx={{ marginTop: 2, flexWrap: "auto", height:"auto",width:"auto" }}>
             {buttonsToShow.map((btn) => (
               <Button
                 key={btn}
