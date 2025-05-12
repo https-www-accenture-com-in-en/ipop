@@ -16,13 +16,18 @@ import Step_4 from './step_4';
 import Step_3 from './step_3';
 
 const steps = [
-  'Create Master Work Types',
-  'Delivery Work Types',
-  'Delivery Work Type Categories',
-  'Create Ticket Delivery',
-  'Create Non Ticket Delivery',
-  'Create Non Ticket Non Delivery',
-  'Application Development Projects'
+  'Create Master Work Types & Delivery Work Types',
+  'Create Delivery Work Type Categories',
+  'Create Ticket Types for Ticket Delivery',
+  'Define Attributes for AM Ticket Delivery ',
+  'Define Attributes for AD Ticket Delivery ',
+  'Create Non Ticket Delivery Work Items',
+  'Create Support Non Delivery Work Items',
+  'Define Project Clusters & Values For Projects Clusters',
+  'Create AD Project',
+  'Create Master Project & Sub-Project',
+  'Create Project Non Delivery Work Items',
+  'Define Time-Off'
 ];
 
 const StepContent = ({ step,onSaveSuccess }) => {
@@ -73,8 +78,11 @@ const DynamicFormUI = () => {
     <Box sx={{ width: '100%'}}>
       <Stepper activeStep={activeStep} alternativeLabel>
         {steps.map((label, index) => (
-          <Step key={index}>
-            <StepLabel>{label}</StepLabel>
+          <Step key={index} completed={false} onClick={() => setActiveStep(index)}>
+            <StepLabel>
+              <Typography sx={{ fontSize: '10px' }}>{label}</Typography>
+            </StepLabel>
+
           </Step>
         ))}
       </Stepper>
