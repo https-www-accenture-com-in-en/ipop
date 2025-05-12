@@ -7,10 +7,13 @@ import {
   StepLabel,
   Button,
   Typography,
-  Paper
+  Paper,
+  Grid
 } from '@mui/material';
-import MultiSelectWithAdd from './step_1';
+import Step_1 from './step_1';
 import Step_2 from './step_2';
+import Step_4 from './step_4';
+import Step_3 from './step_3';
 
 const steps = [
   'Create Master Work Types',
@@ -25,13 +28,13 @@ const steps = [
 const StepContent = ({ step,onSaveSuccess }) => {
   switch (step) {
     case 0:
-      return <MultiSelectWithAdd onSaveSuccess={onSaveSuccess} />
+      return <Step_1 onSaveSuccess={onSaveSuccess} />
     case 1:
       return  <Step_2/> 
     case 2:
-      return <Typography>Step 3: Assign Roles</Typography>;
+      return <Step_3/>;
     case 3:
-      return <Typography>Step 4: Configure Forms</Typography>;
+      return <Step_4/>
     case 4:
       return <Typography>Step 5: Review Fields</Typography>;
     case 5:
@@ -67,7 +70,7 @@ const DynamicFormUI = () => {
   };
 
   return (
-    <Box sx={{ width: '100%', padding: 4 }}>
+    <Box sx={{ width: '100%'}}>
       <Stepper activeStep={activeStep} alternativeLabel>
         {steps.map((label, index) => (
           <Step key={index}>
@@ -75,8 +78,9 @@ const DynamicFormUI = () => {
           </Step>
         ))}
       </Stepper>
-
-      <Paper elevation={3} sx={{ padding: 3, marginTop: 4 }}>
+   <Grid container>
+   <Grid size={4}>
+      <Paper  elevation={3} sx={{ padding: 3, marginTop: 4 }}>
         {activeStep === steps.length ? (
           <>
             <Typography variant="h6" gutterBottom>
@@ -98,6 +102,8 @@ const DynamicFormUI = () => {
           </>
         )}
       </Paper>
+      </Grid>
+   </Grid>
     </Box>
   );
 }; 

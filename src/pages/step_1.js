@@ -1,91 +1,72 @@
-import React, { useState } from 'react';
+
+import React, { useState } from "react";
 import {
-  TextField,
   Select,
   MenuItem,
+  Checkbox,
+  ListItemText,
+  TextField,
   Button,
+  ListSubheader,
   FormControl,
   InputLabel,
   Box,
+  Menu,
   Grid,
-} from '@mui/material';
+  Typography,
+} from "@mui/material";
+import Tb from "./tb";
 
-const FieldRow = ({ index, field, handleInputChange }) => {
-  return (
-    <Grid container spacing={2} alignItems="center" key={index} sx={{ mb: 2 }}>
-      <Grid item xs={6}>
-        <TextField
-          fullWidth
-          label="Create Master Work Type"
-          value={field.name}
-          onChange={(e) => handleInputChange(index, 'name', e.target.value)}
-        />
-      </Grid>
-      <Grid item xs={6}>
-        <FormControl fullWidth sx={{minWidth:120}} >
-          <InputLabel>Type</InputLabel>
-          <Select
-          fullWidth
-            value={field.type}
-            label="Type"
-            onChange={(e) => handleInputChange(index, 'type', e.target.value)}
-            aria-placeholder='type'
-          >
-            <MenuItem value="checkbox">Checkbox</MenuItem>
-            <MenuItem value="radio">Radio</MenuItem>
-            <MenuItem value="button">Button</MenuItem>
-            <MenuItem value="button">Dropdown</MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>
-    </Grid>
-  );
-};
 
-const DynamicFields = ({onSaveSuccess}) => {
-  const [fields, setFields] = useState([{ name: '', type: '',sequence:0,step:1 }]);
-  
+const MultiSelectWithAdd = () => {
+  const [options, setOptions] = useState([]);
+  const fieldTypes = ["checkbox", "radio", "dropdown", "textField", "button"];
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [newOption, setNewOption] = useState("");
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [fields,setFields] = useState({type:""})
 
-  const handleAddField = () => {
-    setFields([...fields, { name: '', type: '',sequence:0 }]);
+  const handleChange = (event) => {
+    const value = event.target.value;
+    setSelectedOptions(typeof value === "string" ? value.split(",") : value);
   };
 
-  const handleInputChange = (index, key, value) => {
-    const updatedFields = [...fields];
-    updatedFields[index][key] = value;
-    setFields(updatedFields);
-  };
-
-  const handleSave = () => {
-    // Simulate save logic
-    const response = 'Success'; // Assume this comes from your actual logic
-    console.log(fields,"fields")
-    if (response === 'Success') {
-      alert('Saved successfully');
-      onSaveSuccess();
+  const handleAddOption = () => {
+    const trimmed = newOption.trim();
+    if (trimmed && !options.includes(trimmed)) {
+      setOptions((prev) => [...prev, trimmed]);
+      setNewOption("");
     }
   };
+  const handleFieldTypeChange = (event) => {
+    const { value } = event.target;
+    setFields({ type: value });
+  };
   return (
-    <Box sx={{ p: 4 }}>
-      {fields.map((field, index) => (
-        <FieldRow
-          key={index}
-          index={index}
-          field={field}
-          handleInputChange={handleInputChange}
-        />
-      ))}
-
-      <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-        <Button variant="contained" onClick={handleAddField}>
-          Add Field
-        </Button>
-        <Button variant="outlined" onClick={handleSave}>
-          Save
-        </Button>
-      </Box>
-    </Box>
+  
+    <FormControl  padding={4} spacing={2} >
+      <Typography>Create master work types</Typography>
+      <Tb />
+      <Typography>Select Field Type</Typography>
+      <Select
+        value={fields.type || ""}
+        onChange={ handleFieldTypeChange}
+        label="Select Field Type"
+      >
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+                {" "}
+        {fieldTypes.map((type) => (
+          <MenuItem key={type} value={type}>
+            {type}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   );
 };
 
-export default DynamicFields;
+export default MultiSelectWithAdd;
+
