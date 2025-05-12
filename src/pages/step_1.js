@@ -1,72 +1,62 @@
+import React, { useState } from 'react';
+import DropdownWithTextBox from './DropDown.tsx';
+import MappedDropdown from './MappedDropdown.tsx';
+import axios from 'axios';
 
-import React, { useState } from "react";
-import {
-  Select,
-  MenuItem,
-  Checkbox,
-  ListItemText,
-  TextField,
-  Button,
-  ListSubheader,
-  FormControl,
-  InputLabel,
-  Box,
-  Menu,
-  Grid,
-  Typography,
-} from "@mui/material";
-import Tb from "./tb";
+const FieldRow = () => { 
+  const [selectedName, setSelectedName] = useState(null);
+  const [uiType, setUiType] = useState('');
+  const [workTypes, setWorkTypes] = useState('');
+  const [sequence, setSequence] = useState('');
+  const [allNames, setAllNames] = useState([]);
 
+const names = allNames.map((name, index) => ({
+  name,
+  sequence: index + 1
+}));
 
-const MultiSelectWithAdd = () => {
-  const [options, setOptions] = useState([]);
-  const fieldTypes = ["checkbox", "radio", "dropdown", "textField", "button"];
-  const [selectedOptions, setSelectedOptions] = useState([]);
-  const [newOption, setNewOption] = useState("");
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [fields,setFields] = useState({type:""})
+  const handleNext = async () => {
 
-  const handleChange = (event) => {
-    const value = event.target.value;
-    setSelectedOptions(typeof value === "string" ? value.split(",") : value);
+   await axios.post(
+  `http://localhost:5000/addGuiwithSequence/`,
+  { gui_type: uiType,
+    master_work_types: names.map((item) => item.name),
+    sequences: names.map((item) => item.sequence),
+  }
+);
   };
 
-  const handleAddOption = () => {
-    const trimmed = newOption.trim();
-    if (trimmed && !options.includes(trimmed)) {
-      setOptions((prev) => [...prev, trimmed]);
-      setNewOption("");
-    }
-  };
-  const handleFieldTypeChange = (event) => {
-    const { value } = event.target;
-    setFields({ type: value });
-  };
   return (
-  
-    <FormControl  padding={4} spacing={2} >
-      <Typography>Create master work types</Typography>
-      <Tb />
-      <Typography>Select Field Type</Typography>
-      <Select
-        value={fields.type || ""}
-        onChange={ handleFieldTypeChange}
-        label="Select Field Type"
-      >
-        <br></br>
-        <br></br>
-        <br></br>
-        <br></br>
-                {" "}
-        {fieldTypes.map((type) => (
-          <MenuItem key={type} value={type}>
-            {type}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-  );
+    <>
+      <DropdownWithTextBox allNames={allNames} setAllNames={setAllNames} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} />
+      <br /><br /><br /><br/><br /><br /><br />
+
+      {selectedName && uiType ? (
+        <MappedDropdown
+          workTypes={workTypes}
+          setWorkTypes={setWorkTypes}
+          uiType={uiType}
+          selectedName={selectedName}
+          setSelectedName={setSelectedName}
+        />
+      ) : null}
+
+      <br /><br /><br /><br /><br />
+
+      {selectedName && workTypes && (
+        <button
+          onClick={handleNext}
+          style={{
+            padding: '8px 16px',
+            fontSize: '16px',
+            cursor: 'pointer'
+          }}
+        >
+          Save
+        </button>
+      )}
+    </>
+  )
 };
 
-export default MultiSelectWithAdd;
-
+export default FieldRow;
