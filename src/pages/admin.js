@@ -78,7 +78,7 @@ const DynamicFormUI = () => {
     <Box sx={{ width: '100%'}}>
       <Stepper activeStep={activeStep} alternativeLabel>
         {steps.map((label, index) => (
-          <Step key={index}>
+          <Step key={index} completed={false} onClick={() => setActiveStep(index)}>
             <StepLabel>
               <Typography sx={{ fontSize: '10px' }}>{label}</Typography>
             </StepLabel>
