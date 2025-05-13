@@ -12,6 +12,6 @@ app.use(express.urlencoded({ extended: true })); // For parsing application/x-ww
 
 // app.use('/api/groups', adminRouter);
 app.use('/api', userRouter);
-app.use('/api/admin', adminRouter); 
+app.use('/', adminRouter); 
 
 export default app // Export the app for use in other files (e.g., server.js)

@@ -1,33 +1,19 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-
-// Define schema for WorkTypes
-const workTypeSchema = new Schema({
-  fieldName: { type: String, required: true },
-  fieldType: { type: String, required: true },
-  flag: { type: Boolean, required: true }
+import mongoose from 'mongoose';
+const mainSchema = new mongoose.Schema({
+  master_work_types: {
+    type: String,
+  },
+  gui_type: {
+    type: String,
+  },
+  work_type_categories: {
+    type: [String],
+  },
+  sequence: {
+    type: Number,
+  },
 });
-
-// Define schema for DeliveryWorkTypes
-const deliveryWorkTypeSchema = new Schema({
-  fieldName: { type: String, required: true },
-  fieldType: { type: String, required: true },
-  workTypes: [workTypeSchema] // Array of workType objects
-});
-
-// Define schema for MasterWorkTypes
-const masterWorkTypeSchema = new Schema({
-  fieldName: { type: String, required: true },
-  fieldType: { type: String, required: true },
-  deliveryWorkTypes: [deliveryWorkTypeSchema] // Array of deliveryWorkType objects
-});
-
-// Define schema for the main structure
-const mainSchema = new Schema({
-  masterWorkTypes: [masterWorkTypeSchema] // Array of masterWorkType objects
-});
-
 // Create the Mongoose model
 const MainModel = mongoose.model('MainModel', mainSchema);
+export default MainModel;
 
-module.exports = MainModel;
