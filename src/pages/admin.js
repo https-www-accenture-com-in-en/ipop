@@ -15,6 +15,7 @@ import Step_2 from './step_2';
 import Step_4 from './step_4';
 import Step_3 from './step_3';
 import Step_7 from './step_7';
+import Step_8 from './step_8';
 
 const steps = [
   'Create Master Work Types & Delivery Work Types',
@@ -48,7 +49,7 @@ const StepContent = ({ step,onSaveSuccess }) => {
     case 6:
       return <Step_7/>
     case 7:
-      return <Typography>Step 8: Finalize & Submit</Typography>;
+      return <Step_8/>
     default:
       return <Typography>Unknown step</Typography>;
   }
