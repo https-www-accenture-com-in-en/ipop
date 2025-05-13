@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import {
   TextField,
@@ -7,13 +8,12 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   Popper,
   Box
 } from '@mui/material';
 import { Save, Edit, Delete, ArrowDropDown } from '@mui/icons-material';
 
-const Tb = () => {
+const Tb = ({ label = "Type and Save" } ) => {
   const [values, setValues] = useState([]);
   const [input, setInput] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
@@ -60,11 +60,11 @@ const Tb = () => {
 
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
-      <Box sx={{ width: 300}}>
+      <Box sx={{ width: 300 }}>
         <Box display="flex" alignItems="start" ref={anchorRef}>
           <TextField
             fullWidth
-            label="Type and Save"
+            label={label}
             value={input}
             onChange={(e) => {
               setInput(e.target.value);
@@ -75,13 +75,11 @@ const Tb = () => {
             InputProps={{
               endAdornment: (
                 <>
-                  {/* Always show the Save button if the input has a value */}
                   {input && (
                     <IconButton onClick={handleSave} size="small">
                       <Save fontSize="small" />
                     </IconButton>
                   )}
-                  {/* Show ArrowDropDown icon if there are saved values */}
                   {values.length > 0 && !input && (
                     <IconButton onClick={() => setShowDropdown(prev => !prev)} size="small">
                       <ArrowDropDown />
@@ -99,23 +97,24 @@ const Tb = () => {
           placement="bottom-start"
           style={{ zIndex: 10, width: anchorRef.current?.offsetWidth }}
         >
-          <Paper style={{ maxHeight: 200, overflowY: 'auto' }}>
+          <Paper sx={{ maxHeight: 200, overflowY: 'auto', overflowX: 'hidden' }}>
             <List dense>
               {filtered.map((item, index) => (
-                <ListItem
-                  key={index}
-                  secondaryAction={
-                    <>
-                      <IconButton onClick={() => handleEdit(index)}>
-                        <Edit fontSize="small" />
-                      </IconButton>
-                      <IconButton onClick={() => handleDelete(index)}>
-                        <Delete fontSize="small" />
-                      </IconButton>
-                    </>
-                  }
-                >
-                  <ListItemText primary={item} />
+                <ListItem key={index}>
+                  <ListItemText
+                    primary={item}
+                    onClick={() => {
+                      setInput(item);
+                      setShowDropdown(false);
+                    }}
+                    sx={{ cursor: 'pointer' }}
+                  />
+                  <IconButton onClick={() => handleEdit(index)} edge="end">
+                    <Edit fontSize="small" />
+                  </IconButton>
+                  <IconButton onClick={() => handleDelete(index)} edge="end">
+                    <Delete fontSize="small" />
+                  </IconButton>
                 </ListItem>
               ))}
             </List>
