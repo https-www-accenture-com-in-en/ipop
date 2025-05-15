@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-const ComboBox = ({allNames,setAllNames,setUiType,setSelectedName,setSequence, label}) => {
+const ComboBox = ({allNames,setAllNames,setUiType,setSelectedName,setSequence}) => {
   const [value, setValue] = useState('');
   const [editingName, setEditingName] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -88,7 +88,7 @@ const ComboBox = ({allNames,setAllNames,setUiType,setSelectedName,setSequence, l
     <>
     <div ref={wrapperRef} style={{ position: 'relative', width: 300 }}>
       <label htmlFor="nameInput" style={{ display: 'block', marginBottom: 6, fontWeight: 'bold' }}>
-        {label}
+Create Master Work Types:
       </label>
       <div style={{ position: 'relative' }}>
         <input
@@ -222,6 +222,22 @@ const ComboBox = ({allNames,setAllNames,setUiType,setSelectedName,setSequence, l
       )}
       
     </div>
+     <div style={{marginTop:"130px"}} >
+      <label htmlFor="uiTypeSelect" style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
+            User Interface GUI Type
+          </label>
+          <select
+            id="uiTypeSelect"
+            style={{ width: '80%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+            onChange={e => setUiType(e.target.value)}
+            defaultValue=""
+          >
+            <option value="" disabled>Select a GUI Type…</option>
+            <option value="check_box">Check Box</option>
+            <option value="radio_button">Radio Button</option>
+            <option value="button">Button</option>
+          </select>
+      </div>
       </>
   );
 };

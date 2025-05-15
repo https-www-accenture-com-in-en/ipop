@@ -73,7 +73,7 @@ export default function Step_4() {
       </Typography>
 
       <FormControl fullWidth margin="normal">
-        <InputLabel>Select Delivery Work Type</InputLabel>
+        <InputLabel>Delivery Work Type</InputLabel>
         <Select
           value={selectedDelivery}
           onChange={handleDeliveryChange}
@@ -86,15 +86,9 @@ export default function Step_4() {
           ))}
         </Select>
       </FormControl>
-       <TextField
-          label="Ticket Delivery"
-          value={ticketType}
-          onChange={(e) => setTicketType(e.target.value)}
-          fullWidth
-        />
 
       <FormControl fullWidth margin="normal" disabled={!selectedDelivery}>
-        <InputLabel> Create Ticket Types</InputLabel>
+        <InputLabel>Work Type Category</InputLabel>
         <Select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}

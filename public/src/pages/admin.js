@@ -39,7 +39,7 @@ const StepContent = ({ step,onSaveSuccess }) => {
     case 1:
       return  <Step_2/> 
     case 2:
-      return <Step_4/>;
+      return <Step_3/>;
     case 3:
       return <Step_4/>
     case 4:
@@ -77,18 +77,20 @@ const DynamicFormUI = () => {
   };
 
   return (
-    <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-      <Stepper activeStep={activeStep} alternativeLabel sx={{ width: '90%', marginTop: 8 , marginBottom: 4 , height: '50%' }}> 
+    <Box sx={{ width: '100%'}}>
+      <Stepper activeStep={activeStep} alternativeLabel>
         {steps.map((label, index) => (
           <Step key={index} completed={false} onClick={() => setActiveStep(index)}>
             <StepLabel>
-              <Typography sx={{ fontSize: '10px' , color: 'white', fontWeight:'medium' }}>{label}</Typography>
+              <Typography sx={{ fontSize: '10px' }}>{label}</Typography>
             </StepLabel>
+
           </Step>
         ))}
       </Stepper>
-   <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ width: '100%', padding: 2 }}>
-      <Paper  elevation={3} sx={{ padding: 10, marginTop: 4, color:'#9708da' , border: '1px solid #7500c0 ' }}>
+   <Grid container>
+   <Grid size={4}>
+      <Paper  elevation={3} sx={{ padding: 3, marginTop: 4 }}>
         {activeStep === steps.length ? (
           <>
             <Typography variant="h6" gutterBottom>
@@ -99,17 +101,18 @@ const DynamicFormUI = () => {
         ) : (
           <>
             <StepContent step={activeStep} onSaveSuccess={handleSaveSuccess}/>
-            {/* <Box sx={{ marginTop: 2 }}>
+            <Box sx={{ marginTop: 2 }}>
               <Button disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 2 }}>
                 Back
               </Button>
               <Button variant="contained" onClick={handleNext}>
                 {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
               </Button>
-            </Box> */}
+            </Box>
           </>
         )}
       </Paper>
+      </Grid>
    </Grid>
     </Box>
   );

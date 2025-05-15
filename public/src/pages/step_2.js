@@ -14,8 +14,6 @@ import {
   IconButton
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import DropdownWithTextBox from './DropDown.tsx';
-
 
 const initialOptions = {
   Support: ["Application Maintainance", "Application Development", "Application Management Services","Cloud Management Services"],
@@ -59,7 +57,7 @@ const DropdownBlock = ({
       setNewOption("");
     }
   };
-  
+
   return (
     <Box
       border={1}
@@ -75,7 +73,23 @@ const DropdownBlock = ({
       >
         <DeleteIcon />
       </IconButton>
-      
+
+      <FormControl fullWidth margin="normal">
+        <InputLabel>Master Work Types</InputLabel>
+        <Select
+          value={selectedType}
+          onChange={handleTypeChange}
+          label="Master Work Types"
+        >
+          {availableTypes.map((type) => (
+            <MenuItem key={type} value={type}>
+              {type}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      {selectedType && (
         <>
           <FormControl fullWidth margin="normal">
             <InputLabel>Delivery Work Types</InputLabel>
@@ -107,6 +121,7 @@ const DropdownBlock = ({
             </Button>
           </Box>
         </>
+      )}
 
       <Button
         variant="contained"
@@ -145,109 +160,28 @@ export default function Step_2() {
   };
 
   const usedTypes = blocks.map((b) => b.masterWorkTypes).filter(Boolean);
-   const deliveryTypes = [
-      "Application Maintenance",
-      "Application Development",
-      "Application Management Services",
-      "Application Development Project",
-      "System Integration Project"
-    ];
-  
-    const [fields, setFields] = useState({
-      deliveryType: "",
-      screenFieldName: "",
-      screenFieldSequence: ""
-    });
-  
-    const [workTypeValue, setWorkTypeValue] = useState("");
-    const [error, setError] = useState(""); // Error state to track validation
-  
-    const handleFieldChange = (key) => (event) => {
-      const value = event.target.value;
-      setFields((prev) => ({ ...prev, [key]: value }));
-  
-      // Check if user filled the Screen Field Sequence but Work Type Category is not selected
-      if (key === "screenFieldSequence" && value !== "") {
-        if (workTypeValue.trim() === "") {
-          setError("Please select Work Type Category before filling the Sequence.");
-        } else {
-          setError(""); // Clear the error if Work Type Category is selected
-        }
-      }
-    };
-      const [selectedName, setSelectedName] = useState(null);
-      const [uiType, setUiType] = useState('');
-      const [workTypes, setWorkTypes] = useState('');
-      const [sequence, setSequence] = useState('');
-      const [allNames, setAllNames] = useState([]);
-    
-    const names = allNames.map((name, index) => ({
-      name,
-      sequence: index + 1
-    }));
-  return (
-      <div style={{marginTop:"20px" , border:"1px solid #7500c0" , borderRadius:"10px" , paddingTop:"20px" , paddingLeft:"60px" , paddingRight:"60px" , paddingBottom:"20px"}} >
-    <Box p={4}>
-       <label htmlFor="deliveryWT" style={{ fontWeight: 'bold', display: 'block' }}>
-                Select Delivery Work Types
-      </label>
-         <Box my={2} sx={{ width: 300 }}>
-              <TextField
-                label="Delivery Work Type"
-                name="deliveryType"
-                fullWidth
-                size="small"
-                select
-                value={fields.deliveryType}
-                onChange={handleFieldChange("deliveryType")}
-              >
-                {deliveryTypes.map((type) => (
-                  <MenuItem key={type} value={type}>
-                    {type}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Box>
-       <DropdownWithTextBox allNames={allNames} setAllNames={setAllNames} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Create Work Type Categories: "} />
 
-       
-      <div style={{marginTop:"20px"}} >
-          <label htmlFor="uiTypeSelect" style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
-                UI Type For Delivery Work Types
-              </label>
-              <select
-                id="uiTypeSelect"
-                style={{  width: '100%', padding: '8px 60px 8px 8px', boxSizing: 'border-box'  }}
-                onChange={e => setUiType(e.target.value)}
-                defaultValue=""
-              >
-                <option value="" disabled>Select a GUI Type…</option>
-                <option value="check_box">Check Box</option>
-                <option value="radio_button">Radio Button</option>
-                <option value="button">Button</option>
-              </select>
-          </div>
-          <div style={{display:"flex", alignItems:'center' , flexDirection:'column'}} >
-          <label htmlFor="screenFN" style={{ fontWeight: 'bold', display: 'block', marginBottom:'10px', marginTop:"20px" }}>
-                Assign Screen Field Name to DWT + WTC
-      </label>
-      <button
-          style={{
-           padding: '8px 14px',
-            fontSize: '12px',
-            cursor: 'pointer',
-            border: 'none',
-            color: 'white',
-            fontWeight: 'bold',
-            borderRadius: '4px',
-            marginTop: '5px',
-            backgroundColor: '#eb7476',
-          }}
-        >
-          Assign
-        </button>
-      </div>
+  return (
+    <Box p={4}>
+      <Typography variant="h5" gutterBottom>
+       Delivery Work Type 
+      </Typography>
+
+      {blocks.map((block) => (
+        <DropdownBlock
+          key={block.id}
+          id={block.id}
+          typeOptions={["Support", "Project"]}
+          usedTypes={usedTypes.filter((t) => t !== block.masterWorkTypes)}
+          onAdd={handleAddBlock}
+          onDelete={handleDeleteBlock}
+          onUpdate={handleUpdateBlock}
+        />
+      ))}
+
+      <Button variant="contained" color="success" onClick={handleSave}>
+        Save
+      </Button>
     </Box>
-    </div>
   );
 }
