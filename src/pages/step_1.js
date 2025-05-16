@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DropdownWithTextBox from './DropDown.tsx';
 import MappedDropdown from './MappedDropdown.tsx';
 import axios from 'axios';
+import { Button } from '@mui/material';
 
 const FieldRow = () => { 
   const [selectedName, setSelectedName] = useState(null);
@@ -29,7 +30,8 @@ const names = allNames.map((name, index) => ({
 
   return (
     <>
-    <div style={{marginTop:"20px" , border:"1px solid #7500c0" , borderRadius:"10px" , paddingTop:"20px" , paddingLeft:"60px" , paddingRight:"60px" , paddingBottom:"20px"}} >
+    <div style={{marginTop:"20px" }} >
+      <div style={{border:"1px solid #7500c0" , borderRadius:"10px" , paddingTop:"20px" , paddingLeft:"20px" , paddingRight:"20px" , paddingBottom:"20px"}}>
       <DropdownWithTextBox allNames={allNames} setAllNames={setAllNames} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Create Master Work Types: "} />
       <br />
       <div style={{marginTop:"0px"}} >   
@@ -42,6 +44,7 @@ const names = allNames.map((name, index) => ({
         /> */}
 
          <DropdownWithTextBox allNames={allNames} setAllNames={setAllNames} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Create Delivery Work Types: "} />
+      </div>
       </div>
         <div style={{marginTop:"20px"}} >
           <label htmlFor="uiTypeSelect" style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
@@ -59,22 +62,26 @@ const names = allNames.map((name, index) => ({
                 <option value="button">Button</option>
               </select>
           </div>
-        <button
-          onClick={handleNext}
-          style={{
-             padding: '8px 14px',
-            fontSize: '12px',
-            cursor: 'pointer',
-            border: 'none',
-            color: 'white',
-            fontWeight: 'bold',
-            borderRadius: '4px',
-            marginTop: '20px',
-            backgroundColor: '#eb7476',
-          }}
-        >
-          Save
-        </button>
+       <Button
+      onClick={handleNext}
+      variant="contained"
+      sx={{
+        mt: 2,
+        px: 2,
+        py: 1,
+        fontSize: '14px',
+        fontWeight: 'bold',
+        borderRadius: '6px',
+        backgroundColor: '#eb7476',
+        color: 'white',
+        textTransform: 'none',
+        '&:hover': {
+          backgroundColor: '#f38b8d',
+        },
+      }}
+    >
+      SAVE
+    </Button>
       </div>
     </>
   )

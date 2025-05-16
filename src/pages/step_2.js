@@ -15,10 +15,16 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DropdownWithTextBox from './DropDown.tsx';
+import {
+  Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper
+} from '@mui/material';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 
 const initialOptions = {
-  Support: ["Application Maintainance", "Application Development", "Application Management Services","Cloud Management Services"],
+  Support: ["Application Maintainance", "Application Development", "Application Management Services", "Cloud Management Services"],
   Project: ["Application Development Project", "System Integration Project"]
 };
 
@@ -34,9 +40,9 @@ const DropdownBlock = ({
   const [subOptions, setSubOptions] = useState([]);
   const [selectedSubs, setSelectedSubs] = useState([]);
   const [newOption, setNewOption] = useState("");
-  console.log(typeOptions,"typeOptions")
+  console.log(typeOptions, "typeOptions")
   const availableTypes = typeOptions.filter((opt) => !usedTypes.includes(opt));
-  console.log(availableTypes,"vamsi")
+  console.log(availableTypes, "vamsi")
 
   const handleTypeChange = (e) => {
     const newType = e.target.value;
@@ -59,7 +65,7 @@ const DropdownBlock = ({
       setNewOption("");
     }
   };
-  
+
   return (
     <Box
       border={1}
@@ -75,38 +81,38 @@ const DropdownBlock = ({
       >
         <DeleteIcon />
       </IconButton>
-      
-        <>
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Delivery Work Types</InputLabel>
-            <Select
-              multiple
-              value={selectedSubs}
-              onChange={handleSubChange}
-              input={<OutlinedInput label="Delivery Work Types" />}
-              renderValue={(selected) => selected.join(", ")}
-            >
-              {subOptions.map((name) => (
-                <MenuItem key={name} value={name}>
-                  <Checkbox checked={selectedSubs.includes(name)} />
-                  <ListItemText primary={name} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
 
-          <Box display="flex" gap={2} alignItems="center" mt={1}>
-            <TextField
-              label="Add Delivery Work Type"
-              value={newOption}
-              onChange={(e) => setNewOption(e.target.value)}
-              size="small"
-            />
-            <Button onClick={handleAddOption} variant="outlined">
-              Add Delivery Work Types
-            </Button>
-          </Box>
-        </>
+      <>
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Delivery Work Types</InputLabel>
+          <Select
+            multiple
+            value={selectedSubs}
+            onChange={handleSubChange}
+            input={<OutlinedInput label="Delivery Work Types" />}
+            renderValue={(selected) => selected.join(", ")}
+          >
+            {subOptions.map((name) => (
+              <MenuItem key={name} value={name}>
+                <Checkbox checked={selectedSubs.includes(name)} />
+                <ListItemText primary={name} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <Box display="flex" gap={2} alignItems="center" mt={1}>
+          <TextField
+            label="Add Delivery Work Type"
+            value={newOption}
+            onChange={(e) => setNewOption(e.target.value)}
+            size="small"
+          />
+          <Button onClick={handleAddOption} variant="outlined">
+            Add Delivery Work Types
+          </Button>
+        </Box>
+      </>
 
       <Button
         variant="contained"
@@ -145,109 +151,231 @@ export default function Step_2() {
   };
 
   const usedTypes = blocks.map((b) => b.masterWorkTypes).filter(Boolean);
-   const deliveryTypes = [
-      "Application Maintenance",
-      "Application Development",
-      "Application Management Services",
-      "Application Development Project",
-      "System Integration Project"
-    ];
-  
-    const [fields, setFields] = useState({
-      deliveryType: "",
-      screenFieldName: "",
-      screenFieldSequence: ""
-    });
-  
-    const [workTypeValue, setWorkTypeValue] = useState("");
-    const [error, setError] = useState(""); // Error state to track validation
-  
-    const handleFieldChange = (key) => (event) => {
-      const value = event.target.value;
-      setFields((prev) => ({ ...prev, [key]: value }));
-  
-      // Check if user filled the Screen Field Sequence but Work Type Category is not selected
-      if (key === "screenFieldSequence" && value !== "") {
-        if (workTypeValue.trim() === "") {
-          setError("Please select Work Type Category before filling the Sequence.");
-        } else {
-          setError(""); // Clear the error if Work Type Category is selected
-        }
-      }
-    };
-      const [selectedName, setSelectedName] = useState(null);
-      const [uiType, setUiType] = useState('');
-      const [workTypes, setWorkTypes] = useState('');
-      const [sequence, setSequence] = useState('');
-      const [allNames, setAllNames] = useState([]);
-    
-    const names = allNames.map((name, index) => ({
-      name,
-      sequence: index + 1
-    }));
-  return (
-      <div style={{marginTop:"20px" , border:"1px solid #7500c0" , borderRadius:"10px" , paddingTop:"20px" , paddingLeft:"60px" , paddingRight:"60px" , paddingBottom:"20px"}} >
-    <Box p={4}>
-       <label htmlFor="deliveryWT" style={{ fontWeight: 'bold', display: 'block' }}>
-                Select Delivery Work Types
-      </label>
-         <Box my={2} sx={{ width: 300 }}>
-              <TextField
-                label="Delivery Work Type"
-                name="deliveryType"
-                fullWidth
-                size="small"
-                select
-                value={fields.deliveryType}
-                onChange={handleFieldChange("deliveryType")}
-              >
-                {deliveryTypes.map((type) => (
-                  <MenuItem key={type} value={type}>
-                    {type}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Box>
-       <DropdownWithTextBox allNames={allNames} setAllNames={setAllNames} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Create Work Type Categories: "} />
+  const deliveryTypes = [
+    "Application Maintenance",
+    "Application Development",
+    "Application Management Services",
+    "Application Development Project",
+    "System Integration Project"
+  ];
 
-       
-      <div style={{marginTop:"20px"}} >
-          <label htmlFor="uiTypeSelect" style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
-                UI Type For Delivery Work Types
-              </label>
-              <select
-                id="uiTypeSelect"
-                style={{  width: '100%', padding: '8px 60px 8px 8px', boxSizing: 'border-box'  }}
-                onChange={e => setUiType(e.target.value)}
-                defaultValue=""
-              >
-                <option value="" disabled>Select a GUI Type…</option>
-                <option value="check_box">Check Box</option>
-                <option value="radio_button">Radio Button</option>
-                <option value="button">Button</option>
-              </select>
-          </div>
-          <div style={{display:"flex", alignItems:'center' , flexDirection:'column'}} >
-          <label htmlFor="screenFN" style={{ fontWeight: 'bold', display: 'block', marginBottom:'10px', marginTop:"20px" }}>
-                Assign Screen Field Name to DWT + WTC
-      </label>
-      <button
-          style={{
-           padding: '8px 14px',
-            fontSize: '12px',
-            cursor: 'pointer',
-            border: 'none',
-            color: 'white',
+  const [fields, setFields] = useState({
+    deliveryType: "",
+    screenFieldName: "",
+    screenFieldSequence: ""
+  });
+
+  const [workTypeValue, setWorkTypeValue] = useState("");
+  const [error, setError] = useState(""); // Error state to track validation
+
+  const handleFieldChange = (key) => (event) => {
+    const value = event.target.value;
+    setFields((prev) => ({ ...prev, [key]: value }));
+
+    // Check if user filled the Screen Field Sequence but Work Type Category is not selected
+    if (key === "screenFieldSequence" && value !== "") {
+      if (workTypeValue.trim() === "") {
+        setError("Please select Work Type Category before filling the Sequence.");
+      } else {
+        setError(""); // Clear the error if Work Type Category is selected
+      }
+    }
+  };
+  const [selectedName, setSelectedName] = useState(null);
+  const [uiType, setUiType] = useState('');
+  const [workTypes, setWorkTypes] = useState('');
+  const [sequence, setSequence] = useState('');
+  const [allNames, setAllNames] = useState([]);
+
+  const names = allNames.map((name, index) => ({
+    name,
+    sequence: index + 1
+  }));
+
+  const initialRows = [
+    { sequence: 1, dwt: 'AM', wtc: 'Ticket Delivery', screenField: '' },
+    { sequence: 2, dwt: 'AM', wtc: 'NTD', screenField: '' },
+    { sequence: 3, dwt: 'AM', wtc: 'NTND', screenField: '' },
+    { sequence: 4, dwt: 'AD', wtc: 'Ticket Delivery', screenField: '' },
+    { sequence: 5, dwt: 'AD', wtc: 'NTD', screenField: '' },
+    { sequence: 6, dwt: 'AD', wtc: 'NTND', screenField: '' },
+    { sequence: 7, dwt: 'AD Project', wtc: 'Delivery', screenField: '' },
+    { sequence: 8, dwt: 'AD Project', wtc: 'Non Delivery', screenField: '' },
+    { sequence: 9, dwt: 'SI Project', wtc: 'Delivery', screenField: '' },
+    { sequence: 10, dwt: 'SI Project', wtc: 'Non Delivery', screenField: '' },
+  ];
+  const [rows, setRows] = useState(initialRows);
+  const [showTable, setShowTable] = useState(false); // Flag to show/hide table
+
+  const handleChange = (index, value) => {
+    const updatedRows = [...rows];
+    updatedRows[index].screenField = value;
+    setRows(updatedRows);
+  };
+
+  const moveRow = (index, direction) => {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= rows.length) return;
+
+    const updatedRows = [...rows];
+    const temp = updatedRows[index];
+    updatedRows[index] = updatedRows[newIndex];
+    updatedRows[newIndex] = temp;
+
+    // Reassign sequences
+    const reSequenced = updatedRows.map((row, i) => ({
+      ...row,
+      sequence: i + 1,
+    }));
+
+    setRows(reSequenced);
+  };
+
+  const handleNext = async () => {
+
+//    await axios.post(
+//   `http://localhost:5000/addGuiwithSequence/`,
+//   { gui_type: uiType,
+//     master_work_types: names.map((item) => item.name),
+//     sequences: names.map((item) => item.sequence),
+//   }
+// );
+    console.log("data saved");
+  };
+
+  return (
+    <>
+    <div style={{ marginTop: "20px" }} >
+      <div  style={{ border: "1px solid #7500c0", borderRadius: "10px", paddingTop: "20px", paddingLeft: "60px", paddingRight: "60px", paddingBottom: "20px" }}> 
+       <label htmlFor="deliveryWT" style={{ fontWeight: 'bold', display: 'block' }}>
+          Select Delivery Work Types
+        </label>
+        <Box my={2} sx={{ width: 300 }}>
+          <TextField
+            label="Delivery Work Type"
+            name="deliveryType"
+            fullWidth
+            size="small"
+            select
+            value={fields.deliveryType}
+            onChange={handleFieldChange("deliveryType")}
+          >
+            {deliveryTypes.map((type) => (
+              <MenuItem key={type} value={type}>
+                {type}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
+        <DropdownWithTextBox allNames={allNames} setAllNames={setAllNames} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Create Work Type Categories: "} />
+        </div>
+      <Box p={2}>
+        <div style={{ display: "flex", alignItems: 'center', flexDirection: 'row', justifyContent:"space-between" }} >
+          <label htmlFor="screenFN" style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', marginTop: "20px" , marginRight:'10px' }}>
+            Assign Screen Field Name to Delivery Work Type + Work Type Category
+          </label>
+          
+           <Button
+         onClick={() => setShowTable(true)}
+          variant="contained"
+          sx={{
+            mt: 2,
+            px: 2,
+            py: 1,
+            fontSize: '14px',
             fontWeight: 'bold',
-            borderRadius: '4px',
-            marginTop: '5px',
+            borderRadius: '6px',
             backgroundColor: '#eb7476',
+            color: 'white',
+            textTransform: 'none',
+            '&:hover': {
+              backgroundColor: '#f38b8d',
+            },
           }}
         >
           Assign
-        </button>
+        </Button>
+        </div>
+      </Box>
+      <div>
+        {showTable && (
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead sx={{ backgroundColor: 'purple' }}>
+                <TableRow>
+                  <TableCell sx={{ color: 'white' }}>Sequence</TableCell>
+                  <TableCell sx={{ color: 'white' }}>DWT</TableCell>
+                  <TableCell sx={{ color: 'white' }}>WTC</TableCell>
+                  <TableCell sx={{ color: 'white' }}>Screen Field Name</TableCell>
+                  <TableCell sx={{ color: 'white' }}>Up/Down</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row, index) => (
+                  <TableRow key={row.sequence}>
+                    <TableCell>{row.sequence}</TableCell>
+                    <TableCell>{row.dwt}</TableCell>
+                    <TableCell>{row.wtc}</TableCell>
+                    <TableCell>
+                      <TextField
+                        variant="standard"
+                        fullWidth
+                        value={row.screenField}
+                        onChange={(e) => handleChange(index, e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <IconButton size="small" onClick={() => moveRow(index, 1)} disabled={index === rows.length - 1}>
+                        <ArrowDownwardIcon fontSize="inherit" />
+                      </IconButton>
+                      <IconButton size="small" onClick={() => moveRow(index, -1)} disabled={index === 0}>
+                        <ArrowUpwardIcon fontSize="inherit" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </div>
-    </Box>
+      <div style={{ marginTop: "10px" }} >
+        <label htmlFor="uiTypeSelect" style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
+          UI Type For Master Task Types
+        </label>
+        <select
+          id="uiTypeSelect"
+          style={{ width: '100%', padding: '8px 60px 8px 8px', boxSizing: 'border-box' }}
+          onChange={e => setUiType(e.target.value)}
+          defaultValue=""
+        >
+          <option value="" disabled>Select a GUI Type…</option>
+          <option value="check_box">Check Box</option>
+          <option value="radio_button">Radio Button</option>
+          <option value="button">Button</option>
+        </select>
+      </div>
     </div>
-  );
+     <Button
+          onClick={handleNext}
+          variant="contained"
+          sx={{
+            mt: 2,
+            px: 2,
+            py: 1,
+            fontSize: '14px',
+            fontWeight: 'bold',
+            borderRadius: '6px',
+            backgroundColor: '#eb7476',
+            color: 'white',
+            textTransform: 'none',
+            '&:hover': {
+              backgroundColor: '#f38b8d',
+            },
+          }}
+        >
+          SAVE
+        </Button>
+    </>
+  )
 }

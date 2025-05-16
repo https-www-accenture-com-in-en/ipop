@@ -39,7 +39,7 @@ const StepContent = ({ step,onSaveSuccess }) => {
     case 1:
       return  <Step_2/> 
     case 2:
-      return <Step_4/>;
+      return <Step_3/>;
     case 3:
       return <Step_4/>
     case 4:
@@ -78,7 +78,7 @@ const DynamicFormUI = () => {
 
   return (
     <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-      <Stepper activeStep={activeStep} alternativeLabel sx={{ width: '90%', marginTop: 8 , marginBottom: 4 , height: '50%' }}> 
+      <Stepper activeStep={activeStep} alternativeLabel sx={{ width: '90%', marginTop: 8 , marginBottom: 4  }}> 
         {steps.map((label, index) => (
           <Step key={index} completed={false} onClick={() => setActiveStep(index)}>
             <StepLabel>
@@ -88,7 +88,7 @@ const DynamicFormUI = () => {
         ))}
       </Stepper>
    <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ width: '100%', padding: 2 }}>
-      <Paper  elevation={3} sx={{ padding: 10, marginTop: 4, color:'#9708da' , border: '1px solid #7500c0 ' }}>
+      <Paper  elevation={3} sx={{ paddingTop:4, paddingLeft:12,paddingRight:12, paddingBottom:4, marginTop: 4, color:'#9708da' , border: '1px solid #7500c0 ' }}>
         {activeStep === steps.length ? (
           <>
             <Typography variant="h6" gutterBottom>
