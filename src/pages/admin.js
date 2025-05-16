@@ -16,6 +16,10 @@ import Step_4 from './step_4';
 import Step_3 from './step_3';
 import Step_7 from './step_7';
 import Step_8 from './step_8';
+import Step_9 from './step_9';
+import Step_10 from './step_10';
+import Step_11 from './step_11';
+import Step_12 from './step_12';
 
 const steps = [
   'Create Master Work Types & Delivery Work Types',
@@ -25,9 +29,11 @@ const steps = [
   'Define Attributes for AD Ticket Delivery ',
   'Create Non Ticket Delivery Work Items',
   'Create Support Non Delivery Work Items',
+  'NA',
   'Define Project Clusters & Values For Projects Clusters',
-  'Create AD Project',
+  'NA',
   'Create Master Project & Sub-Project',
+  'Create V-Model Tasks for Sub-Project',
   'Create Project Non Delivery Work Items',
   'Define Time-Off'
 ];
@@ -50,6 +56,14 @@ const StepContent = ({ step,onSaveSuccess }) => {
       return <Step_7/>
     case 7:
       return <Step_8/>
+    case 8:
+      return <Step_9/>
+    case 9:
+      return <Step_10/>
+    case 10:
+      return <Step_11/>
+    case 11:
+      return <Step_12/>
     default:
       return <Typography>Unknown step</Typography>;
   }
