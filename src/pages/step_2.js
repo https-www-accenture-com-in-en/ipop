@@ -21,6 +21,7 @@ import {
 } from '@mui/material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 
 const initialOptions = {
@@ -186,6 +187,7 @@ export default function Step_2() {
   const [workTypes, setWorkTypes] = useState('');
   const [sequence, setSequence] = useState('');
   const [allNames, setAllNames] = useState([]);
+  const [isAssigned, setIsAssigned] = useState(false);
 
   const names = allNames.map((name, index) => ({
     name,
@@ -233,81 +235,99 @@ export default function Step_2() {
 
   const handleNext = async () => {
 
-//    await axios.post(
-//   `http://localhost:5000/addGuiwithSequence/`,
-//   { gui_type: uiType,
-//     master_work_types: names.map((item) => item.name),
-//     sequences: names.map((item) => item.sequence),
-//   }
-// );
+    //    await axios.post(
+    //   `http://localhost:5000/addGuiwithSequence/`,
+    //   { gui_type: uiType,
+    //     master_work_types: names.map((item) => item.name),
+    //     sequences: names.map((item) => item.sequence),
+    //   }
+    // );
     console.log("data saved");
   };
 
   return (
     <>
-    <div style={{ marginTop: "20px" }} >
-      <div  style={{ border: "1px solid #7500c0", borderRadius: "10px", paddingTop: "20px", paddingLeft: "60px", paddingRight: "60px", paddingBottom: "20px" }}> 
-       <label htmlFor="deliveryWT" style={{ fontWeight: 'bold', display: 'block' }}>
-          Select Delivery Work Types
-        </label>
-        <Box my={2} sx={{ width: 300 }}>
-          <TextField
-            label="Delivery Work Type"
-            name="deliveryType"
-            fullWidth
-            size="small"
-            select
-            value={fields.deliveryType}
-            onChange={handleFieldChange("deliveryType")}
-          >
-            {deliveryTypes.map((type) => (
-              <MenuItem key={type} value={type}>
-                {type}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Box>
-        <DropdownWithTextBox allNames={allNames} setAllNames={setAllNames} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Create Work Type Categories: "} />
-        </div>
-      <Box p={2}>
-        <div style={{ display: "flex", alignItems: 'center', flexDirection: 'row', justifyContent:"space-between" }} >
-          <label htmlFor="screenFN" style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', marginTop: "20px" , marginRight:'10px' }}>
-            Assign Screen Field Name to Delivery Work Type + Work Type Category
+      <div style={{ marginTop: "20px" }} >
+        <div style={{ border: "1px solid #7500c0", borderRadius: "10px", padding: "20px" }}>
+          <label htmlFor="deliveryWT" style={{ fontWeight: 'bold', display: 'block' }}>
+            Select Delivery Work Types
           </label>
-          
-           <Button
-         onClick={() => setShowTable(true)}
-          variant="contained"
-          sx={{
-            mt: 2,
-            px: 2,
-            py: 1,
-            fontSize: '14px',
-            fontWeight: 'bold',
-            borderRadius: '6px',
-            backgroundColor: '#eb7476',
-            color: 'white',
-            textTransform: 'none',
-            '&:hover': {
-              backgroundColor: '#f38b8d',
-            },
-          }}
-        >
-          Assign
-        </Button>
+          <Box my={2} sx={{ width: 300 }}>
+            <TextField
+              label="Delivery Work Type"
+              name="deliveryType"
+              fullWidth
+              size="small"
+              select
+              value={fields.deliveryType}
+              onChange={handleFieldChange("deliveryType")}
+            >
+              {deliveryTypes.map((type) => (
+                <MenuItem key={type} value={type}>
+                  {type}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
+          <DropdownWithTextBox allNames={allNames} setAllNames={setAllNames} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Create Work Type Categories: "} />
+          <Button
+            onClick={() => {
+              handleSave();
+              setShowTable(true);       // Show table
+              setIsAssigned(true);      // Hide Assign section
+            }}
+            variant="contained"
+            sx={{
+              mt: 1,
+              px: 0.5,
+              py: 0.5,
+              fontSize: '10px',
+              width: '100%',
+              fontWeight: 'bold',
+              borderRadius: '6px',
+              backgroundColor: '#7500c0',
+              color: 'white',
+              textTransform: 'none',
+              '&:hover': {
+                backgroundColor: '#7500c0',
+                transform: 'scale(1.05)',
+              },
+            }}
+          >
+            Assign Work Type Categories <ArrowForwardIcon />
+          </Button>
+
         </div>
-      </Box>
-      <div>
-        {showTable && (
-          <TableContainer component={Paper}>
+      </div>
+
+      {showTable && (
+        <div style={{ border: "1px solid #7500c0", borderRadius: "10px", padding: "10px", marginTop: "20px" }}>
+          <TableContainer component={Paper} sx={{ overflow: 'hidden', borderRadius: '12px', mb: 2 }}>
             <Table>
-              <TableHead sx={{ backgroundColor: 'purple' }}>
-                <TableRow>
-                  <TableCell sx={{ color: 'white' }}>Sequence</TableCell>
-                  <TableCell sx={{ color: 'white' }}>DWT</TableCell>
-                  <TableCell sx={{ color: 'white' }}>WTC</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Screen Field Name</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Up/Down</TableCell>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: '#7500c0' }}>
+                  <TableCell sx={{
+                    color: 'white',
+                    fontWeight: 'bold',
+                    paddingY: '6px',
+                    '&:first-of-type': { borderBottomLeftRadius: '12px' },
+                    // '&:last-of-type': { }
+                  }}>
+                    Sequence
+                  </TableCell>
+                  <TableCell sx={{ color: 'white', fontWeight: 'bold', paddingY: '6px' }}>DWT</TableCell>
+                  <TableCell sx={{ color: 'white', fontWeight: 'bold', paddingY: '6px' }}>WTC</TableCell>
+                  <TableCell sx={{ color: 'white', fontWeight: 'bold', paddingY: '6px' }}>
+                    Screen Field Name For Task Type
+                  </TableCell>
+                  <TableCell sx={{
+                    color: 'white',
+                    fontWeight: 'bold',
+                    paddingY: '6px',
+                    '&:last-of-type': { borderBottomRightRadius: '12px' }
+                  }}>
+                    Up/Down
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -337,45 +357,30 @@ export default function Step_2() {
               </TableBody>
             </Table>
           </TableContainer>
-        )}
-      </div>
-      <div style={{ marginTop: "10px" }} >
-        <label htmlFor="uiTypeSelect" style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
-          UI Type For Master Task Types
-        </label>
-        <select
-          id="uiTypeSelect"
-          style={{ width: '100%', padding: '8px 60px 8px 8px', boxSizing: 'border-box' }}
-          onChange={e => setUiType(e.target.value)}
-          defaultValue=""
-        >
-          <option value="" disabled>Select a GUI Type…</option>
-          <option value="check_box">Check Box</option>
-          <option value="radio_button">Radio Button</option>
-          <option value="button">Button</option>
-        </select>
-      </div>
-    </div>
-     <Button
-          onClick={handleNext}
-          variant="contained"
-          sx={{
-            mt: 2,
-            px: 2,
-            py: 1,
-            fontSize: '14px',
-            fontWeight: 'bold',
-            borderRadius: '6px',
-            backgroundColor: '#eb7476',
-            color: 'white',
-            textTransform: 'none',
-            '&:hover': {
-              backgroundColor: '#f38b8d',
-            },
-          }}
-        >
-          SAVE
-        </Button>
+        </div>
+      )}
+      <Button
+        onClick={handleNext}
+        variant="contained"
+        sx={{
+          mt: 1,
+          px: 0.5,
+          py: 0.5,
+          fontSize: '10px',
+          width: '100%',
+          fontWeight: 'bold',
+          borderRadius: '6px',
+          backgroundColor: '#7500c0',
+          color: 'white',
+          textTransform: 'none',
+          '&:hover': {
+            backgroundColor: '#7500c0',
+            transform: 'scale(1.05)',
+          },
+        }}
+      >
+        Save
+      </Button>
     </>
   )
 }
