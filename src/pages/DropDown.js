@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
  
 const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequence, label , disabled=false }) => {
-const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequence, label }) => {
 
   const [value, setValue] = useState('');
   const [editingName, setEditingName] = useState(null);

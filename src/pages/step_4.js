@@ -84,7 +84,15 @@ export default function Step_4() {
   };
 
   const handleSave = () => {
-    console.log("Final Mappings", mappings);
+    
+    const ticketData = {
+      ticketType: selectedTicketType,
+      explicitAttributes: allNames,
+      implicitAttributes: implicitAttr,
+    };
+    console.log("Saving Ticket Type Data:", ticketData);
+    
+    
   };
 
   return (
@@ -215,8 +223,9 @@ export default function Step_4() {
           setAllNames={setImplicitAttr}
           setUiType={setUiType}
           setSequence={setSequence}
-          setSelectedName={setSelectedName}
+          setSelectedName={() => {}}
           label={"Define Implicit Attributes"}
+          disabled={!setSelectedName}
         />
 
         <List>
