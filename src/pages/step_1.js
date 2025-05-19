@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import DropdownWithTextBox from './DropDown';
+import DropdownWithTextBox from './DropDown.js';
 import { Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
  
 const FieldRow = () => {
@@ -8,27 +8,40 @@ const FieldRow = () => {
   const [uiType, setUiType] = useState('');
   const [sequence, setSequence] = useState('');
  
-  const handleNext = () => {
-    const savedData = {
+const savedData = {
       masterWorkType,
       uiType,
       deliveryWorkTypes,
     };
  
-    console.log('Data saved locally:');
+ 
+  const handleNext = () => {
+ 
     console.log('UI Type:', savedData.uiType);
-    console.log('Master Work Types:', savedData.masterWorkType);
-    console.log('Delivery Work Types:', savedData.deliveryWorkTypes);
+   
+  };
+ 
+   const handleSave = () => {
+ 
+    console.log('Data saved locally:');
+     console.log(savedData);
+    // flush the data to the server or local storage
+    setDeliveryWorkTypes([]);
+    setMasterWorkType('');
   };
  
   return (
     <>
-      <div style={{ marginTop: '20px' }}>
+      <div style={{ marginTop: '20px'  }}>
         <div
           style={{
             border: '1px solid #7500c0',
             borderRadius: '10px',
             padding: '20px',
+            display: 'flex',
+            alignContent:'center',
+            flexDirection: 'column',
+ 
           }}
         >
           <DropdownWithTextBox
@@ -51,9 +64,38 @@ const FieldRow = () => {
             setSelectedName={() => {}}
             label={'Create Delivery Work Types: '}
           />
-        </div>
+   <Button
+          onClick={handleSave}
+          variant="contained"
+          sx={{
+            mt: 1,
+            px: 0.5,
+            py: 0.5,
+            fontSize: '10px',
+            fontWeight: 'bold',
+            borderRadius: '6px',
+            backgroundColor: '#7500c0',
+            color: 'white',
+            textTransform: 'none',
+            '&:hover': {
+              backgroundColor: '#7500c0',
+              transform: 'scale(1.05)',
+            },
+          }}
+        >
+          Assign Delivery Work Types
+        </Button>
  
-        <div style={{ marginTop: "10px" }} >
+        </div>
+<div
+          style={{
+            border: '1px solid #7500c0',
+            borderRadius: '10px',
+            padding: '20px',
+            marginTop: '20px',
+          }}
+        >
+<div >
         <label htmlFor="uiTypeSelect" style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
           UI Type For Master Work Types
         </label>
@@ -69,29 +111,30 @@ const FieldRow = () => {
           <option value="button">Button</option>
         </select>
       </div>
-
-
  
+      </div>
         <Button
           onClick={handleNext}
           variant="contained"
           sx={{
-            mt: 2,
-            px: 2,
-            py: 1,
-            fontSize: '14px',
+            mt: 0.5,
+            px: 0.5,
+            py: 0.5,
+            fontSize: '10px',
             fontWeight: 'bold',
             borderRadius: '6px',
-            backgroundColor: '#eb7476',
+            backgroundColor: '#7500c0',
             color: 'white',
+            width: '100%',
+            marginTop: '10px',
             textTransform: 'none',
             '&:hover': {
-              backgroundColor: '#f38b8d',
+              backgroundColor: '#7500c0',
               transform: 'scale(1.05)',
             },
           }}
         >
-          SAVE
+          Save
         </Button>
       </div>
     </>
