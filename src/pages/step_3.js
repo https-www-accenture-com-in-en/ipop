@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Tb from "./tb";
-import DropdownWithTextBox from './DropDown.tsx';
+import DropdownWithTextBox from './DropDown.js';
 
 // L1 -> L2 mapping
 const workTypeCategoryMap = {

@@ -13,6 +13,7 @@ import {
 import Step_1 from './step_1';
 import Step_2 from './step_2';
 import Step_4 from './step_4';
+import Step_5 from './step_5';
 import Step_3 from './step_3';
 import Step_7 from './step_7';
 import Step_8 from './step_8';
@@ -21,8 +22,7 @@ const steps = [
   'Create Master Work Types & Delivery Work Types',
   'Create Delivery Work Type Categories',
   'Create Ticket Types for Ticket Delivery',
-  'Define Attributes for AM Ticket Delivery ',
-  'Define Attributes for AD Ticket Delivery ',
+  'Define Meta Data (Ticket Attributes) for Ticket Types',
   'Create Non Ticket Delivery Work Items',
   'Create Support Non Delivery Work Items',
   'Define Project Clusters & Values For Projects Clusters',
@@ -43,9 +43,9 @@ const StepContent = ({ step,onSaveSuccess }) => {
     case 3:
       return <Step_4/>
     case 4:
-      return <Typography>Step 5: Review Fields</Typography>;
+      return <Typography>Step 5: Map Workflows</Typography>;
     case 5:
-      return <Typography>Step 6: Map Workflows</Typography>;
+      return <Typography>Step 6</Typography>;
     case 6:
       return <Step_7/>
     case 7:
