@@ -14,9 +14,20 @@ import {
   IconButton
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Tb from "./tb";
+import DropdownWithTextBox from './DropDown.js';
 
-// L1 -> L2 mapping
+// Hardcoded list of Ticket Types
+const hardcodedTicketTypes = [
+  "Assistance",
+"Correction",
+"PMON",
+"Habilitation",
+"Evolution",
+"RITM"
+];
+
+
+// Delivery Work Type -> Work Type Category mapping
 const workTypeCategoryMap = {
   "Application Maintainance": [
     "Correction", "Assistance", "PMON", "RITM", "Habilitation",
@@ -33,20 +44,28 @@ const deliveryWorkTypes = Object.keys(workTypeCategoryMap);
 export default function Step_4() {
   const [selectedDelivery, setSelectedDelivery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [ticketType, setTicketType] = useState("");
+  const [selectedTicketType, setSelectedTicketType] = useState("");
+  const [ticketNumber, setTicketNumber] = useState("");
+  const [selectedName, setSelectedName] = useState(null);
+  const [uiType, setUiType] = useState('');
+  const [sequence, setSequence] = useState('');
+
+  const [allNames, setAllNames] = useState(["Ticket Number","Ticket description"]);
+  const [implicitAttr, setImplicitAttr] = useState(["Estimated Effort" ,"Burnt Effort","Remaining Effort","Effort To Be Clocked","Additional Effort To Be Clocked"])
   const [mappings, setMappings] = useState([]);
 
   const handleAddMapping = () => {
-    if (ticketType && selectedDelivery && selectedCategory) {
+    if (selectedTicketType && ticketNumber && selectedDelivery && selectedCategory) {
       setMappings([
         ...mappings,
         {
-          ticketType,
+          ticketType: selectedTicketType,
+          ticketNumber,
           deliveryWorkType: selectedDelivery,
           workTypeCategory: selectedCategory
         }
       ]);
-      setTicketType("");
+      setTicketNumber("");
     }
   };
 
@@ -67,60 +86,58 @@ export default function Step_4() {
   };
 
   return (
-    <Box p={4}>
-      <Typography variant="h5" gutterBottom>
-        Ticket Type Mapping
+    <Box p={4} sx={{ maxWidth: 500, mx: 'auto' }}>
+      <Typography variant="h5"
+  gutterBottom
+  sx={{
+    whiteSpace: 'normal',
+    wordWrap: 'break-word',
+    overflowWrap: 'break-word',
+    maxWidth: '60%'  // Optional: can also use '600px' or so if you want a narrower wrap
+  }}>
+        Define Meta Data (Ticket Attributes) for Ticket Types
       </Typography>
 
-      <FormControl fullWidth margin="normal">
-        <InputLabel>Select Delivery Work Type</InputLabel>
+      <br></br>
+
+      <label htmlFor="nameInput" style={{ display: 'block', marginBottom: 3, fontWeight: 'bold' }}>
+        Ticket type
+      </label>
+      <FormControl margin="normal" sx={{ minWidth: 300 }}>
+        <InputLabel>Select Ticket Type</InputLabel>
         <Select
-          value={selectedDelivery}
-          onChange={handleDeliveryChange}
-          label="Delivery Work Type"
+          value={selectedTicketType}
+          onChange={(e) => setSelectedTicketType(e.target.value)}
+          label="Ticket Type"
         >
-          {deliveryWorkTypes.map((type) => (
+          {hardcodedTicketTypes.map((type) => (
             <MenuItem key={type} value={type}>
               {type}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
-       <TextField
-          label="Ticket Delivery"
-          value={ticketType}
-          onChange={(e) => setTicketType(e.target.value)}
-          fullWidth
-        />
 
-      <FormControl fullWidth margin="normal" disabled={!selectedDelivery}>
-        <InputLabel> Create Ticket Types</InputLabel>
-        <Select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          label="Work Type Category"
-        >
-          {(workTypeCategoryMap[selectedDelivery] || []).map((cat) => (
-            <MenuItem key={cat} value={cat}>
-              {cat}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      <Tb />
-
+{/* <label htmlFor="nameInput" style={{ display: 'block', marginBottom: 3, fontWeight: 'bold' }}>
+        Ticket Number
+      </label>
       <Box display="flex" alignItems="center" gap={2} mt={2}>
         <TextField
-          label="Create Ticket Preference Number"
-          value={ticketType}
-          onChange={(e) => setTicketType(e.target.value)}
+          label="Enter Ticket Number"
+          value={ticketNumber}
+          onChange={(e) => setTicketNumber(e.target.value)}
           fullWidth
         />
-        <Button variant="contained" onClick={handleAddMapping}>
-          Map
-        </Button>
-      </Box>
+        
+      </Box> */}
+
+      <div style={{ marginTop: "20px" }}>
+        <DropdownWithTextBox allNames={allNames} setAllNames={setAllNames} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Define Explicit Attributes"} />
+        </div>
+
+      <div style={{ marginTop: "20px" }}>
+        <DropdownWithTextBox allNames={implicitAttr} setAllNames={setImplicitAttr} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Define Implicit Attributes"} />
+        </div>
 
       <List sx={{ mt: 3 }}>
         {mappings.map((map, index) => (
@@ -133,7 +150,7 @@ export default function Step_4() {
             }
           >
             <ListItemText
-              primary={map.ticketType}
+              primary={`${map.ticketType} - ${map.ticketNumber}`}
               secondary={`Category: ${map.workTypeCategory}, Delivery: ${map.deliveryWorkType}`}
             />
           </ListItem>

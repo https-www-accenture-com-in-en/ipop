@@ -1,35 +1,36 @@
 import React, { useState } from 'react';
-import DropdownWithTextBox from './DropDown';
+import DropdownWithTextBox from './DropDown.js';
 import { Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
-
+ 
 const FieldRow = () => {
-  const [masterWorkType, setMasterWorkType] = useState('');
+  const [masterWorkType, setMasterWorkType] = useState([]);
   const [deliveryWorkTypes, setDeliveryWorkTypes] = useState([]);
   const [uiType, setUiType] = useState('');
   const [sequence, setSequence] = useState('');
-
+  const [selectedMasterName, setSelectedMasterName] = useState(null);
+ 
 const savedData = {
-      masterWorkType,
+      selectedMasterName,
       uiType,
       deliveryWorkTypes,
     };
-
-
+ 
+ 
   const handleNext = () => {
  
     console.log('UI Type:', savedData.uiType);
    
   };
-
+ 
    const handleSave = () => {
-  
+ 
     console.log('Data saved locally:');
-     console.log(savedData);
+    console.log(savedData);
     // flush the data to the server or local storage
     setDeliveryWorkTypes([]);
-    setMasterWorkType('');
+    setMasterWorkType([]);
   };
-
+ 
   return (
     <>
       <div style={{ marginTop: '20px'  }}>
@@ -41,20 +42,20 @@ const savedData = {
             display: 'flex',
             alignContent:'center',
             flexDirection: 'column',
+ 
           }}
         >
           <DropdownWithTextBox
-            allNames={masterWorkType ? [masterWorkType] : []}
-            setAllNames={(newList) => setMasterWorkType(newList[0] || '')}
+            allNames={masterWorkType}
+            setAllNames={setMasterWorkType}
             setUiType={setUiType}
             setSequence={setSequence}
-            setSelectedName={setMasterWorkType}
+            setSelectedName={setSelectedMasterName}
             label={'Create Master Work Types: '}
-            singleEntry
           />
 
           <br />
-
+ 
           <DropdownWithTextBox
             allNames={deliveryWorkTypes}
             setAllNames={setDeliveryWorkTypes}
@@ -62,28 +63,8 @@ const savedData = {
             setSequence={setSequence}
             setSelectedName={() => {}}
             label={'Create Delivery Work Types: '}
+            disabled={!selectedMasterName}
           />
-   <Button
-          onClick={handleSave}
-          variant="contained"
-          sx={{
-            mt: 1,
-            px: 0.5,
-            py: 0.5,
-            fontSize: '10px',
-            fontWeight: 'bold',
-            borderRadius: '6px',
-            backgroundColor: '#7500c0',
-            color: 'white',
-            textTransform: 'none',
-            '&:hover': {
-              backgroundColor: '#7500c0',
-              transform: 'scale(1.05)',
-            },
-          }}
-        >
-          Assign Delivery Work Types
-        </Button>
 
         </div>
 <div
@@ -91,7 +72,7 @@ const savedData = {
             border: '1px solid #7500c0',
             borderRadius: '10px',
             padding: '20px',
-            marginTop: '20px', 
+            marginTop: '20px',
           }}
         >
 <div >
@@ -110,10 +91,10 @@ const savedData = {
           <option value="button">Button</option>
         </select>
       </div>
-
+ 
       </div>
         <Button
-          onClick={handleNext}
+          onClick={handleSave}
           variant="contained"
           sx={{
             mt: 0.5,
@@ -133,11 +114,11 @@ const savedData = {
             },
           }}
         >
-          Save
+        Assign Delivery Work Types
         </Button>
       </div>
     </>
   );
 };
-
+ 
 export default FieldRow;
