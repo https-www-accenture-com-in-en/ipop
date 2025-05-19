@@ -19,14 +19,10 @@ import DropdownWithTextBox from './DropDown.js';
 
 // L1 -> L2 mapping
 const workTypeCategoryMap = {
-  "Application Maintainance": [
-    "Correction", "Assistance", "PMON", "RITM", "Habilitation",
-    "Incidents", "Scoping", "Study", "Prototyping"
-  ],
-  "Application Development": [
-    "Category-1", "Category-2", "Category-3",
-    "Category-4", "Category-5", "Category-6"
-  ]
+  "AM Ticket Delivery":[],
+  "AD Ticket Delivery":[],
+  "CM Ticket Delivery":[],
+  "CBS Ticket Delivery":[],
 };
 
 const deliveryWorkTypes = Object.keys(workTypeCategoryMap);
@@ -87,10 +83,21 @@ export default function Step_4() {
     console.log("data saved");
   };
   return (
-    <div style={{ border: "1px solid #7500c0", borderRadius: "10px", paddingTop: "20px", paddingLeft: "60px", paddingRight: "60px", paddingBottom: "20px" }}>
+    <div style={{ border: "1px solid #7500c0", borderRadius: "10px", padding: "20px"}}>
       <Box p={4}>
-        <label htmlFor="ticketTypes" style={{ fontWeight: 'bold', display: 'block', marginBottom: '2px' }}>
-          Create Ticket Types
+        <label htmlFor="workType" style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
+          Work Type Category
+        </label>
+         <TextField
+                  name="workType"
+                  value="Ticket Delivery"
+                  fullWidth
+                  InputProps={{
+                    readOnly: true
+                  }}
+                />
+        <label htmlFor="ticketTypes" style={{ fontWeight: 'bold', display: 'block',marginTop: '20px' }}>
+          Select Task Type
         </label>
 
         <FormControl fullWidth margin="normal">
@@ -107,39 +114,32 @@ export default function Step_4() {
             ))}
           </Select>
         </FormControl>
-        <label htmlFor="ticketDelivery" style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px', marginTop: '8px' }}>
-          Work Type Category
-        </label>
-        <TextField
-          label="Ticket Delivery"
-          value={ticketType}
-          disabled={!selectedDelivery}
-          onChange={(e) => setTicketType(e.target.value)}
-          fullWidth
-        />
+
         <div style={{ marginTop: "20px" }}>
         <DropdownWithTextBox allNames={allNames} setAllNames={setAllNames} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Create Ticket Types: "} />
         </div>
- <Button
-      onClick={handleNext}
-      variant="contained"
-      sx={{
-        mt: 2,
-        px: 2,
-        py: 1,
-        fontSize: '14px',
-        fontWeight: 'bold',
-        borderRadius: '6px',
-        backgroundColor: '#eb7476',
-        color: 'white',
-        textTransform: 'none',
-        '&:hover': {
-          backgroundColor: '#f38b8d',
-        },
-      }}
-    >
-      SAVE
-    </Button>
+  <Button
+           onClick={handleNext}
+           variant="contained"
+           sx={{
+             mt: 2,
+             px: 0.5,
+             py: 0.5,
+             fontSize: '10px',
+             width: '100%',
+             fontWeight: 'bold',
+             borderRadius: '6px',
+             backgroundColor: '#7500c0',
+             color: 'white',
+             textTransform: 'none',
+             '&:hover': {
+               backgroundColor: '#7500c0',
+               transform: 'scale(1.05)',
+             },
+           }}
+         >
+           Save
+         </Button>
       </Box>
     </div>
   );

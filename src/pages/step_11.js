@@ -1,5 +1,6 @@
 import { useState } from "react";
 import DropdownWithTextBox from "./DropDown.js";
+import ProjectManager from "../components/Dropdownv1.jsx";
 
 const FieldRow = () => {
   const [selectedName, setSelectedName] = useState(null);
@@ -65,6 +66,7 @@ const FieldRow = () => {
         >
           Save
         </button>
+        <ProjectManager />
       </div>
     </>
   );

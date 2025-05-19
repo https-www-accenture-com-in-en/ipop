@@ -16,6 +16,19 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import DropdownWithTextBox from './DropDown.js';
 
+// Hardcoded list of Ticket Types
+const hardcodedTicketTypes = [
+  "Assistance",
+"Correction",
+"PMON",
+"Habilitation",
+"Evolution",
+"RITM"
+];
+
+
+// Delivery Work Type -> Work Type Category mapping
+
 const hardcodedTicketTypes = [
   "Assistance", "Correction", "PMON", "Habilitation", "Evolution", "RITM"
 ];
@@ -42,6 +55,9 @@ export default function Step_4() {
   const [uiType, setUiType] = useState('');
   const [sequence, setSequence] = useState('');
 
+
+  const [allNames, setAllNames] = useState(["Ticket Number","Ticket description"]);
+  const [implicitAttr, setImplicitAttr] = useState(["Estimated Effort" ,"Burnt Effort","Remaining Effort","Effort To Be Clocked","Additional Effort To Be Clocked"])
   const [allNames, setAllNames] = useState(["Ticket Number", "Ticket description", "Ticket Priority"]);
   const [implicitAttr, setImplicitAttr] = useState(["Estimated Effort", "Burnt Effort", "Remaining Effort", "Effort To Be Clocked", "Additional Effort To Be Clocked"]);
   const [mappings, setMappings] = useState([]);
@@ -80,6 +96,76 @@ export default function Step_4() {
   };
 
   return (
+    <Box p={4} sx={{ maxWidth: 500, mx: 'auto' }}>
+      <Typography variant="h5"
+  gutterBottom
+  sx={{
+    whiteSpace: 'normal',
+    wordWrap: 'break-word',
+    overflowWrap: 'break-word',
+    maxWidth: '60%'  // Optional: can also use '600px' or so if you want a narrower wrap
+  }}>
+        Define Meta Data (Ticket Attributes) for Ticket Types
+      </Typography>
+
+      <br></br>
+
+      <label htmlFor="nameInput" style={{ display: 'block', marginBottom: 3, fontWeight: 'bold' }}>
+        Ticket type
+      </label>
+      <FormControl margin="normal" sx={{ minWidth: 300 }}>
+        <InputLabel>Select Ticket Type</InputLabel>
+        <Select
+          value={selectedTicketType}
+          onChange={(e) => setSelectedTicketType(e.target.value)}
+          label="Ticket Type"
+        >
+          {hardcodedTicketTypes.map((type) => (
+            <MenuItem key={type} value={type}>
+              {type}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+{/* <label htmlFor="nameInput" style={{ display: 'block', marginBottom: 3, fontWeight: 'bold' }}>
+        Ticket Number
+      </label>
+      <Box display="flex" alignItems="center" gap={2} mt={2}>
+        <TextField
+          label="Enter Ticket Number"
+          value={ticketNumber}
+          onChange={(e) => setTicketNumber(e.target.value)}
+          fullWidth
+        />
+        
+      </Box> */}
+
+      <div style={{ marginTop: "20px" }}>
+        <DropdownWithTextBox allNames={allNames} setAllNames={setAllNames} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Define Explicit Attributes"} />
+        </div>
+
+      <div style={{ marginTop: "20px" }}>
+        <DropdownWithTextBox allNames={implicitAttr} setAllNames={setImplicitAttr} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Define Implicit Attributes"} />
+        </div>
+
+      <List sx={{ mt: 3 }}>
+        {mappings.map((map, index) => (
+          <ListItem
+            key={index}
+            secondaryAction={
+              <IconButton edge="end" onClick={() => handleDelete(index)}>
+                <DeleteIcon />
+              </IconButton>
+            }
+          >
+            <ListItemText
+              primary={`${map.ticketType} - ${map.ticketNumber}`}
+              secondary={`Category: ${map.workTypeCategory}, Delivery: ${map.deliveryWorkType}`}
+            />
+          </ListItem>
+        ))}
+      </List>
     <Box sx={{ p: 3, maxWidth: 500, mx: 'auto' }}>
       <div
         style={{
