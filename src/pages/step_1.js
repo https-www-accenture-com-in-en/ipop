@@ -1,90 +1,143 @@
 import React, { useState } from 'react';
-import DropdownWithTextBox from './DropDown.tsx';
-import MappedDropdown from './MappedDropdown.tsx';
-import axios from 'axios';
-import { Button } from '@mui/material';
+import DropdownWithTextBox from './DropDown';
+import { Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 
-const FieldRow = () => { 
-  const [selectedName, setSelectedName] = useState(null);
+const FieldRow = () => {
+  const [masterWorkType, setMasterWorkType] = useState('');
+  const [deliveryWorkTypes, setDeliveryWorkTypes] = useState([]);
   const [uiType, setUiType] = useState('');
-  const [workTypes, setWorkTypes] = useState('');
   const [sequence, setSequence] = useState('');
-  const [allNames, setAllNames] = useState([]);
 
-const names = allNames.map((name, index) => ({
-  name,
-  sequence: index + 1
-}));
+const savedData = {
+      masterWorkType,
+      uiType,
+      deliveryWorkTypes,
+    };
 
-  const handleNext = async () => {
 
-//    await axios.post(
-//   `http://localhost:5000/addGuiwithSequence/`,
-//   { gui_type: uiType,
-//     master_work_types: names.map((item) => item.name),
-//     sequences: names.map((item) => item.sequence),
-//   }
-// );
-    console.log("data saved");
+  const handleNext = () => {
+ 
+    console.log('UI Type:', savedData.uiType);
+   
+  };
+
+   const handleSave = () => {
+  
+    console.log('Data saved locally:');
+     console.log(savedData);
+    // flush the data to the server or local storage
+    setDeliveryWorkTypes([]);
+    setMasterWorkType('');
   };
 
   return (
     <>
-    <div style={{marginTop:"20px" }} >
-      <div style={{border:"1px solid #7500c0" , borderRadius:"10px" , paddingTop:"20px" , paddingLeft:"20px" , paddingRight:"20px" , paddingBottom:"20px"}}>
-      <DropdownWithTextBox allNames={allNames} setAllNames={setAllNames} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Create Master Work Types: "} />
-      <br />
-      <div style={{marginTop:"0px"}} >   
-        {/* <MappedDropdown
-          workTypes={workTypes}
-          setWorkTypes={setWorkTypes}
-          uiType={uiType}
-          selectedName={selectedName}
-          setSelectedName={setSelectedName}
-        /> */}
+      <div style={{ marginTop: '20px'  }}>
+        <div
+          style={{
+            border: '1px solid #7500c0',
+            borderRadius: '10px',
+            padding: '20px',
+            display: 'flex',
+            alignContent:'center',
+            flexDirection: 'column',
+          }}
+        >
+          <DropdownWithTextBox
+            allNames={masterWorkType ? [masterWorkType] : []}
+            setAllNames={(newList) => setMasterWorkType(newList[0] || '')}
+            setUiType={setUiType}
+            setSequence={setSequence}
+            setSelectedName={setMasterWorkType}
+            label={'Create Master Work Types: '}
+            singleEntry
+          />
 
-         <DropdownWithTextBox allNames={allNames} setAllNames={setAllNames} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Create Delivery Work Types: "} />
+          <br />
+
+          <DropdownWithTextBox
+            allNames={deliveryWorkTypes}
+            setAllNames={setDeliveryWorkTypes}
+            setUiType={setUiType}
+            setSequence={setSequence}
+            setSelectedName={() => {}}
+            label={'Create Delivery Work Types: '}
+          />
+   <Button
+          onClick={handleSave}
+          variant="contained"
+          sx={{
+            mt: 1,
+            px: 0.5,
+            py: 0.5,
+            fontSize: '10px',
+            fontWeight: 'bold',
+            borderRadius: '6px',
+            backgroundColor: '#7500c0',
+            color: 'white',
+            textTransform: 'none',
+            '&:hover': {
+              backgroundColor: '#7500c0',
+              transform: 'scale(1.05)',
+            },
+          }}
+        >
+          Assign Delivery Work Types
+        </Button>
+
+        </div>
+<div
+          style={{
+            border: '1px solid #7500c0',
+            borderRadius: '10px',
+            padding: '20px',
+            marginTop: '20px', 
+          }}
+        >
+<div >
+        <label htmlFor="uiTypeSelect" style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
+          UI Type For Master Work Types
+        </label>
+        <select
+          id="uiTypeSelect"
+          style={{ width: '100%', padding: '8px 60px 8px 8px', boxSizing: 'border-box' }}
+          onChange={e => setUiType(e.target.value)}
+          defaultValue=""
+        >
+          <option value="" disabled>Select a GUI Type…</option>
+          <option value="check_box">Check Box</option>
+          <option value="radio_button">Radio Button</option>
+          <option value="button">Button</option>
+        </select>
       </div>
+
       </div>
-        <div style={{marginTop:"20px"}} >
-          <label htmlFor="uiTypeSelect" style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
-                UI Type For Master Work Types
-              </label>
-              <select
-                id="uiTypeSelect"
-                style={{  width: '100%', padding: '8px 60px 8px 8px', boxSizing: 'border-box'  }}
-                onChange={e => setUiType(e.target.value)}
-                defaultValue=""
-              >
-                <option value="" disabled>Select a GUI Type…</option>
-                <option value="check_box">Check Box</option>
-                <option value="radio_button">Radio Button</option>
-                <option value="button">Button</option>
-              </select>
-          </div>
-       <Button
-      onClick={handleNext}
-      variant="contained"
-      sx={{
-        mt: 2,
-        px: 2,
-        py: 1,
-        fontSize: '14px',
-        fontWeight: 'bold',
-        borderRadius: '6px',
-        backgroundColor: '#eb7476',
-        color: 'white',
-        textTransform: 'none',
-        '&:hover': {
-          backgroundColor: '#f38b8d',
-        },
-      }}
-    >
-      SAVE
-    </Button>
+        <Button
+          onClick={handleNext}
+          variant="contained"
+          sx={{
+            mt: 0.5,
+            px: 0.5,
+            py: 0.5,
+            fontSize: '10px',
+            fontWeight: 'bold',
+            borderRadius: '6px',
+            backgroundColor: '#7500c0',
+            color: 'white',
+            width: '100%',
+            marginTop: '10px',
+            textTransform: 'none',
+            '&:hover': {
+              backgroundColor: '#7500c0',
+              transform: 'scale(1.05)',
+            },
+          }}
+        >
+          Save
+        </Button>
       </div>
     </>
-  )
+  );
 };
 
 export default FieldRow;
