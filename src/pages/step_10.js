@@ -1,4 +1,6 @@
+
 import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -9,6 +11,8 @@ import {
 } from "@mui/material";
 import VModelTable from "../components/VModelTable.jsx";
 import TextBox from "../components/TextBox.jsx";
+
+import axios from "axios";
 
 export default function Step_10() {
   const dummyClusters = [
@@ -25,6 +29,18 @@ export default function Step_10() {
       clusterValues: [],
     },
   ];
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/v1/api/admin/clusters")
+      .then((response) => {
+        console.log("Clusters fetched successfully:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching clusters:", error);
+      });
+  }, []);
+
 
   const [showTable, setShowTable] = useState(false);
   const [selectedCluster, setSelectedCluster] = useState("");

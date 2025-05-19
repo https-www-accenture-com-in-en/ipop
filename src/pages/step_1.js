@@ -8,6 +8,7 @@ const FieldRow = () => {
   const [uiType, setUiType] = useState('');
   const [sequence, setSequence] = useState('');
   const [selectedMasterName, setSelectedMasterName] = useState(null);
+
  
 const savedData = {
       selectedMasterName,
@@ -53,7 +54,7 @@ const savedData = {
             setSelectedName={setSelectedMasterName}
             label={'Create Master Work Types: '}
           />
-
+ 
           <br />
  
           <DropdownWithTextBox
@@ -65,7 +66,28 @@ const savedData = {
             label={'Create Delivery Work Types: '}
             disabled={!selectedMasterName}
           />
-
+   <Button
+          onClick={handleSave}
+          variant="contained"
+          sx={{
+            mt: 1,
+            px: 0.5,
+            py: 0.5,
+            fontSize: '10px',
+            fontWeight: 'bold',
+            borderRadius: '6px',
+            backgroundColor: '#7500c0',
+            color: 'white',
+            textTransform: 'none',
+            '&:hover': {
+              backgroundColor: '#7500c0',
+              transform: 'scale(1.05)',
+            },
+          }}
+        >
+          Assign Delivery Work Types
+        </Button>
+ 
         </div>
 <div
           style={{

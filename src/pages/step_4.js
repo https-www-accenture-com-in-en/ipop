@@ -28,6 +28,11 @@ const hardcodedTicketTypes = [
 
 
 // Delivery Work Type -> Work Type Category mapping
+
+const hardcodedTicketTypes = [
+  "Assistance", "Correction", "PMON", "Habilitation", "Evolution", "RITM"
+];
+
 const workTypeCategoryMap = {
   "Application Maintainance": [
     "Correction", "Assistance", "PMON", "RITM", "Habilitation",
@@ -50,8 +55,11 @@ export default function Step_4() {
   const [uiType, setUiType] = useState('');
   const [sequence, setSequence] = useState('');
 
+
   const [allNames, setAllNames] = useState(["Ticket Number","Ticket description"]);
   const [implicitAttr, setImplicitAttr] = useState(["Estimated Effort" ,"Burnt Effort","Remaining Effort","Effort To Be Clocked","Additional Effort To Be Clocked"])
+  const [allNames, setAllNames] = useState(["Ticket Number", "Ticket description", "Ticket Priority"]);
+  const [implicitAttr, setImplicitAttr] = useState(["Estimated Effort", "Burnt Effort", "Remaining Effort", "Effort To Be Clocked", "Additional Effort To Be Clocked"]);
   const [mappings, setMappings] = useState([]);
 
   const handleAddMapping = () => {
@@ -77,12 +85,6 @@ export default function Step_4() {
 
   const handleSave = () => {
     console.log("Final Mappings", mappings);
-  };
-
-  const handleDeliveryChange = (e) => {
-    const value = e.target.value;
-    setSelectedDelivery(value);
-    setSelectedCategory(""); // Reset category when delivery changes
   };
 
   return (
@@ -156,10 +158,109 @@ export default function Step_4() {
           </ListItem>
         ))}
       </List>
+    <Box sx={{ p: 3, maxWidth: 500, mx: 'auto' }}>
+      <div
+        style={{
+          border: '1px solid #7500c0',
+          borderRadius: '10px',
+          padding: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+        }}
+      >
+        <Typography
+          variant="h5"
+          gutterBottom
+          sx={{
+            whiteSpace: 'normal',
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word',
+            fontWeight: 'bold',
+            fontSize: '18px',
+          }}
+        >
+          Define Meta Data (Ticket Attributes)
+        </Typography>
 
-      <Button variant="contained" color="success" sx={{ mt: 3 }} onClick={handleSave}>
-        Save
-      </Button>
+<label htmlFor="nameInput" style={{ display: 'block',  fontWeight: 'bold' }}>
+        Ticket Type
+      </label>
+        <FormControl  fullWidth sx={{ maxWidth: '100%'}}>
+          <InputLabel>Select Ticket Type</InputLabel>
+          <Select
+            value={selectedTicketType}
+            onChange={(e) => setSelectedTicketType(e.target.value)}
+            label="Ticket Type"
+          >
+            {hardcodedTicketTypes.map((type) => (
+              <MenuItem key={type} value={type}>
+                {type}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <DropdownWithTextBox
+          allNames={allNames}
+          setAllNames={setAllNames}
+          setUiType={setUiType}
+          setSequence={setSequence}
+          setSelectedName={setSelectedName}
+          label={"Define Explicit Attributes"}
+        />
+
+        <DropdownWithTextBox
+          allNames={implicitAttr}
+          setAllNames={setImplicitAttr}
+          setUiType={setUiType}
+          setSequence={setSequence}
+          setSelectedName={setSelectedName}
+          label={"Define Implicit Attributes"}
+        />
+
+        <List>
+          {mappings.map((map, index) => (
+            <ListItem
+              key={index}
+              secondaryAction={
+                <IconButton edge="end" onClick={() => handleDelete(index)}>
+                  <DeleteIcon />
+                </IconButton>
+              }
+            >
+              <ListItemText
+                primary={`${map.ticketType} - ${map.ticketNumber}`}
+                secondary={`Category: ${map.workTypeCategory}, Delivery: ${map.deliveryWorkType}`}
+              />
+            </ListItem>
+          ))}
+        </List>
+
+        <Button
+                  onClick={handleSave}
+                  variant="contained"
+                  sx={{
+                    mt: 0.5,
+                    px: 0.5,
+                    py: 0.5,
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                    borderRadius: '6px',
+                    backgroundColor: '#7500c0',
+                    color: 'white',
+                    width: '100%',
+                    marginTop: '0px',
+                    textTransform: 'none',
+                    '&:hover': {
+                      backgroundColor: '#7500c0',
+                      transform: 'scale(1.05)',
+                    },
+                  }}
+                >
+                  Save
+                </Button>
+      </div>
     </Box>
   );
 }
