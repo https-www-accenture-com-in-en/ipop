@@ -120,6 +120,9 @@ const VModelTable = () => {
           ]}
         />
       </Box>
+
+      <Button
+
       {/* <Button
         onClick={validate}
         variant="contained"
@@ -139,6 +142,9 @@ const VModelTable = () => {
         }}
       >
         Validate
+
+      </Button>
+
       </Button> */}
     </div>
   );

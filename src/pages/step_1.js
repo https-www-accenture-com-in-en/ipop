@@ -3,13 +3,15 @@ import DropdownWithTextBox from './DropDown.js';
 import { Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
  
 const FieldRow = () => {
-  const [masterWorkType, setMasterWorkType] = useState('');
+  const [masterWorkType, setMasterWorkType] = useState([]);
   const [deliveryWorkTypes, setDeliveryWorkTypes] = useState([]);
   const [uiType, setUiType] = useState('');
   const [sequence, setSequence] = useState('');
+  const [selectedMasterName, setSelectedMasterName] = useState(null);
+
  
 const savedData = {
-      masterWorkType,
+      selectedMasterName,
       uiType,
       deliveryWorkTypes,
     };
@@ -24,10 +26,10 @@ const savedData = {
    const handleSave = () => {
  
     console.log('Data saved locally:');
-     console.log(savedData);
+    console.log(savedData);
     // flush the data to the server or local storage
     setDeliveryWorkTypes([]);
-    setMasterWorkType('');
+    setMasterWorkType([]);
   };
  
   return (
@@ -45,13 +47,12 @@ const savedData = {
           }}
         >
           <DropdownWithTextBox
-            allNames={masterWorkType ? [masterWorkType] : []}
-            setAllNames={(newList) => setMasterWorkType(newList[0] || '')}
+            allNames={masterWorkType}
+            setAllNames={setMasterWorkType}
             setUiType={setUiType}
             setSequence={setSequence}
-            setSelectedName={setMasterWorkType}
+            setSelectedName={setSelectedMasterName}
             label={'Create Master Work Types: '}
-            singleEntry
           />
  
           <br />
@@ -63,6 +64,7 @@ const savedData = {
             setSequence={setSequence}
             setSelectedName={() => {}}
             label={'Create Delivery Work Types: '}
+            disabled={!selectedMasterName}
           />
    <Button
           onClick={handleSave}
@@ -114,7 +116,7 @@ const savedData = {
  
       </div>
         <Button
-          onClick={handleNext}
+          onClick={handleSave}
           variant="contained"
           sx={{
             mt: 0.5,
@@ -134,7 +136,7 @@ const savedData = {
             },
           }}
         >
-          Save
+        Assign Delivery Work Types
         </Button>
       </div>
     </>

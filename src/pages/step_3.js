@@ -20,21 +20,9 @@ import DropdownWithTextBox from './DropDown.js';
 // L1 -> L2 mapping
 const workTypeCategoryMap = {
   "AM Ticket Delivery":[],
-  "AM Non Ticket Delivery":[],
-  "AM Non Delivery":[],
   "AD Ticket Delivery":[],
-  "AD Non Ticket Delivery":[],
-  "AD Non Delivery":[],
   "CM Ticket Delivery":[],
-  "CM Non Ticket Delivery":[],
-  "CM Non Delivery":[],
   "CBS Ticket Delivery":[],
-  "CBS Non Ticket Delivery":[],
-  "CBS Non Delivery":[],
-  "SIP Ticket Delivery":[],
-  "SIP Non Ticket Delivery":[],
-  "SIP Non Delivery":[],
-  
 };
 
 const deliveryWorkTypes = Object.keys(workTypeCategoryMap);
@@ -95,9 +83,20 @@ export default function Step_4() {
     console.log("data saved");
   };
   return (
-    <div style={{ border: "1px solid #7500c0", borderRadius: "10px", paddingTop: "20px", paddingLeft: "60px", paddingRight: "60px", paddingBottom: "20px" }}>
+    <div style={{ border: "1px solid #7500c0", borderRadius: "10px", padding: "20px"}}>
       <Box p={4}>
-        <label htmlFor="ticketTypes" style={{ fontWeight: 'bold', display: 'block', marginBottom: '2px' }}>
+        <label htmlFor="workType" style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
+          Work Type Category
+        </label>
+         <TextField
+                  name="workType"
+                  value="Ticket Delivery"
+                  fullWidth
+                  InputProps={{
+                    readOnly: true
+                  }}
+                />
+        <label htmlFor="ticketTypes" style={{ fontWeight: 'bold', display: 'block',marginTop: '20px' }}>
           Select Task Type
         </label>
 
@@ -123,7 +122,7 @@ export default function Step_4() {
            onClick={handleNext}
            variant="contained"
            sx={{
-             mt: 1,
+             mt: 2,
              px: 0.5,
              py: 0.5,
              fontSize: '10px',

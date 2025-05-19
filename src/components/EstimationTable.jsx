@@ -5,7 +5,11 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+
+import { TextField } from "@mui/material";
+
 import { Button, Tab, TextField } from "@mui/material";
+
 import { useState } from "react";
 
 const EstimationTable = ({ initialRows }) => {
@@ -24,6 +28,7 @@ const EstimationTable = ({ initialRows }) => {
     console.log(rows);
   };
 
+
   const validate = () => {
     const totalDistribution = rows.reduce(
       (acc, row) => acc + parseFloat(row.distribution || 0),
@@ -33,6 +38,7 @@ const EstimationTable = ({ initialRows }) => {
       alert("Total distribution must be 100%");
     }
   };
+
 
   return (
     <div>
@@ -44,7 +50,9 @@ const EstimationTable = ({ initialRows }) => {
               <TableCell sx={{ color: "white" }}>% Distribution</TableCell>
               <TableCell sx={{ color: "white" }}>Estimated Effort</TableCell>
               <TableCell sx={{ color: "white" }}>Burnt Effort</TableCell>
+
               <TableCell sx={{ color: "white" }}>Delete</TableCell>
+
             </TableRow>
           </TableHead>
           <TableBody>
@@ -74,11 +82,13 @@ const EstimationTable = ({ initialRows }) => {
                 <TableCell>{row.estimatedEffort}</TableCell>
                 <TableCell>{row.burntEffort}</TableCell>
                 <TableCell>🗑️</TableCell>
+
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+
       <Button
         onClick={validate}
         variant="contained"
