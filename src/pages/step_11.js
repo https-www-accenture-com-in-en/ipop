@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DropdownWithTextBox from "./DropDown.tsx";
+import DropdownWithTextBox from "./DropDown.js";
 
 const FieldRow = () => {
   const [selectedName, setSelectedName] = useState(null);
