@@ -1,35 +1,35 @@
 import React, { useState } from 'react';
-import DropdownWithTextBox from './DropDown';
+import DropdownWithTextBox from './DropDown.js';
 import { Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
-
+ 
 const FieldRow = () => {
   const [masterWorkType, setMasterWorkType] = useState('');
   const [deliveryWorkTypes, setDeliveryWorkTypes] = useState([]);
   const [uiType, setUiType] = useState('');
   const [sequence, setSequence] = useState('');
-
+ 
 const savedData = {
       masterWorkType,
       uiType,
       deliveryWorkTypes,
     };
-
-
+ 
+ 
   const handleNext = () => {
  
     console.log('UI Type:', savedData.uiType);
    
   };
-
+ 
    const handleSave = () => {
-  
+ 
     console.log('Data saved locally:');
      console.log(savedData);
     // flush the data to the server or local storage
     setDeliveryWorkTypes([]);
     setMasterWorkType('');
   };
-
+ 
   return (
     <>
       <div style={{ marginTop: '20px'  }}>
@@ -41,6 +41,7 @@ const savedData = {
             display: 'flex',
             alignContent:'center',
             flexDirection: 'column',
+ 
           }}
         >
           <DropdownWithTextBox
@@ -52,9 +53,9 @@ const savedData = {
             label={'Create Master Work Types: '}
             singleEntry
           />
-
+ 
           <br />
-
+ 
           <DropdownWithTextBox
             allNames={deliveryWorkTypes}
             setAllNames={setDeliveryWorkTypes}
@@ -84,14 +85,14 @@ const savedData = {
         >
           Assign Delivery Work Types
         </Button>
-
+ 
         </div>
 <div
           style={{
             border: '1px solid #7500c0',
             borderRadius: '10px',
             padding: '20px',
-            marginTop: '20px', 
+            marginTop: '20px',
           }}
         >
 <div >
@@ -110,7 +111,7 @@ const savedData = {
           <option value="button">Button</option>
         </select>
       </div>
-
+ 
       </div>
         <Button
           onClick={handleNext}
@@ -139,5 +140,5 @@ const savedData = {
     </>
   );
 };
-
+ 
 export default FieldRow;

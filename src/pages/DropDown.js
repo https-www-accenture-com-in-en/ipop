@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-
+ 
 const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequence, label }) => {
   const [value, setValue] = useState('');
   const [editingName, setEditingName] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef(null);
-
+ 
   // Close dropdown on outside click
   useEffect(() => {
     const onClickOutside = e => {
@@ -16,19 +16,19 @@ const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequen
     document.addEventListener('mousedown', onClickOutside);
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, []);
-
+ 
   const onInputChange = e => {
     setValue(e.target.value);
     setIsOpen(true);
   };
-
+ 
   const onCommit = () => {
     const trimmed = value.trim();
     if (!trimmed) {
       resetInput();
       return;
     }
-
+ 
     if (editingName) {
       const updated = allNames.map(name =>
         name === editingName ? trimmed : name
@@ -37,19 +37,19 @@ const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequen
     } else if (!allNames.includes(trimmed)) {
       setAllNames([...allNames, trimmed]);
     }
-
+ 
     resetInput();
   };
-
+ 
   const onDelete = (nameToDelete) => {
     const target = nameToDelete || editingName || value.trim();
     if (!target) return;
-
+ 
     const updated = allNames.filter(name => name !== target);
     setAllNames(updated);
     resetInput();
   };
-
+ 
   const onSelect = (name, index) => {
     setValue(name);
     setEditingName(null);
@@ -57,25 +57,25 @@ const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequen
     setSelectedName(name);
     setSequence(index);
   };
-
+ 
   const onKeyDown = e => {
     if (e.key === 'Enter') {
       e.preventDefault();
       onCommit();
     }
   };
-
+ 
   const resetInput = () => {
     setValue('');
     setEditingName(null);
     setIsOpen(false);
   };
-
+ 
   const isExisting = allNames.includes(value.trim());
   const showSave = value.trim().length > 0 && (editingName !== null || !isExisting);
   const showDeleteInput = editingName !== null;
   const showToggle = !showSave && !showDeleteInput;
-
+ 
   return (
     <div ref={wrapperRef} style={{ position: 'relative', width: 300 }}>
       <label htmlFor="nameInput" style={{ display: 'block', marginBottom: 6, fontWeight: 'bold' }}>
@@ -89,9 +89,9 @@ const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequen
           onChange={onInputChange}
           onFocus={() => setIsOpen(true)}
           onKeyDown={onKeyDown}
-          placeholder="Type or select a Master Work Type…"
+          placeholder="Type or select"
         />
-
+ 
         {/* Save button */}
         {showSave && (
           <button
@@ -111,7 +111,7 @@ const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequen
             💾
           </button>
         )}
-
+ 
         {/* Delete button */}
         {showDeleteInput && (
           <button
@@ -132,7 +132,7 @@ const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequen
             🗑️
           </button>
         )}
-
+ 
         {/* Toggle dropdown */}
         {showToggle && (
           <button
@@ -153,7 +153,7 @@ const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequen
           </button>
         )}
       </div>
-
+ 
       {/* Dropdown list */}
       {isOpen && (
         <ul
@@ -207,7 +207,7 @@ const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequen
                 >
                   ✏️
                 </button>
-
+ 
                 {/* Delete */}
                 <button
                   onClick={e => {
@@ -226,7 +226,7 @@ const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequen
                 >
                   🗑️
                 </button>
-
+ 
                 {/* Move Up */}
                 <button
                   onClick={e => {
@@ -242,7 +242,7 @@ const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequen
                 >
                   ↑
                 </button>
-
+ 
                 {/* Move Down */}
                 <button
                   onClick={e => {
@@ -266,5 +266,5 @@ const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequen
     </div>
   );
 };
-
+ 
 export default ComboBox;

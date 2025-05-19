@@ -300,72 +300,87 @@ export default function Step_2() {
         </div>
       </div>
 
-      
-        <div style={{ border: "1px solid #7500c0", borderRadius: "10px", padding: "10px" , marginTop: "20px"}}>
-          {showTable && (
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead sx={{ backgroundColor: '#7500c0'}}>
-                  <TableRow>
-                    <TableCell sx={{ color: 'white', fontWeight:'bold' }}>Sequence</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight:'bold' }}>DWT</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight:'bold' }}>WTC</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight:'bold' }}>Screen Field Name For Task Type</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight:'bold' }}>Up/Down</TableCell>
+      {showTable && (
+        <div style={{ border: "1px solid #7500c0", borderRadius: "10px", padding: "10px", marginTop: "20px" }}>
+          <TableContainer component={Paper} sx={{ overflow: 'hidden', borderRadius: '12px', mb: 2 }}>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: '#7500c0' }}>
+                  <TableCell sx={{
+                    color: 'white',
+                    fontWeight: 'bold',
+                    paddingY: '6px',
+                    '&:first-of-type': { borderBottomLeftRadius: '12px' },
+                    // '&:last-of-type': { }
+                  }}>
+                    Sequence
+                  </TableCell>
+                  <TableCell sx={{ color: 'white', fontWeight: 'bold', paddingY: '6px' }}>DWT</TableCell>
+                  <TableCell sx={{ color: 'white', fontWeight: 'bold', paddingY: '6px' }}>WTC</TableCell>
+                  <TableCell sx={{ color: 'white', fontWeight: 'bold', paddingY: '6px' }}>
+                    Screen Field Name For Task Type
+                  </TableCell>
+                  <TableCell sx={{
+                    color: 'white',
+                    fontWeight: 'bold',
+                    paddingY: '6px',
+                    '&:last-of-type': { borderBottomRightRadius: '12px' }
+                  }}>
+                    Up/Down
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row, index) => (
+                  <TableRow key={row.sequence}>
+                    <TableCell>{row.sequence}</TableCell>
+                    <TableCell>{row.dwt}</TableCell>
+                    <TableCell>{row.wtc}</TableCell>
+                    <TableCell>
+                      <TextField
+                        variant="standard"
+                        fullWidth
+                        value={row.screenField}
+                        onChange={(e) => handleChange(index, e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <IconButton size="small" onClick={() => moveRow(index, 1)} disabled={index === rows.length - 1}>
+                        <ArrowDownwardIcon fontSize="inherit" />
+                      </IconButton>
+                      <IconButton size="small" onClick={() => moveRow(index, -1)} disabled={index === 0}>
+                        <ArrowUpwardIcon fontSize="inherit" />
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row, index) => (
-                    <TableRow key={row.sequence}>
-                      <TableCell>{row.sequence}</TableCell>
-                      <TableCell>{row.dwt}</TableCell>
-                      <TableCell>{row.wtc}</TableCell>
-                      <TableCell>
-                        <TextField
-                          variant="standard"
-                          fullWidth
-                          value={row.screenField}
-                          onChange={(e) => handleChange(index, e.target.value)}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <IconButton size="small" onClick={() => moveRow(index, 1)} disabled={index === rows.length - 1}>
-                          <ArrowDownwardIcon fontSize="inherit" />
-                        </IconButton>
-                        <IconButton size="small" onClick={() => moveRow(index, -1)} disabled={index === 0}>
-                          <ArrowUpwardIcon fontSize="inherit" />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </div>
-    
-        <Button
-          onClick={handleNext}
-          variant="contained"
-          sx={{
-            mt: 1,
-            px: 0.5,
-            py: 0.5,
-            fontSize: '10px',
-            width: '100%',
-            fontWeight: 'bold',
-            borderRadius: '6px',
+      )}
+      <Button
+        onClick={handleNext}
+        variant="contained"
+        sx={{
+          mt: 1,
+          px: 0.5,
+          py: 0.5,
+          fontSize: '10px',
+          width: '100%',
+          fontWeight: 'bold',
+          borderRadius: '6px',
+          backgroundColor: '#7500c0',
+          color: 'white',
+          textTransform: 'none',
+          '&:hover': {
             backgroundColor: '#7500c0',
-            color: 'white',
-            textTransform: 'none',
-            '&:hover': {
-              backgroundColor: '#7500c0',
-              transform: 'scale(1.05)',
-            },
-          }}
-        >
-          Save
-        </Button>
+            transform: 'scale(1.05)',
+          },
+        }}
+      >
+        Save
+      </Button>
     </>
   )
 }
