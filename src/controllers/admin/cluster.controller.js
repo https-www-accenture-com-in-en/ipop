@@ -23,25 +23,27 @@ const httpAddCluster = async (req, res) => {
 
 const httpAddMasterProject = async (req, res) => {
   try {
-    const { masterProjectName, projectName } = req.body;
+    const { masterProjectName, subProjectNames } = req.body;
 
-    if (!masterProjectName || !projectName || !Array.isArray(projectName)) {
+    if (
+      !masterProjectName ||
+      !subProjectNames ||
+      !Array.isArray(subProjectNames)
+    ) {
       return res.status(400).json({ error: "Invalid data" });
     }
     const newMasterProject = new MasterProject({
       masterProjectName,
-      projectName,
+      subProjectNames,
     });
     const savedMasterProject = await newMasterProject.save();
     if (!savedMasterProject) {
       return res.status(500).json({ error: "Failed to save master project" });
     }
-    res
-      .status(201)
-      .json({
-        message: "Master Project created successfully",
-        master: savedMasterProject,
-      });
+    res.status(201).json({
+      message: "Master Project created successfully",
+      master: savedMasterProject,
+    });
   } catch (error) {
     console.error("Error creating master project:", error);
     res.status(500).json({ error: "Server error" });

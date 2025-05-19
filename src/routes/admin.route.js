@@ -15,7 +15,7 @@ const adminRouter = express.Router();
 adminRouter.post("/clusters", httpAddCluster);
 adminRouter.get("/clusters", httpGetCluster);
 
-adminRouter.post("/masterproject", httpAddMasterProject);
-adminRouter.get("/masterproject", httpGetMasterProject);
+adminRouter.post("/masterprojects", httpAddMasterProject);
+adminRouter.get("/masterprojects", httpGetMasterProject);
 
 export default adminRouter;
