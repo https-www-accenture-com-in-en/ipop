@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
  
-const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequence, label }) => {
+const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequence, label, disabled=false }) => {
   const [value, setValue] = useState('');
   const [editingName, setEditingName] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -90,6 +90,7 @@ const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequen
           onFocus={() => setIsOpen(true)}
           onKeyDown={onKeyDown}
           placeholder="Type or select"
+          disabled={disabled}
         />
  
         {/* Save button */}
@@ -155,7 +156,7 @@ const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequen
       </div>
  
       {/* Dropdown list */}
-      {isOpen && (
+      {!disabled && isOpen && (
         <ul
           style={{
             listStyle: 'none',
