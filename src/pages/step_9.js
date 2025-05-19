@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import DropdownWithTextBox from "./DropDown.js";
+import ProjectManagerMUI from "../components/Dropdownv2.jsx";
 
 const FieldRow = () => {
   const [selectedName, setSelectedName] = useState(null);
@@ -65,6 +66,9 @@ const FieldRow = () => {
         >
           Save
         </button>
+        <div>
+          <ProjectManagerMUI />
+        </div>
       </div>
     </>
   );
