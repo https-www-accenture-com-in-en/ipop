@@ -1,6 +1,11 @@
 import { TextField } from "@mui/material";
 
-const TextBox = ({ InputLabel, InputInnerLabel }) => {
+const TextBox = ({
+  inputValue,
+  setInputValue,
+  InputLabel,
+  InputInnerLabel,
+}) => {
   return (
     <div>
       <label
@@ -12,6 +17,10 @@ const TextBox = ({ InputLabel, InputInnerLabel }) => {
         label={InputInnerLabel}
         variant="outlined"
         size="small"
+        value={inputValue}
+        onChange={(e) => {
+          setInputValue(e.target.value);
+        }}
         fullWidth
         style={{
           fontWeight: "bold",

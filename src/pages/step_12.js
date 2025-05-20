@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   MenuItem,
@@ -8,25 +8,25 @@ import {
   InputLabel,
   Box,
 } from "@mui/material";
+import axios from "axios";
 
 import VModelTable from "../components/VModelTable";
+import CustomButton from "../components/CustomButton.jsx";
 
 export default function Step_12() {
-  const dummyData = [
-    {
-      masterProjectName: "USA Rollout",
-      projectName: ["USA Phase 1", "USA Phase 2", "USA QA"],
-    },
-    {
-      masterProjectName: "Meneca Rollout",
-      projectName: ["Meneca Frontend", "Meneca Backend"],
-    },
-    {
-      masterProjectName: "Kazakstan Rollout",
-      projectName: ["KZ Module A", "KZ Module B", "KZ Reports"],
-    },
-  ];
+  const [dummyData, setDummyData] = useState([]);
 
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/v1/api/admin/masterprojects")
+      .then((response) => {
+        console.log("Master projects fetched successfully:", response.data);
+        setDummyData(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching master projects:", error);
+      });
+  }, []);
   const [showTable, setShowTable] = useState(false);
   const [selectedMaster, setSelectedMaster] = useState("");
   const [selectedSubProject, setSelectedSubProject] = useState("");
@@ -94,7 +94,7 @@ export default function Step_12() {
               label="Sub Project"
               onChange={handleSubProjectChange}
             >
-              {currentMaster?.projectName.map((sub) => (
+              {currentMaster?.subProjectNames.map((sub) => (
                 <MenuItem key={sub} value={sub}>
                   {sub}
                 </MenuItem>
@@ -102,26 +102,12 @@ export default function Step_12() {
             </Select>
           </FormControl>
         </Box>
-        <Button
-          onClick={() => setShowTable(true)}
-          variant="contained"
-          sx={{
-            mt: 2,
-            px: 2,
-            py: 1,
-            fontSize: "14px",
-            fontWeight: "bold",
-            borderRadius: "6px",
-            backgroundColor: "#eb7476",
-            color: "white",
-            textTransform: "none",
-            "&:hover": {
-              backgroundColor: "#f38b8d",
-            },
+        <CustomButton
+          handleClick={() => {
+            setShowTable(true);
           }}
-        >
-          Create V-Model Project Tasks
-        </Button>
+          innerContent="Create V-Model Project Tasks"
+        />
       </div>
       <Box my={2}>
         {showTable && <VModelTable style={{ marginTop: "20px" }} />}

@@ -1,11 +1,7 @@
-
-import React, { useState } from "react";
-import DropdownWithTextBox from "./DropDown.js";
-
 import { useState } from "react";
 import DropdownWithTextBox from "./DropDown.js";
 import ProjectManagerMUI from "../components/Dropdownv2.jsx";
-
+import CustomButton from "../components/CustomButton.jsx";
 
 const FieldRow = () => {
   const [selectedName, setSelectedName] = useState(null);
@@ -55,25 +51,8 @@ const FieldRow = () => {
             label={"Create Values for Cluster: "}
           />
         </div>
-        <button
-          onClick={handleNext}
-          style={{
-            padding: "8px 14px",
-            fontSize: "12px",
-            cursor: "pointer",
-            border: "none",
-            color: "white",
-            fontWeight: "bold",
-            borderRadius: "4px",
-            marginTop: "20px",
-            backgroundColor: "#eb7476",
-          }}
-        >
-          Save
-        </button>
-        <div>
-          <ProjectManagerMUI />
-        </div>
+        <CustomButton handleClick={handleNext} innerContent={"Save"} />
+        <div>{/* <ProjectManagerMUI /> */}</div>
       </div>
     </>
   );
