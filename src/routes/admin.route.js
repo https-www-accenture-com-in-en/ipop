@@ -13,7 +13,6 @@ const adminRouter = express.Router();
 adminRouter.post("/masteranddeliveryworktypes", httpCreateMasterDeliveryWT);
 
 //SCREEN 9 FURTHER WORK
-
 adminRouter.post("/clusters", httpAddCluster);
 adminRouter.get("/clusters", httpGetCluster);
 

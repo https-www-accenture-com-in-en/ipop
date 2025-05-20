@@ -1,4 +1,4 @@
-import { MasterDeliveryWT } from "../../models/master.model.js";
+import { MasterWorkType, DeliveryWorkType } from "../../models/master.model.js";
 
 const httpMasterDeliveryWT = async (req, res) => {
   try {
@@ -12,34 +12,35 @@ const httpMasterDeliveryWT = async (req, res) => {
 
 const httpCreateMasterDeliveryWT = async (req, res) => {
   try {
-    console.log("Request body:", req.body);
-    const { masterWorkTypes, gui_type, deliveryWorkTypes, sequence } = req.body;
+    const payload = req.body;
+    const result = [];
 
-    if (!masterWorkTypes || !gui_type || !deliveryWorkTypes || !sequence) {
-      return res.status(400).json({ error: "Invalid data" });
+    for (const entry of payload) {
+      const { masterWorkTypes, gui_type, sequence, deliveryWorkTypes } = entry;
+      console.log(entry);
+      const masterWorkType = await MasterWorkType.create({
+        masterWorkTypes,
+        gui_type,
+        sequence,
+      });
+
+      console.log(deliveryWorkTypes);
+      const deliveryWorkType = await DeliveryWorkType.insertMany(
+        deliveryWorkTypes.map((dw) => ({
+          masterWorkTypes,
+          deliveryWorkTypes: dw,
+          sequence,
+          MasterWorkTypeId: masterWorkType._id,
+        }))
+      );
+
+      result.push({ masterWorkType, deliveryWorkType });
     }
 
-    const newMasterDeliveryWT = new MasterDeliveryWT({
-      masterWorkTypes,
-      gui_type,
-      deliveryWorkTypes,
-      sequence,
-    });
-
-    const savedMasterDeliveryWT = await newMasterDeliveryWT.save();
-    if (!savedMasterDeliveryWT) {
-      return res
-        .status(500)
-        .json({ error: "Failed to save master delivery work type" });
-    }
-
-    res.status(201).json({
-      message: "Master Delivery Work Type created successfully",
-      masterDeliveryWT: savedMasterDeliveryWT,
-    });
+    res.status(201).json(result);
   } catch (error) {
-    console.error("Error creating master delivery work type:", error);
-    res.status(500).json({ error: "Server error" });
+    console.error("Error posting:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
