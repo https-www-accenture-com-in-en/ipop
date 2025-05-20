@@ -1,5 +1,5 @@
 import express from "express";
-// import { httpGetAdminData, httpAddAdminData, } from '../controllers/admin/admin.controller.js';
+import { httpCreateMasterDeliveryWT } from "../controllers/admin/master-delivery.controller.js";
 import {
   httpAddCluster,
   httpAddMasterProject,
@@ -9,8 +9,10 @@ import {
 
 const adminRouter = express.Router();
 
-// adminRouter.post('/masterworktypes', httpAddAdminData);
-// adminRouter.post('/deliveryworktypes', httpGetAdminData);
+//SCREEN1
+adminRouter.post("/masteranddeliveryworktypes", httpCreateMasterDeliveryWT);
+
+//SCREEN 9 FURTHER WORK
 
 adminRouter.post("/clusters", httpAddCluster);
 adminRouter.get("/clusters", httpGetCluster);
