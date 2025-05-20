@@ -1,5 +1,7 @@
 import { useState } from "react";
 import DropdownWithTextBox from "./DropDown.js";
+import ProjectManager from "../components/Dropdownv1.jsx";
+import CustomButton from "../components/CustomButton.jsx";
 
 const FieldRow = () => {
   const [selectedName, setSelectedName] = useState(null);
@@ -49,22 +51,8 @@ const FieldRow = () => {
             label={"Create Sub-Project: "}
           />
         </div>
-        <button
-          onClick={handleNext}
-          style={{
-            padding: "8px 14px",
-            fontSize: "12px",
-            cursor: "pointer",
-            border: "none",
-            color: "white",
-            fontWeight: "bold",
-            borderRadius: "4px",
-            marginTop: "20px",
-            backgroundColor: "#eb7476",
-          }}
-        >
-          Save
-        </button>
+        <CustomButton handleClick={handleNext} innerContent={"Save"} />
+        {/* <ProjectManager /> */}
       </div>
     </>
   );

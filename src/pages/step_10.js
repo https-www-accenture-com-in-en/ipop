@@ -1,30 +1,26 @@
-import { useState } from "react";
-import {
-  Box,
-  Button,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-} from "@mui/material";
+import { useEffect, useState } from "react";
+import { Box, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 import VModelTable from "../components/VModelTable.jsx";
 import TextBox from "../components/TextBox.jsx";
 
+import axios from "axios";
+import CustomButton from "../components/CustomButton.jsx";
+
 export default function Step_10() {
-  const dummyClusters = [
-    {
-      clusterName: "Squad",
-      clusterValues: ["SFB", "PCO", "SFA", "OCE", "SMT", "PDM"],
-    },
-    {
-      clusterName: "Business Stream",
-      clusterValues: ["MS", "RC", "EP", "HR", "SC", "Renewables"],
-    },
-    {
-      clusterName: "System Landscape",
-      clusterValues: [],
-    },
-  ];
+  const [clusters, setClusters] = useState([]);
+  const [adProject, setAdProject] = useState("");
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/v1/api/admin/clusters")
+      .then((response) => {
+        console.log("Clusters fetched successfully:", response.data);
+        setClusters(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching clusters:", error);
+      });
+  }, []);
 
   const [showTable, setShowTable] = useState(false);
   const [selectedCluster, setSelectedCluster] = useState("");
@@ -39,7 +35,7 @@ export default function Step_10() {
     setSelectedValue(event.target.value);
   };
 
-  const currentCluster = dummyClusters.find(
+  const currentCluster = clusters.find(
     (c) => c.clusterName === selectedCluster
   );
 
@@ -66,7 +62,7 @@ export default function Step_10() {
               label="Cluster"
               onChange={handleClusterChange}
             >
-              {dummyClusters.map((cluster) => (
+              {clusters.map((cluster) => (
                 <MenuItem key={cluster.clusterName} value={cluster.clusterName}>
                   {cluster.clusterName}
                 </MenuItem>
@@ -102,34 +98,18 @@ export default function Step_10() {
         </Box>
         <Box my={2} sx={{ width: 300 }}>
           <TextBox
+            inputValue={adProject}
+            setInputValue={setAdProject}
             InputLabel="Create AD Project"
             InputInnerLabel="Enter Project Name"
           />
         </Box>
-        <label
-          htmlFor="deliveryWT"
-          style={{ fontWeight: "bold", display: "block" }}
-        ></label>
-        <Button
-          onClick={() => setShowTable(true)}
-          variant="contained"
-          sx={{
-            mt: 2,
-            px: 2,
-            py: 1,
-            fontSize: "14px",
-            fontWeight: "bold",
-            borderRadius: "6px",
-            backgroundColor: "#eb7476",
-            color: "white",
-            textTransform: "none",
-            "&:hover": {
-              backgroundColor: "#f38b8d",
-            },
+        <CustomButton
+          handleClick={() => {
+            setShowTable(true);
           }}
-        >
-          Create V-Model Project Tasks
-        </Button>
+          innerContent="Create V-Model Project Tasks"
+        />
       </div>
       <Box my={2}>
         {showTable && <VModelTable style={{ marginTop: "20px" }} />}

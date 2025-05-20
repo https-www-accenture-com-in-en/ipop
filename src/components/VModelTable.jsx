@@ -120,26 +120,6 @@ const VModelTable = () => {
           ]}
         />
       </Box>
-      <Button
-        onClick={validate}
-        variant="contained"
-        sx={{
-          mt: 2,
-          px: 2,
-          py: 1,
-          fontSize: "14px",
-          fontWeight: "bold",
-          borderRadius: "6px",
-          backgroundColor: "#eb7476",
-          color: "white",
-          textTransform: "none",
-          "&:hover": {
-            backgroundColor: "#f38b8d",
-          },
-        }}
-      >
-        Validate
-      </Button>
     </div>
   );
 };
