@@ -101,11 +101,9 @@ export default function Step_4() {
         </label>
 
         <FormControl fullWidth margin="normal">
-          <InputLabel>Select Delivery Work Type</InputLabel>
           <Select
             value={selectedDelivery}
             onChange={handleDeliveryChange}
-            label="Delivery Work Type"
           >
             {deliveryWorkTypes.map((type) => (
               <MenuItem key={type} value={type}>
