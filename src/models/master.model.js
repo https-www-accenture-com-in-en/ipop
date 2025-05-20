@@ -1,23 +1,23 @@
 import mongoose from "mongoose";
-const masterDeliveryWorkTypes = new mongoose.Schema({
-  masterWorkTypes: {
-    type: String,
-    required: true,
+const masterWorkTypeSchema = new mongoose.Schema(
+  {
+    masterWorkTypes: {
+      type: String, // or an Array/Object depending on your data
+      required: true,
+    },
+    gui_type: {
+      type: String,
+      required: true,
+    },
+    sequence: {
+      type: Number,
+      required: true,
+    },
   },
-  gui_type: {
-    type: String,
-    required: true,
-  },
-  deliveryWorkTypes: {
-    type: [String],
-  },
-  sequence: {
-    type: Number,
-    required: true,
-  },
-});
+  { timestamps: true }
+);
 
-masterDeliveryWorkTypes.set("toJSON", {
+masterWorkTypeSchema.set("toJSON", {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
@@ -25,9 +25,42 @@ masterDeliveryWorkTypes.set("toJSON", {
   },
 });
 
-// Create the Mongoose model
-const MasterDeliveryWT = mongoose.model(
-  "MasterDeliveryWT",
-  masterDeliveryWorkTypes
+const MasterWorkType = mongoose.model("MasterWorkType", masterWorkTypeSchema);
+
+const DeliveryWorkTypeSchema = new mongoose.Schema(
+  {
+    masterWorkTypes: {
+      type: String, // same as in the first model
+      required: true,
+    },
+    deliveryWorkTypes: {
+      type: String,
+      required: true,
+    },
+    sequence: {
+      type: Number,
+      required: true,
+    },
+    MasterWorkTypeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MasterWorkType",
+      required: true,
+    },
+  },
+  { timestamps: true }
 );
-export { MasterDeliveryWT };
+
+DeliveryWorkTypeSchema.set("toJSON", {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+
+const DeliveryWorkType = mongoose.model(
+  "DeliveryWorkType",
+  DeliveryWorkTypeSchema
+);
+
+export { MasterWorkType, DeliveryWorkType };
