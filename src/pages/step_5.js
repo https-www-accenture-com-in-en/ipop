@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import DropdownWithTextBox from './DropDown.js';
 import { Button, MenuItem, Select, InputLabel, FormControl, Box, TextField } from '@mui/material';
+import TextBox from "../components/TextBox.jsx";
  
 const FieldRow = () => {
   
@@ -22,7 +23,7 @@ const savedData = {
       workItem
     };
 
-    const taskTypeOptions = ["TaskType1","TaskType2"];
+    const taskTypeOptions = ["AM Non Ticket Delivery","AD Non Ticket Delivery","CM Non Ticket Delivery","CBS Non Ticket Delivery"];
 
  
  
@@ -55,24 +56,21 @@ const savedData = {
           }}
         >
 
-            <label htmlFor="ticketNumberInput" style={{ display: 'block', marginBottom: 0, fontWeight: 'bold' }}>
-        WorkTypeCategory
-      </label>
-            <Box display="flex" alignItems="center" gap={2} mt={2}>
-        <TextField
-          
-          value={workTypeCategory}
-          onChange={(e) => setWorkTypeCategory(e.target.value)}
-          fullWidth
-        />
-      </Box>
+
+      <TextBox
+            inputValue={workTypeCategory}
+            setInputValue={setWorkTypeCategory}
+            InputLabel="WorkTypeCategory"
+            InputInnerLabel="Enter WorkTypeCategory"
+          />
+        
 
       <br/>
 
-      <label htmlFor="nameInput" style={{ display: 'block',marginBottom: '4',  fontWeight: 'bold' }}>
+      <label style={{ display: 'block',marginBottom: 8,  fontWeight: 'bold' }}>
               Task Type
             </label>
-              <FormControl  fullWidth sx={{ maxWidth: '100%'}}>
+              <FormControl fullWidth size='small' >
                 <InputLabel>Select Task Type</InputLabel>
                 <Select
                   value={selectedTaskType}
@@ -109,7 +107,7 @@ const savedData = {
             setSequence={setSequence}
             setSelectedName={() => {}}
             label={'Create Non Ticket Delivery Work Sub-Category: '}
-            
+            disabled={!selectedName}
           />
 
           <br/>
@@ -121,7 +119,7 @@ const savedData = {
             setSequence={setSequence}
             setSelectedName={() => {}}
             label={'Create Non Ticket Delivery Work Item: '}
-            
+            disabled={!selectedName}
           />
 
           <Button

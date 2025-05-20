@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import DropdownWithTextBox from './DropDown.js';
 import { Button, MenuItem, Select, InputLabel, FormControl, Box, TextField } from '@mui/material';
+import TextBox from "../components/TextBox.jsx";
  
 const FieldRow = () => {
   
@@ -22,7 +23,7 @@ const savedData = {
       workItem
     };
 
-    const taskTypeOptions = ["TaskType1","TaskType2"];
+    const taskTypeOptions = ["AM Non Delivery","AD Non Delivery","CM Non Delivery","CBS Non Delivery"];
 
  
  
@@ -55,24 +56,19 @@ const savedData = {
           }}
         >
 
-            <label htmlFor="ticketNumberInput" style={{ display: 'block', marginBottom: 0, fontWeight: 'bold' }}>
-        WorkTypeCategory
-      </label>
-            <Box display="flex" alignItems="center" gap={2} mt={2}>
-        <TextField
-          
-          value={workTypeCategory}
-          onChange={(e) => setWorkTypeCategory(e.target.value)}
-          fullWidth
-        />
-      </Box>
+            <TextBox
+            inputValue={workTypeCategory}
+            setInputValue={setWorkTypeCategory}
+            InputLabel="WorkTypeCategory"
+            InputInnerLabel="Enter WorkTypeCategory"
+          />
 
       <br/>
 
-      <label htmlFor="nameInput" style={{ display: 'block',marginBottom: '4',  fontWeight: 'bold' }}>
+      <label htmlFor="nameInput" style={{ display: 'block',marginBottom: 6,  fontWeight: 'bold' }}>
               Task Type
             </label>
-              <FormControl  fullWidth sx={{ maxWidth: '100%'}}>
+              <FormControl  fullWidth size='small'>
                 <InputLabel>Select Task Type</InputLabel>
                 <Select
                   value={selectedTaskType}
@@ -96,7 +92,7 @@ const savedData = {
             setUiType={setUiType}
             setSequence={setSequence}
             setSelectedName={setSelectedName}
-            label={'Create Non Ticket Delivery Work Category: '}
+            label={'Create Non Delivery Work Category: '}
             
           />
  
@@ -108,8 +104,8 @@ const savedData = {
             setUiType={setUiType}
             setSequence={setSequence}
             setSelectedName={() => {}}
-            label={'Create Non Ticket Delivery Work Sub-Category: '}
-            
+            label={'Create Non Delivery Work Sub-Category: '}
+            disabled={!selectedName}
           />
 
           <br/>
@@ -120,8 +116,8 @@ const savedData = {
             setUiType={setUiType}
             setSequence={setSequence}
             setSelectedName={() => {}}
-            label={'Create Non Ticket Delivery Work Item: '}
-            
+            label={'Create Non Delivery Work Item: '}
+            disabled={!selectedName}
           />
 
           <Button
