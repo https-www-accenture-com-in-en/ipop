@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DropdownWithTextBox from './DropDown.js';
+import CustomButton from "../components/CustomButton.jsx";
 
 // Hardcoded list of Ticket Types
 const hardcodedTicketTypes = [
@@ -120,9 +121,10 @@ export default function Step_4() {
 <label htmlFor="nameInput" style={{ display: 'block',  fontWeight: 'bold' }}>
         Ticket Type
       </label>
-        <FormControl  fullWidth sx={{ maxWidth: '100%'}}>
+        <FormControl  fullWidth size="small">
           <InputLabel>Select Ticket Type</InputLabel>
           <Select
+            
             value={selectedTicketType}
             onChange={(e) => setSelectedTicketType(e.target.value)}
             label="Ticket Type"
@@ -154,47 +156,7 @@ export default function Step_4() {
           disabled={!setSelectedName}
         />
 
-        <List>
-          {mappings.map((map, index) => (
-            <ListItem
-              key={index}
-              secondaryAction={
-                <IconButton edge="end" onClick={() => handleDelete(index)}>
-                  <DeleteIcon />
-                </IconButton>
-              }
-            >
-              <ListItemText
-                primary={`${map.ticketType} - ${map.ticketNumber}`}
-                secondary={`Category: ${map.workTypeCategory}, Delivery: ${map.deliveryWorkType}`}
-              />
-            </ListItem>
-          ))}
-        </List>
-
-        <Button
-                  onClick={handleSave}
-                  variant="contained"
-                  sx={{
-                    mt: 0.5,
-                    px: 0.5,
-                    py: 0.5,
-                    fontSize: '10px',
-                    fontWeight: 'bold',
-                    borderRadius: '6px',
-                    backgroundColor: '#7500c0',
-                    color: 'white',
-                    width: '100%',
-                    marginTop: '0px',
-                    textTransform: 'none',
-                    '&:hover': {
-                      backgroundColor: '#7500c0',
-                      transform: 'scale(1.05)',
-                    },
-                  }}
-                >
-                  Save
-                </Button>
+        <CustomButton handleClick={handleSave} innerContent={"Save"} />
       </div>
     </Box>
   );
