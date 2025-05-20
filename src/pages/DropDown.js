@@ -136,7 +136,7 @@ const ComboBox = ({ allNames, setAllNames, setUiType, setSelectedName, setSequen
         )}
  
         {/* Toggle dropdown */}
-        {showToggle && (
+        {!disabled && showToggle && (
           <button
             onClick={() => setIsOpen(o => !o)}
             aria-label="Toggle"

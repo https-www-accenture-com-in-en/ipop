@@ -310,7 +310,6 @@ export default function Step_2() {
                     color: 'white',
                     fontWeight: 'bold',
                     paddingY: '6px',
-                    '&:first-of-type': { borderBottomLeftRadius: '12px' },
                     // '&:last-of-type': { }
                   }}>
                     Sequence
@@ -324,7 +323,6 @@ export default function Step_2() {
                     color: 'white',
                     fontWeight: 'bold',
                     paddingY: '6px',
-                    '&:last-of-type': { borderBottomRightRadius: '12px' }
                   }}>
                     Up/Down
                   </TableCell>

@@ -1,13 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import DropdownWithTextBox from "./DropDown.js";
-import {
-  Button,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
-} from "@mui/material";
-import CustomButton from "../components/CustomButton.jsx";
+import { Button } from "@mui/material";
 
 const FieldRow = () => {
   const [masterWorkType, setMasterWorkType] = useState([]);
@@ -15,24 +8,66 @@ const FieldRow = () => {
   const [uiType, setUiType] = useState("");
   const [sequence, setSequence] = useState("");
   const [selectedMasterName, setSelectedMasterName] = useState(null);
-
-  const savedData = {
-    selectedMasterName,
-    uiType,
-    deliveryWorkTypes,
-  };
-
-  const handleNext = () => {
-    console.log("UI Type:", savedData.uiType);
-  };
+  const [masterData, setMasterData] = useState([]);
 
   const handleSave = () => {
-    console.log("Data saved locally:");
-    console.log(savedData);
-    // flush the data to the server or local storage
-    setDeliveryWorkTypes([]);
+    // Save the currently selected master’s data if needed
+    let updatedData = [...masterData];
+    if (selectedMasterName) {
+      // Remove existing entry for selected master
+      updatedData = updatedData.filter(
+        (entry) => entry.masterWorkType !== selectedMasterName
+      );
+      // Add the latest data
+      updatedData.push({
+        masterWorkType: selectedMasterName,
+        deliveryWorkTypes,
+        uiType,
+        sequence,
+      });
+    }
+
+    // You now have complete data per master
+    console.log("🚀 Final Data to send:", updatedData);
+
+    // Optional: reset UI state
+    setMasterData([]);
     setMasterWorkType([]);
+    setDeliveryWorkTypes([]);
+    setSelectedMasterName(null);
+    setUiType("");
+    setSequence("");
   };
+
+  const handleMasterSelect = (newMasterName) => {
+    // Save current delivery work types under the previous master
+    if (selectedMasterName) {
+      setMasterData((prev) => {
+        const updated = prev.filter(
+          (entry) => entry.masterWorkType !== selectedMasterName
+        );
+        return [
+          ...updated,
+          {
+            masterWorkType: selectedMasterName,
+            deliveryWorkTypes,
+            uiType,
+            sequence,
+          },
+        ];
+      });
+    }
+
+    // Load delivery work types for newly selected master (if any)
+    const existing = masterData.find(
+      (entry) => entry.masterWorkType === newMasterName
+    );
+    setDeliveryWorkTypes(existing ? existing.deliveryWorkTypes : []);
+    setSelectedMasterName(newMasterName);
+  };
+
+  const isReadyToSave =
+    selectedMasterName && deliveryWorkTypes.length > 0 && uiType !== "";
 
   return (
     <>
@@ -52,7 +87,7 @@ const FieldRow = () => {
             setAllNames={setMasterWorkType}
             setUiType={setUiType}
             setSequence={setSequence}
-            setSelectedName={setSelectedMasterName}
+            setSelectedName={handleMasterSelect}
             label={"Create Master Work Types: "}
           />
 
@@ -67,27 +102,6 @@ const FieldRow = () => {
             label={"Create Delivery Work Types: "}
             disabled={!selectedMasterName}
           />
-          <Button
-            onClick={handleSave}
-            variant="contained"
-            sx={{
-              mt: 1,
-              px: 0.5,
-              py: 0.5,
-              fontSize: "10px",
-              fontWeight: "bold",
-              borderRadius: "6px",
-              backgroundColor: "#7500c0",
-              color: "white",
-              textTransform: "none",
-              "&:hover": {
-                backgroundColor: "#7500c0",
-                transform: "scale(1.05)",
-              },
-            }}
-          >
-            Assign Delivery Work Types
-          </Button>
         </div>
         <div
           style={{
@@ -115,7 +129,18 @@ const FieldRow = () => {
                 padding: "8px 60px 8px 8px",
                 boxSizing: "border-box",
               }}
-              onChange={(e) => setUiType(e.target.value)}
+              onChange={(e) => {
+                const newUiType = e.target.value;
+                setUiType(newUiType);
+
+                // Update UI type for every master entry
+                setMasterData((prev) =>
+                  prev.map((entry) => ({
+                    ...entry,
+                    uiType: newUiType,
+                  }))
+                );
+              }}
               defaultValue=""
             >
               <option value="" disabled>
@@ -130,6 +155,7 @@ const FieldRow = () => {
         <Button
           onClick={handleSave}
           variant="contained"
+          disabled={!isReadyToSave}
           sx={{
             mt: 0.5,
             px: 0.5,
