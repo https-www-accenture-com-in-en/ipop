@@ -261,12 +261,14 @@ export default function Step_2() {
 
   return (
     <>
-      <div style={{ marginTop: "20px" }}>
+     
         <div
           style={{
             border: "1px solid #7500c0",
             borderRadius: "10px",
             padding: "20px",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           <label
@@ -275,7 +277,7 @@ export default function Step_2() {
           >
             Select Delivery Work Types
           </label>
-          <Box my={2} sx={{ width: 300 }}>
+          <Box my={2}>
             <TextField
               label="Delivery Work Type"
               name="deliveryType"
@@ -291,7 +293,7 @@ export default function Step_2() {
                 </MenuItem>
               ))}
             </TextField>
-          </Box>
+          <div style={{marginTop: "20px"}}>
           <DropdownWithTextBox
             allNames={allNames}
             setAllNames={setAllNames}
@@ -300,6 +302,7 @@ export default function Step_2() {
             setSelectedName={setSelectedName}
             label={"Create Work Type Categories: "}
           />
+          </div>
           <Button
             onClick={() => {
               handleSave();
@@ -314,6 +317,7 @@ export default function Step_2() {
               fontSize: "10px",
               width: "100%",
               fontWeight: "bold",
+              marginTop: "10px",
               borderRadius: "6px",
               backgroundColor: "#7500c0",
               color: "white",
@@ -326,9 +330,9 @@ export default function Step_2() {
           >
             Assign Work Type Categories <ArrowForwardIcon />
           </Button>
+      </Box>
         </div>
-      </div>
-
+ 
       {showTable && (
         <div
           style={{

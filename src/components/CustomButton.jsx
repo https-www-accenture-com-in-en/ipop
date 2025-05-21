@@ -10,7 +10,7 @@ const CustomButton = ({ handleClick, innerContent, ...props }) => {
         mt: 0.5,
         px: 0.5,
         py: 0.5,
-        fontSize: "10px",
+        fontSize: "12px",
         fontWeight: "bold",
         borderRadius: "6px",
         backgroundColor: "#7500c0",

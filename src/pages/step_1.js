@@ -66,7 +66,7 @@ const FieldRow = () => {
           style={{
             border: "1px solid #7500c0",
             borderRadius: "10px",
-            padding: "20px",
+            padding: "30px",
             display: "flex",
             alignContent: "center",
             flexDirection: "column",
@@ -97,7 +97,7 @@ const FieldRow = () => {
           style={{
             border: "1px solid #7500c0",
             borderRadius: "10px",
-            padding: "20px",
+            padding: "30px",
             marginTop: "20px",
           }}
         >
@@ -134,7 +134,7 @@ const FieldRow = () => {
               defaultValue=""
             >
               <option value="" disabled>
-                Select a GUI Type…
+                Select a GUI Type
               </option>
               <option value="check_box">Check Box</option>
               <option value="radio_button">Radio Button</option>
