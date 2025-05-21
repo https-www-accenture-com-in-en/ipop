@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { apiPost, apiPut, apiDelete } from '../utils/api';
+import { useSnackbar } from './CustomSnackbar';
+
 
 const ComboBox = ({
   allNameObjs,
@@ -14,6 +16,7 @@ const ComboBox = ({
   const [editingId, setEditingId] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef(null);
+  const { showSnackbar } = useSnackbar();
 
   useEffect(() => {
     const onClickOutside = (e) => {
@@ -54,6 +57,7 @@ const ComboBox = ({
             obj._id === editingId ? { ...obj, name: trimmed } : obj
           )
         );
+        showSnackbar('Item updated successfully!', 'success');
       } else {
         // Create new item, if name doesn't already exist
         // This check uses the current 'allNameObjs' state.
@@ -62,8 +66,11 @@ const ComboBox = ({
           // Ensure 'res' from apiPost contains the 'id' of the newly created item.
           if (res && typeof res._id !== 'undefined') {
             setAllNameObjs(prevObjs => [...prevObjs, res]);
+            showSnackbar('Item created successfully!', 'success');
           } else {
             console.error("API Error: New item was created but API response did not include an 'id'.", res);
+            showSnackbar("Error: Could not create item (missing ID in response).", 'error');
+
           }
         } else {
           // Name already exists, user might be trying to select it or made a typo
@@ -77,6 +84,7 @@ const ComboBox = ({
       }
     } catch (err) {
       console.error('Failed to commit change:', err);
+      showSnackbar(`Error: ${err.message || 'Failed to save item.'}`, 'error');
     }
 
     resetInput(); // Reset after successful operation or if no operation was performed.
@@ -87,6 +95,7 @@ const ComboBox = ({
 
     if (id === null || typeof id === 'undefined') {
       console.error("Delete Error: No ID specified for deletion.");
+      showSnackbar('Error: No item selected for deletion.', 'error');
       resetInput();
       return;
     }
@@ -94,8 +103,10 @@ const ComboBox = ({
     try {
       await apiDelete(`${endpoint}/${id}`);
       setAllNameObjs(prevObjs => prevObjs.filter(obj => obj._id !== id));
+      showSnackbar('Item deleted successfully!', 'success');
     } catch (err) {
       console.error('Failed to delete:', err);
+      showSnackbar(`Error: ${err.message || 'Failed to delete item.'}`, 'error');
     }
     resetInput();
   };

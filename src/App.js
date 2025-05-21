@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { SnackbarProvider } from './components/CustomSnackbar';
 
 
 // Lazy load pages
@@ -19,6 +20,7 @@ const AM = lazy(() => import("./pages/AM"));
 
 const App = () => {
   return (
+  <SnackbarProvider>
     <Router>
       {/* <Suspense fallback={<div>Loading...</div>}> */}
         <Routes>
@@ -40,6 +42,7 @@ const App = () => {
         </Routes>
       {/* </Suspense> */}
     </Router>
+    </SnackbarProvider>
   );
 };
 
