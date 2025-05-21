@@ -1,11 +1,17 @@
 import express from "express";
-import { httpCreateMasterDeliveryWT } from "../controllers/admin/master-delivery.controller.js";
+import {
+  httpGetDeliveryWT,
+  httpCreateMasterDeliveryWT,
+} from "../controllers/admin/master-delivery.controller.js";
+import { httpCreateDeliveryWorkTypeCategory } from "../controllers/admin/delivery-worktype-category.controller.js";
+
 import {
   httpAddCluster,
   httpAddMasterProject,
   httpGetCluster,
   httpGetMasterProject,
 } from "../controllers/admin/cluster.controller.js";
+import { httpAddMetadata, httpGetMetadata } from '../controllers/admin/metadata.controller.js';
 import {
   httpGetTimeOffCategories,
   httpAddTimeOffCategory,
@@ -15,8 +21,15 @@ import {
 
 const adminRouter = express.Router();
 
-//SCREEN1
+//SCREEN1 MASTER DELIVERY WORK TYPE
+adminRouter.get("/masteranddeliveryworktypes", httpGetDeliveryWT);
 adminRouter.post("/masteranddeliveryworktypes", httpCreateMasterDeliveryWT);
+
+//SCREEN 2 DELIVERY WORK TYPE CATEGORY
+adminRouter.post(
+  "/deliveryworktypecategory",
+  httpCreateDeliveryWorkTypeCategory
+);
 
 //SCREEN 9 FURTHER WORK
 adminRouter.post("/clusters", httpAddCluster);
@@ -24,6 +37,11 @@ adminRouter.get("/clusters", httpGetCluster);
 
 adminRouter.post("/masterprojects", httpAddMasterProject);
 adminRouter.get("/masterprojects", httpGetMasterProject);
+
+
+//SCREEN 4 
+adminRouter.post('/ticket-metadata',httpAddMetadata);
+adminRouter.get('/ticket-metadata',httpGetMetadata)
 
 adminRouter.get("/timeoff", httpGetTimeOffCategories);
 adminRouter.post("/timeoff", httpAddTimeOffCategory);
