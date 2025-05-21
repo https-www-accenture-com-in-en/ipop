@@ -1,12 +1,14 @@
 import { MasterWorkType, DeliveryWorkType } from "../../models/master.model.js";
 
-const httpMasterDeliveryWT = async (req, res) => {
+const httpGetDeliveryWT = async (req, res) => {
   try {
-    const master = await MasterDeliveryWT.find({});
-    res.status(200).json(groups);
+    // Fetch all master work types and populate their delivery work types
+    const data = await DeliveryWorkType.find();
+
+    res.status(200).json(data);
   } catch (error) {
-    console.error("Error fetching groups:", error);
-    res.status(500).json({ error: "Server error" });
+    console.error("Error fetching master/delivery work types:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -16,11 +18,11 @@ const httpCreateMasterDeliveryWT = async (req, res) => {
     const result = [];
 
     for (const entry of payload) {
-      const { masterWorkTypes, gui_type, sequence, deliveryWorkTypes } = entry;
+      const { masterWorkTypes, uiType, sequence, deliveryWorkTypes } = entry;
       console.log(entry);
       const masterWorkType = await MasterWorkType.create({
         masterWorkTypes,
-        gui_type,
+        uiType,
         sequence,
       });
 
@@ -44,4 +46,4 @@ const httpCreateMasterDeliveryWT = async (req, res) => {
   }
 };
 
-export { httpMasterDeliveryWT, httpCreateMasterDeliveryWT };
+export { httpGetDeliveryWT, httpCreateMasterDeliveryWT };

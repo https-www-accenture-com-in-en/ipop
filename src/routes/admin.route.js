@@ -1,5 +1,10 @@
 import express from "express";
-import { httpCreateMasterDeliveryWT } from "../controllers/admin/master-delivery.controller.js";
+import {
+  httpGetDeliveryWT,
+  httpCreateMasterDeliveryWT,
+} from "../controllers/admin/master-delivery.controller.js";
+import { httpCreateDeliveryWorkTypeCategory } from "../controllers/admin/delivery-worktype-category.controller.js";
+
 import {
   httpAddCluster,
   httpAddMasterProject,
@@ -10,8 +15,15 @@ import { httpMetadata } from '../controllers/admin/metadata.controller.js';
 
 const adminRouter = express.Router();
 
-//SCREEN1
+//SCREEN1 MASTER DELIVERY WORK TYPE
+adminRouter.get("/masteranddeliveryworktypes", httpGetDeliveryWT);
 adminRouter.post("/masteranddeliveryworktypes", httpCreateMasterDeliveryWT);
+
+//SCREEN 2 DELIVERY WORK TYPE CATEGORY
+adminRouter.post(
+  "/deliveryworktypecategory",
+  httpCreateDeliveryWorkTypeCategory
+);
 
 //SCREEN 9 FURTHER WORK
 adminRouter.post("/clusters", httpAddCluster);
