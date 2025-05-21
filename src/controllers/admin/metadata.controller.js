@@ -1,6 +1,6 @@
 import { TicketMetadataSchema } from "../../models/metadata.model.js";
 
-const httpMetadata = async (req, res) => {
+const httpAddMetadata = async (req, res) => {
     const { ticketType, explicitAttributes, implicitAttributes } = req.body;
 
   if (!ticketType) {
@@ -29,6 +29,16 @@ const httpMetadata = async (req, res) => {
   }
 };
 
+const httpGetMetadata = async(req, res) =>{
+    try {
+    const allMetadata = await TicketMetadataSchema.find({});
+    return res.status(200).json(allMetadata);
+  } catch (err) {
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 export{
-    httpMetadata
+    httpAddMetadata,
+    httpGetMetadata
 }
