@@ -6,6 +6,12 @@ import {
   httpGetCluster,
   httpGetMasterProject,
 } from "../controllers/admin/cluster.controller.js";
+import {
+  httpGetTimeOffCategories,
+  httpAddTimeOffCategory,
+  httpUpdateTimeOffCategory,
+  httpDeleteTimeOffCategory,
+} from "../controllers/admin/timeoff.controller.js";
 
 const adminRouter = express.Router();
 
@@ -18,5 +24,10 @@ adminRouter.get("/clusters", httpGetCluster);
 
 adminRouter.post("/masterprojects", httpAddMasterProject);
 adminRouter.get("/masterprojects", httpGetMasterProject);
+
+adminRouter.get("/timeoff", httpGetTimeOffCategories);
+adminRouter.post("/timeoff", httpAddTimeOffCategory);
+adminRouter.put("/timeoff/:id", httpUpdateTimeOffCategory);
+adminRouter.delete("/timeoff/:id", httpDeleteTimeOffCategory);
 
 export default adminRouter;

@@ -20,7 +20,8 @@ const deliveryWorkTypeSchema = new Schema({
     workTypes: [workTypeSchema] // Embedding the WorkType schema here
 });
 
-const DeliveryWorkType = mongoose.model('DeliveryWorkType', deliveryWorkTypeSchema);
+
+const DeliveryWorkType = mongoose.models.DeliveryWorkType || mongoose.model('DeliveryWorkType', deliveryWorkTypeSchema);
 
 const masterWorkTypeSchema = new Schema({
     fieldName: { type: String, required: true },
@@ -29,8 +30,18 @@ const masterWorkTypeSchema = new Schema({
     deliveryWorkType: [deliveryWorkTypeSchema] // Embedding the DeliveryWorkType schema here
 });
 
-const MasterWorkType = mongoose.model('MasterWorkType', masterWorkTypeSchema);
 
+const MasterWorkType = mongoose.models.MasterWorkType || mongoose.model('MasterWorkType', masterWorkTypeSchema);
 
-export {MasterWorkType, DeliveryWorkType, WorkType};
+const timeOffCategorySchema = new Schema({
+    name: {
+    type: String,
+    required: true,
+    unique: true,
+  }
+});
+
+const TimeOffCategory = mongoose.model("TimeOffCategory", timeOffCategorySchema);
+
+export {MasterWorkType, DeliveryWorkType, WorkType, TimeOffCategory};
 
