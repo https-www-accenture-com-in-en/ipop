@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Stepper,
@@ -8,63 +7,56 @@ import {
   Button,
   Typography,
   Paper,
-  Grid
-} from '@mui/material';
-import Step_1 from './step_1';
-import Step_2 from './step_2';
-import Step_4 from './step_4';
-import Step_5 from './step_5';
-import Step_6 from './step_6';
-import Step_3 from './step_3';
-import Step_7 from './step_7';
-import Step_8 from './step_8';
-import Step_9 from './step_9';
-import Step_10 from './step_10';
-import Step_11 from './step_11';
-import Step_12 from './step_12';
+  Grid,
+} from "@mui/material";
+import Step_1 from "./step_1";
+import Step_2 from "./step_2";
+import Step_4 from "./step_4";
+import Step_5 from "./step_5";
+import Step_6 from "./step_6";
+import Step_3 from "./step_3";
+import Step_7 from "./step_7";
+import Step_8 from "./step_8";
+import Step_9 from "./step_9";
+import Step_10 from "./step_10";
 
 const steps = [
-  'Create Master Work Types & Delivery Work Types',
-  'Create Delivery Work Type Categories',
-  'Create Ticket Types for Ticket Delivery',
-  'Define Meta Data (Ticket Attributes) for Ticket Types',
-  'Create Non Ticket Delivery Work Items',
-  'Create Support Non Delivery Work Items',
-  'NA',
-  'Define Project Clusters & Values For Projects Clusters',
-  'NA',
-  'Create Master Project & Sub-Project',
-  'Create V-Model Tasks for Sub-Project',
-  'Create Project Non Delivery Work Items',
-  'Define Time-Off'
+  "Create Master Work Types & Delivery Work Types",
+  "Create Delivery Work Type Categories",
+  "Create Ticket Types for Ticket Delivery",
+  "Define Meta Data (Ticket Attributes) for Ticket Types",
+  "Create Non Ticket Delivery Work Items",
+  "Create Support Non Delivery Work Items",
+  "Define Project Clusters & Values For Project Clusters",
+  "Create V-Model Tasks for AD Project",
+  "Create Master Project & Sub-Project",
+  "Create V-Model Tasks for Sub-Project",
+  "Create Project Non Delivery Work Items",
+  "Define Time-Off",
 ];
 
-const StepContent = ({ step,onSaveSuccess }) => {
+const StepContent = ({ step, onSaveSuccess }) => {
   switch (step) {
     case 0:
-      return <Step_1 onSaveSuccess={onSaveSuccess} />
+      return <Step_1 onSaveSuccess={onSaveSuccess} />;
     case 1:
-      return  <Step_2/> 
+      return <Step_2 />;
     case 2:
-      return <Step_3/>;
+      return <Step_3 />;
     case 3:
-      return <Step_4/>
+      return <Step_4 />;
     case 4:
-      return <Step_5/>;
+      return <Step_5 />;
     case 5:
-      return <Step_6/>;
+      return <Step_6 />;
     case 6:
-      return <Step_7/>
+      return <Step_7 />;
     case 7:
-      return <Step_8/>
+      return <Step_8 />;
     case 8:
-      return <Step_9/>
+      return <Step_9 />;
     case 9:
-      return <Step_10/>
-    case 10:
-      return <Step_11/>
-    case 11:
-      return <Step_12/>
+      return <Step_10 />;
     default:
       return <Typography>Unknown step</Typography>;
   }
@@ -72,15 +64,14 @@ const StepContent = ({ step,onSaveSuccess }) => {
 
 const DynamicFormUI = () => {
   const [activeStep, setActiveStep] = useState(0);
-  const [step,setStep] = useState(0);
- 
+  const [step, setStep] = useState(0);
 
   const handleNext = () => {
     setActiveStep((prevStep) => prevStep + 1);
   };
   const handleSaveSuccess = () => {
-    setStep(1); 
-    handleNext(); 
+    setStep(1);
+    handleNext();
   };
 
   const handleBack = () => {
@@ -92,29 +83,68 @@ const DynamicFormUI = () => {
   };
 
   return (
-    <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-      <Stepper activeStep={activeStep} alternativeLabel sx={{ width: '90%', marginTop: 8 , marginBottom: 4  }}> 
+    <Box
+      sx={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <Stepper
+        activeStep={activeStep}
+        alternativeLabel
+        sx={{ width: "90%", marginTop: 8, marginBottom: 4 }}
+      >
         {steps.map((label, index) => (
-          <Step key={index} completed={false} onClick={() => setActiveStep(index)}>
+          <Step
+            key={index}
+            completed={false}
+            onClick={() => setActiveStep(index)}
+          >
             <StepLabel>
-              <Typography sx={{ fontSize: '10px' , color: 'white', fontWeight:'medium' }}>{label}</Typography>
+              <Typography
+                sx={{ fontSize: "10px", color: "white", fontWeight: "medium" }}
+              >
+                {label}
+              </Typography>
             </StepLabel>
           </Step>
         ))}
       </Stepper>
-   <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ width: '100%', padding: 2 }}>
-      <Paper  elevation={3} sx={{ paddingTop:4, paddingLeft:12,paddingRight:12, paddingBottom:4, marginTop: 4, color:'#9708da' , border: '1px solid #7500c0 ' }}>
-        {activeStep === steps.length ? (
-          <>
-            <Typography variant="h6" gutterBottom>
-              All steps completed!
-            </Typography>
-            <Button onClick={handleReset}>Reset</Button>
-          </>
-        ) : (
-          <>
-            <StepContent step={activeStep} onSaveSuccess={handleSaveSuccess}/>
-            {/* <Box sx={{ marginTop: 2 }}>
+      <Grid
+        container
+        spacing={2}
+        justifyContent="center"
+        alignItems="center"
+        sx={{ width: "100%", padding: 2 }}
+      >
+        <Paper
+          elevation={3}
+          sx={{
+            paddingTop: 4,
+            paddingLeft: 12,
+            paddingRight: 12,
+            paddingBottom: 4,
+            marginTop: 4,
+            color: "#9708da",
+            border: "1px solid #7500c0 ",
+          }}
+        >
+          {activeStep === steps.length ? (
+            <>
+              <Typography variant="h6" gutterBottom>
+                All steps completed!
+              </Typography>
+              <Button onClick={handleReset}>Reset</Button>
+            </>
+          ) : (
+            <>
+              <StepContent
+                step={activeStep}
+                onSaveSuccess={handleSaveSuccess}
+              />
+              {/* <Box sx={{ marginTop: 2 }}>
               <Button disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 2 }}>
                 Back
               </Button>
@@ -122,13 +152,12 @@ const DynamicFormUI = () => {
                 {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
               </Button>
             </Box> */}
-          </>
-        )}
-      </Paper>
-   </Grid>
+            </>
+          )}
+        </Paper>
+      </Grid>
     </Box>
   );
-}; 
+};
 
 export default DynamicFormUI;
-

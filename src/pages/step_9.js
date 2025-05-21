@@ -1,6 +1,6 @@
 import { useState } from "react";
 import DropdownWithTextBox from "./DropDown.js";
-import ProjectManagerMUI from "../components/Dropdownv2.jsx";
+import ProjectManager from "../components/Dropdownv1.jsx";
 import CustomButton from "../components/CustomButton.jsx";
 
 const FieldRow = () => {
@@ -38,7 +38,7 @@ const FieldRow = () => {
           setUiType={setUiType}
           setSequence={setSequence}
           setSelectedName={setSelectedName}
-          label={"Create Project Clusters: "}
+          label={"Create Master Project: "}
         />
         <br />
         <div style={{ marginTop: "0px" }}>
@@ -48,11 +48,11 @@ const FieldRow = () => {
             setUiType={setUiType}
             setSequence={setSequence}
             setSelectedName={setSelectedName}
-            label={"Create Values for Cluster: "}
+            label={"Create Sub-Project: "}
           />
         </div>
         <CustomButton handleClick={handleNext} innerContent={"Save"} />
-        <div>{/* <ProjectManagerMUI /> */}</div>
+        {/* <ProjectManager /> */}
       </div>
     </>
   );

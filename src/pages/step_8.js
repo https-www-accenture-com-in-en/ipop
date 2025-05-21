@@ -1,103 +1,126 @@
-import React, { useState } from "react";
-import {
-  Select,
-  MenuItem,
-  TextField,
-  Typography,
-  FormControl,
-  Box,
-  Button
-} from "@mui/material";
-import Tb from "./tb";
- 
-const Step_8 = () => {
-  const deliveryTypes = [
-    "Application Maintenance",
-    "Application Development",
-    "Application Management Services",
-    "Application Development Project",
-    "System Integration Project"
-  ];
- 
- 
-  const [fields, setFields] = useState({
-    deliveryType: "",
-    type: ""
-  });
- 
-  const handleFieldChange = (key) => (event) => {
-    const value = event.target.value;
-    setFields((prev) => ({ ...prev, [key]: value }));
+import { useEffect, useState } from "react";
+import { Box, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import VModelTable from "../components/VModelTable.jsx";
+import TextBox from "../components/TextBox.jsx";
+
+import axios from "axios";
+import CustomButton from "../components/CustomButton.jsx";
+
+export default function Step_10() {
+  const [clusters, setClusters] = useState([]);
+  const [adProject, setAdProject] = useState("");
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/v1/api/admin/clusters")
+      .then((response) => {
+        console.log("Clusters fetched successfully:", response.data);
+        setClusters(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching clusters:", error);
+      });
+  }, []);
+
+  const [showTable, setShowTable] = useState(false);
+  const [selectedCluster, setSelectedCluster] = useState("");
+  const [selectedValue, setSelectedValue] = useState("");
+
+  const handleClusterChange = (event) => {
+    setSelectedCluster(event.target.value);
+    setSelectedValue("");
   };
- 
-  return (
-    <FormControl sx={{ p: 4 }} fullWidth>
-      <Typography variant="h6" gutterBottom>
-      Non Ticket Non Delivery
-      </Typography>
- 
-      {/* 1. Delivery Work Type */}
-      <Box my={2} sx={{ width: 300 }}>
-        <TextField
-          label="Delivery Work Type"
-          name="deliveryType"
-          fullWidth
-          margin="dense"
-          size="small"
-          select
-          value={fields.deliveryType}
-          onChange={handleFieldChange("deliveryType")}
-        >
-          <MenuItem value="">
-            <em>Select</em>
-          </MenuItem>
-          {deliveryTypes.map((type) => (
-            <MenuItem key={type} value={type}>
-              {type}
-            </MenuItem>
-          ))}
-        </TextField>
-      </Box>
- 
-      {/* 2. Work Type Category - Static Default */}
-      <Box my={2} sx={{ width: 300 }}>
-        <TextField
-          label="Work Type Category"
-          value="Non Ticket Non Delivery"
-          fullWidth
-          InputProps={{
-            readOnly: true
-          }}
-        />
-      </Box>
-      <Box my={2} sx={{ width: 300 }}>
-       
-        <Tb label="Create Non Ticket Non Delivery Work Category" />
-      </Box>
-      <Box my={2} sx={{ width: 300 }}>
-       
-        <Tb label="Create Non Ticket Non Delivery Work Sub-Category" />
-      </Box>
-      <Box my={2} sx={{ width: 300 }}>
-       
-        <Tb label="Create Non Ticket Non Delivery Work Item" />
-      </Box>
- 
-      {/* Save Button */}
-      <Box my={2} sx={{ width: "30%" }}>
-        <Button
-          variant="contained"
-          color="success"
-          onClick={() => {
-            console.log("Saved values:", fields);
-          }}
-          fullWidth
-        >
-          Save
-        </Button>
-      </Box>
-    </FormControl>
+
+  const handleValueChange = (event) => {
+    setSelectedValue(event.target.value);
+  };
+
+  const currentCluster = clusters.find(
+    (c) => c.clusterName === selectedCluster
   );
-};
- 
-export default Step_8;
+
+  return (
+    <div style={{ marginTop: "20px" }}>
+      <div
+        style={{
+          border: "1px solid #7500c0",
+          borderRadius: "10px",
+          paddingTop: "20px",
+          paddingLeft: "60px",
+          paddingRight: "60px",
+          paddingBottom: "20px",
+        }}
+      >
+        <label style={{ fontWeight: "bold", display: "block" }}>
+          Select Cluster
+        </label>
+        <Box my={2} sx={{ width: 300 }}>
+          <FormControl fullWidth size="small">
+            <InputLabel>Cluster</InputLabel>
+            <Select
+              value={selectedCluster}
+              label="Cluster"
+              onChange={handleClusterChange}
+            >
+              {clusters.map((cluster) => (
+                <MenuItem key={cluster.clusterName} value={cluster.clusterName}>
+                  {cluster.clusterName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+
+        <label
+          style={{
+            fontWeight: "bold",
+            display: "block",
+            marginTop: "20px",
+          }}
+        >
+          Select Cluster Value
+        </label>
+        <Box my={2} sx={{ width: 300 }}>
+          <FormControl fullWidth size="small" disabled={!selectedCluster}>
+            <InputLabel>Cluster Value</InputLabel>
+            <Select
+              value={selectedValue}
+              label="Cluster Value"
+              onChange={handleValueChange}
+            >
+              {currentCluster?.clusterValues.map((value) => (
+                <MenuItem key={value} value={value}>
+                  {value}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+        <Box my={2} sx={{ width: 300 }}>
+          {/* <TextBox
+            InputLabel="Create AD Project"
+            value={adProject}
+            onChange={(e) => {
+              setAdProject(e.target.value);
+            }}
+            label="Enter Project Name"
+            size="small"
+          /> */}
+          <TextBox
+            inputValue={adProject}
+            setInputValue={setAdProject}
+            InputLabel="Create AD Project"
+            InputInnerLabel="Enter Project Name"
+          />
+          <CustomButton
+            handleClick={() => {
+              setShowTable(true);
+            }}
+            innerContent="Create V-Model Project Tasks"
+          />
+        </Box>
+      </div>
+      {showTable && <VModelTable style={{ marginTop: "20px" }} />}
+    </div>
+  );
+}

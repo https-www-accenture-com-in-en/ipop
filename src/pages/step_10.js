@@ -1,42 +1,47 @@
 import { useEffect, useState } from "react";
-import { Box, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
-import VModelTable from "../components/VModelTable.jsx";
-import TextBox from "../components/TextBox.jsx";
-
+import {
+  Button,
+  MenuItem,
+  TextField,
+  Select,
+  FormControl,
+  InputLabel,
+  Box,
+} from "@mui/material";
 import axios from "axios";
+
+import VModelTable from "../components/VModelTable";
 import CustomButton from "../components/CustomButton.jsx";
 
-export default function Step_10() {
-  const [clusters, setClusters] = useState([]);
-  const [adProject, setAdProject] = useState("");
+export default function Step_12() {
+  const [dummyData, setDummyData] = useState([]);
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/v1/api/admin/clusters")
+      .get("http://localhost:5000/v1/api/admin/masterprojects")
       .then((response) => {
-        console.log("Clusters fetched successfully:", response.data);
-        setClusters(response.data);
+        console.log("Master projects fetched successfully:", response.data);
+        setDummyData(response.data);
       })
       .catch((error) => {
-        console.error("Error fetching clusters:", error);
+        console.error("Error fetching master projects:", error);
       });
   }, []);
-
   const [showTable, setShowTable] = useState(false);
-  const [selectedCluster, setSelectedCluster] = useState("");
-  const [selectedValue, setSelectedValue] = useState("");
+  const [selectedMaster, setSelectedMaster] = useState("");
+  const [selectedSubProject, setSelectedSubProject] = useState("");
 
-  const handleClusterChange = (event) => {
-    setSelectedCluster(event.target.value);
-    setSelectedValue("");
+  const handleMasterChange = (event) => {
+    setSelectedMaster(event.target.value);
+    setSelectedSubProject("");
   };
 
-  const handleValueChange = (event) => {
-    setSelectedValue(event.target.value);
+  const handleSubProjectChange = (event) => {
+    setSelectedSubProject(event.target.value);
   };
 
-  const currentCluster = clusters.find(
-    (c) => c.clusterName === selectedCluster
+  const currentMaster = dummyData.find(
+    (p) => p.masterProjectName === selectedMaster
   );
 
   return (
@@ -52,66 +57,50 @@ export default function Step_10() {
         }}
       >
         <label style={{ fontWeight: "bold", display: "block" }}>
-          Select Cluster
+          Select Master Project
         </label>
         <Box my={2} sx={{ width: 300 }}>
           <FormControl fullWidth size="small">
-            <InputLabel>Cluster</InputLabel>
+            <InputLabel>Master Project</InputLabel>
             <Select
-              value={selectedCluster}
-              label="Cluster"
-              onChange={handleClusterChange}
+              value={selectedMaster}
+              label="Master Project"
+              onChange={handleMasterChange}
             >
-              {clusters.map((cluster) => (
-                <MenuItem key={cluster.clusterName} value={cluster.clusterName}>
-                  {cluster.clusterName}
+              {dummyData.map((project) => (
+                <MenuItem
+                  key={project.masterProjectName}
+                  value={project.masterProjectName}
+                >
+                  {project.masterProjectName}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
         </Box>
-
         <label
           style={{
             fontWeight: "bold",
             display: "block",
-            marginTop: "20px",
           }}
         >
-          Select Cluster Value
+          Select Sub-Project
         </label>
         <Box my={2} sx={{ width: 300 }}>
-          <FormControl fullWidth size="small" disabled={!selectedCluster}>
-            <InputLabel>Cluster Value</InputLabel>
+          <FormControl fullWidth size="small" disabled={!selectedMaster}>
+            <InputLabel>Sub Project</InputLabel>
             <Select
-              value={selectedValue}
-              label="Cluster Value"
-              onChange={handleValueChange}
+              value={selectedSubProject}
+              label="Sub Project"
+              onChange={handleSubProjectChange}
             >
-              {currentCluster?.clusterValues.map((value) => (
-                <MenuItem key={value} value={value}>
-                  {value}
+              {currentMaster?.subProjectNames.map((sub) => (
+                <MenuItem key={sub} value={sub}>
+                  {sub}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-        </Box>
-        <Box my={2} sx={{ width: 300 }}>
-          {/* <TextBox
-            InputLabel="Create AD Project"
-            value={adProject}
-            onChange={(e) => {
-              setAdProject(e.target.value);
-            }}
-            label="Enter Project Name"
-            size="small"
-          /> */}
-          <TextBox
-            inputValue={adProject}
-            setInputValue={setAdProject}
-            InputLabel="Create AD Project"
-            InputInnerLabel="Enter Project Name"
-          />
           <CustomButton
             handleClick={() => {
               setShowTable(true);
