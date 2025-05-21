@@ -1,10 +1,11 @@
 import { Button } from "@mui/material";
 
-const CustomButton = ({ handleClick, innerContent }) => {
+const CustomButton = ({ handleClick, innerContent, ...props }) => {
   return (
     <Button
       onClick={handleClick}
       variant="contained"
+      {...props}
       sx={{
         mt: 0.5,
         px: 0.5,

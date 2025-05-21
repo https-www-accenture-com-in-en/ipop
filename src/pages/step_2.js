@@ -11,22 +11,31 @@ import {
   ListItemText,
   OutlinedInput,
   Typography,
-  IconButton
+  IconButton,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import DropdownWithTextBox from './DropDown.js';
+import DropdownWithTextBox from "./DropDown.js";
 import {
-  Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper
-} from '@mui/material';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
-
 const initialOptions = {
-  Support: ["Application Maintainance", "Application Development", "Application Management Services", "Cloud Management Services"],
-  Project: ["Application Development Project", "System Integration Project"]
+  Support: [
+    "Application Maintainance",
+    "Application Development",
+    "Application Management Services",
+    "Cloud Management Services",
+  ],
+  Project: ["Application Development Project", "System Integration Project"],
 };
 
 const DropdownBlock = ({
@@ -35,15 +44,15 @@ const DropdownBlock = ({
   usedTypes,
   onAdd,
   onDelete,
-  onUpdate
+  onUpdate,
 }) => {
   const [selectedType, setSelectedType] = useState("");
   const [subOptions, setSubOptions] = useState([]);
   const [selectedSubs, setSelectedSubs] = useState([]);
   const [newOption, setNewOption] = useState("");
-  console.log(typeOptions, "typeOptions")
+  console.log(typeOptions, "typeOptions");
   const availableTypes = typeOptions.filter((opt) => !usedTypes.includes(opt));
-  console.log(availableTypes, "vamsi")
+  console.log(availableTypes, "vamsi");
 
   const handleTypeChange = (e) => {
     const newType = e.target.value;
@@ -68,13 +77,7 @@ const DropdownBlock = ({
   };
 
   return (
-    <Box
-      border={1}
-      borderRadius={2}
-      p={2}
-      mb={2}
-      position="relative"
-    >
+    <Box border={1} borderRadius={2} p={2} mb={2} position="relative">
       <IconButton
         size="small"
         onClick={() => onDelete(id)}
@@ -128,11 +131,16 @@ const DropdownBlock = ({
 };
 
 export default function Step_2() {
-  const [blocks, setBlocks] = useState([{ id: 0, masterWorkTypes: "", deliveryWorkTypes: [] }]);
+  const [blocks, setBlocks] = useState([
+    { id: 0, masterWorkTypes: "", deliveryWorkTypes: [] },
+  ]);
 
   const handleAddBlock = (addedType) => {
     const nextId = Math.max(...blocks.map((b) => b.id)) + 1;
-    setBlocks([...blocks, { id: nextId, masterWorkTypes: "", deliveryWorkTypes: [] }]);
+    setBlocks([
+      ...blocks,
+      { id: nextId, masterWorkTypes: "", deliveryWorkTypes: [] },
+    ]);
   };
 
   const handleDeleteBlock = (id) => {
@@ -142,13 +150,18 @@ export default function Step_2() {
   const handleUpdateBlock = (id, masterWorkTypes, deliveryWorkTypes) => {
     setBlocks((prev) =>
       prev.map((block) =>
-        block.id === id ? { ...block, masterWorkTypes, deliveryWorkTypes } : block
+        block.id === id
+          ? { ...block, masterWorkTypes, deliveryWorkTypes }
+          : block
       )
     );
   };
 
   const handleSave = () => {
-    console.log("Saved Data:", blocks.filter((b) => b.masterWorkTypes));
+    console.log(
+      "Saved Data:",
+      blocks.filter((b) => b.masterWorkTypes)
+    );
   };
 
   const usedTypes = blocks.map((b) => b.masterWorkTypes).filter(Boolean);
@@ -157,13 +170,13 @@ export default function Step_2() {
     "Application Development",
     "Application Management Services",
     "Application Development Project",
-    "System Integration Project"
+    "System Integration Project",
   ];
 
   const [fields, setFields] = useState({
     deliveryType: "",
     screenFieldName: "",
-    screenFieldSequence: ""
+    screenFieldSequence: "",
   });
 
   const [workTypeValue, setWorkTypeValue] = useState("");
@@ -176,35 +189,37 @@ export default function Step_2() {
     // Check if user filled the Screen Field Sequence but Work Type Category is not selected
     if (key === "screenFieldSequence" && value !== "") {
       if (workTypeValue.trim() === "") {
-        setError("Please select Work Type Category before filling the Sequence.");
+        setError(
+          "Please select Work Type Category before filling the Sequence."
+        );
       } else {
         setError(""); // Clear the error if Work Type Category is selected
       }
     }
   };
   const [selectedName, setSelectedName] = useState(null);
-  const [uiType, setUiType] = useState('');
-  const [workTypes, setWorkTypes] = useState('');
-  const [sequence, setSequence] = useState('');
+  const [uiType, setUiType] = useState("");
+  const [workTypes, setWorkTypes] = useState("");
+  const [sequence, setSequence] = useState("");
   const [allNames, setAllNames] = useState([]);
   const [isAssigned, setIsAssigned] = useState(false);
 
   const names = allNames.map((name, index) => ({
     name,
-    sequence: index + 1
+    sequence: index + 1,
   }));
 
   const initialRows = [
-    { sequence: 1, dwt: 'AM', wtc: 'Ticket Delivery', screenField: '' },
-    { sequence: 2, dwt: 'AM', wtc: 'NTD', screenField: '' },
-    { sequence: 3, dwt: 'AM', wtc: 'NTND', screenField: '' },
-    { sequence: 4, dwt: 'AD', wtc: 'Ticket Delivery', screenField: '' },
-    { sequence: 5, dwt: 'AD', wtc: 'NTD', screenField: '' },
-    { sequence: 6, dwt: 'AD', wtc: 'NTND', screenField: '' },
-    { sequence: 7, dwt: 'AD Project', wtc: 'Delivery', screenField: '' },
-    { sequence: 8, dwt: 'AD Project', wtc: 'Non Delivery', screenField: '' },
-    { sequence: 9, dwt: 'SI Project', wtc: 'Delivery', screenField: '' },
-    { sequence: 10, dwt: 'SI Project', wtc: 'Non Delivery', screenField: '' },
+    { sequence: 1, dwt: "AM", wtc: "Ticket Delivery", screenField: "" },
+    { sequence: 2, dwt: "AM", wtc: "NTD", screenField: "" },
+    { sequence: 3, dwt: "AM", wtc: "NTND", screenField: "" },
+    { sequence: 4, dwt: "AD", wtc: "Ticket Delivery", screenField: "" },
+    { sequence: 5, dwt: "AD", wtc: "NTD", screenField: "" },
+    { sequence: 6, dwt: "AD", wtc: "NTND", screenField: "" },
+    { sequence: 7, dwt: "AD Project", wtc: "Delivery", screenField: "" },
+    { sequence: 8, dwt: "AD Project", wtc: "Non Delivery", screenField: "" },
+    { sequence: 9, dwt: "SI Project", wtc: "Delivery", screenField: "" },
+    { sequence: 10, dwt: "SI Project", wtc: "Non Delivery", screenField: "" },
   ];
   const [rows, setRows] = useState(initialRows);
   const [showTable, setShowTable] = useState(false); // Flag to show/hide table
@@ -234,7 +249,6 @@ export default function Step_2() {
   };
 
   const handleNext = async () => {
-
     //    await axios.post(
     //   `http://localhost:5000/addGuiwithSequence/`,
     //   { gui_type: uiType,
@@ -247,9 +261,18 @@ export default function Step_2() {
 
   return (
     <>
-      <div style={{ marginTop: "20px" }} >
-        <div style={{ border: "1px solid #7500c0", borderRadius: "10px", padding: "20px" }}>
-          <label htmlFor="deliveryWT" style={{ fontWeight: 'bold', display: 'block' }}>
+      <div style={{ marginTop: "20px" }}>
+        <div
+          style={{
+            border: "1px solid #7500c0",
+            borderRadius: "10px",
+            padding: "20px",
+          }}
+        >
+          <label
+            htmlFor="deliveryWT"
+            style={{ fontWeight: "bold", display: "block" }}
+          >
             Select Delivery Work Types
           </label>
           <Box my={2} sx={{ width: 300 }}>
@@ -269,61 +292,91 @@ export default function Step_2() {
               ))}
             </TextField>
           </Box>
-          <DropdownWithTextBox allNames={allNames} setAllNames={setAllNames} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Create Work Type Categories: "} />
+          <DropdownWithTextBox
+            allNames={allNames}
+            setAllNames={setAllNames}
+            setUiType={setUiType}
+            setSequence={setSequence}
+            setSelectedName={setSelectedName}
+            label={"Create Work Type Categories: "}
+          />
           <Button
             onClick={() => {
               handleSave();
-              setShowTable(true);       // Show table
-              setIsAssigned(true);      // Hide Assign section
+              setShowTable(true); // Show table
+              setIsAssigned(true); // Hide Assign section
             }}
             variant="contained"
             sx={{
               mt: 1,
               px: 0.5,
               py: 0.5,
-              fontSize: '10px',
-              width: '100%',
-              fontWeight: 'bold',
-              borderRadius: '6px',
-              backgroundColor: '#7500c0',
-              color: 'white',
-              textTransform: 'none',
-              '&:hover': {
-                backgroundColor: '#7500c0',
-                transform: 'scale(1.05)',
+              fontSize: "10px",
+              width: "100%",
+              fontWeight: "bold",
+              borderRadius: "6px",
+              backgroundColor: "#7500c0",
+              color: "white",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#7500c0",
+                transform: "scale(1.05)",
               },
             }}
           >
             Assign Work Type Categories <ArrowForwardIcon />
           </Button>
-
         </div>
       </div>
 
       {showTable && (
-        <div style={{ border: "1px solid #7500c0", borderRadius: "10px", padding: "10px", marginTop: "20px" }}>
-          <TableContainer component={Paper} sx={{ overflow: 'hidden', borderRadius: '12px', mb: 2 }}>
+        <div
+          style={{
+            border: "1px solid #7500c0",
+            borderRadius: "10px",
+            padding: "10px",
+            marginTop: "20px",
+          }}
+        >
+          <TableContainer
+            component={Paper}
+            sx={{ overflow: "hidden", borderRadius: "12px", mb: 2 }}
+          >
             <Table>
               <TableHead>
-                <TableRow sx={{ backgroundColor: '#7500c0' }}>
-                  <TableCell sx={{
-                    color: 'white',
-                    fontWeight: 'bold',
-                    paddingY: '6px',
-                    // '&:last-of-type': { }
-                  }}>
+                <TableRow sx={{ backgroundColor: "#7500c0" }}>
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      fontWeight: "bold",
+                      paddingY: "6px",
+                      // '&:last-of-type': { }
+                    }}
+                  >
                     Sequence
                   </TableCell>
-                  <TableCell sx={{ color: 'white', fontWeight: 'bold', paddingY: '6px' }}>DWT</TableCell>
-                  <TableCell sx={{ color: 'white', fontWeight: 'bold', paddingY: '6px' }}>WTC</TableCell>
-                  <TableCell sx={{ color: 'white', fontWeight: 'bold', paddingY: '6px' }}>
+                  <TableCell
+                    sx={{ color: "white", fontWeight: "bold", paddingY: "6px" }}
+                  >
+                    DWT
+                  </TableCell>
+                  <TableCell
+                    sx={{ color: "white", fontWeight: "bold", paddingY: "6px" }}
+                  >
+                    WTC
+                  </TableCell>
+                  <TableCell
+                    sx={{ color: "white", fontWeight: "bold", paddingY: "6px" }}
+                  >
                     Screen Field Name For Task Type
                   </TableCell>
-                  <TableCell sx={{
-                    color: 'white',
-                    fontWeight: 'bold',
-                    paddingY: '6px',
-                  }}>
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      fontWeight: "bold",
+                      paddingY: "6px",
+                    }}
+                  >
                     Up/Down
                   </TableCell>
                 </TableRow>
@@ -343,10 +396,18 @@ export default function Step_2() {
                       />
                     </TableCell>
                     <TableCell>
-                      <IconButton size="small" onClick={() => moveRow(index, 1)} disabled={index === rows.length - 1}>
+                      <IconButton
+                        size="small"
+                        onClick={() => moveRow(index, 1)}
+                        disabled={index === rows.length - 1}
+                      >
                         <ArrowDownwardIcon fontSize="inherit" />
                       </IconButton>
-                      <IconButton size="small" onClick={() => moveRow(index, -1)} disabled={index === 0}>
+                      <IconButton
+                        size="small"
+                        onClick={() => moveRow(index, -1)}
+                        disabled={index === 0}
+                      >
                         <ArrowUpwardIcon fontSize="inherit" />
                       </IconButton>
                     </TableCell>
@@ -364,21 +425,21 @@ export default function Step_2() {
           mt: 1,
           px: 0.5,
           py: 0.5,
-          fontSize: '10px',
-          width: '100%',
-          fontWeight: 'bold',
-          borderRadius: '6px',
-          backgroundColor: '#7500c0',
-          color: 'white',
-          textTransform: 'none',
-          '&:hover': {
-            backgroundColor: '#7500c0',
-            transform: 'scale(1.05)',
+          fontSize: "10px",
+          width: "100%",
+          fontWeight: "bold",
+          borderRadius: "6px",
+          backgroundColor: "#7500c0",
+          color: "white",
+          textTransform: "none",
+          "&:hover": {
+            backgroundColor: "#7500c0",
+            transform: "scale(1.05)",
           },
         }}
       >
         Save
       </Button>
     </>
-  )
+  );
 }

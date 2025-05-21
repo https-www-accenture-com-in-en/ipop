@@ -1,6 +1,7 @@
 import { useState } from "react";
 import DropdownWithTextBox from "./DropDown.js";
 import { Button } from "@mui/material";
+import CustomButton from "../components/CustomButton.jsx";
 
 const FieldRow = () => {
   const [masterWorkType, setMasterWorkType] = useState([]);
@@ -29,14 +30,6 @@ const FieldRow = () => {
 
     // You now have complete data per master
     console.log("🚀 Final Data to send:", updatedData);
-
-    // Optional: reset UI state
-    setMasterData([]);
-    setMasterWorkType([]);
-    setDeliveryWorkTypes([]);
-    setSelectedMasterName(null);
-    setUiType("");
-    setSequence("");
   };
 
   const handleMasterSelect = (newMasterName) => {
@@ -65,9 +58,6 @@ const FieldRow = () => {
     setDeliveryWorkTypes(existing ? existing.deliveryWorkTypes : []);
     setSelectedMasterName(newMasterName);
   };
-
-  const isReadyToSave =
-    selectedMasterName && deliveryWorkTypes.length > 0 && uiType !== "";
 
   return (
     <>
@@ -152,30 +142,11 @@ const FieldRow = () => {
             </select>
           </div>
         </div>
-        <Button
-          onClick={handleSave}
-          variant="contained"
-          disabled={!isReadyToSave}
-          sx={{
-            mt: 0.5,
-            px: 0.5,
-            py: 0.5,
-            fontSize: "10px",
-            fontWeight: "bold",
-            borderRadius: "6px",
-            backgroundColor: "#7500c0",
-            color: "white",
-            width: "100%",
-            marginTop: "10px",
-            textTransform: "none",
-            "&:hover": {
-              backgroundColor: "#7500c0",
-              transform: "scale(1.05)",
-            },
-          }}
-        >
-          Assign Delivery Work Types
-        </Button>
+        <CustomButton
+          handleClick={handleSave}
+          innerContent="Save"
+          disabled={!uiType}
+        />
       </div>
     </>
   );
