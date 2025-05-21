@@ -89,24 +89,30 @@ const ComboBox = ({
   const showToggle = !showSave && !showDeleteInput;
 
   return (
-    <div ref={wrapperRef} style={{ position: "relative", width: 300 }}>
+    <div ref={wrapperRef} style={{ position: "relative", minWidth: "300px" }}>
       <label
         htmlFor="nameInput"
         style={{ display: "block", marginBottom: 6, fontWeight: "bold" }}
       >
         {label}
       </label>
-      <div style={{ position: "relative" }}>
+      <div style={{ position: "relative", width: "100%" }}>
         <input
           id="nameInput"
           style={{
             width: "100%",
-            padding: "8px 60px 8px 8px",
+            padding: "8px 8px 8px 8px",
             boxSizing: "border-box",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+            outline: "none",
           }}
           value={value}
           onChange={onInputChange}
-          onFocus={() => setIsOpen(true)}
+          onFocus={(e) => {
+            e.target.style.border = "1px solid #7500c0";
+            setIsOpen(true);
+          }}
           onKeyDown={onKeyDown}
           placeholder="Type or select"
           disabled={disabled}
