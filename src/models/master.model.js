@@ -5,7 +5,7 @@ const masterWorkTypeSchema = new mongoose.Schema(
       type: String, // or an Array/Object depending on your data
       required: true,
     },
-    gui_type: {
+    uiType: {
       type: String,
       required: true,
     },
@@ -16,6 +16,16 @@ const masterWorkTypeSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// masterWorkTypeSchema.virtual("deliveryWorkTypes", {
+//   ref: "DeliveryWorkType",
+//   localField: "_id",
+//   foreignField: "MasterWorkTypeId",
+//   justOne: false,
+// });
+
+// masterWorkTypeSchema.set("toObject", { virtuals: true });
+// masterWorkTypeSchema.set("toJSON", { virtuals: true });
 
 masterWorkTypeSchema.set("toJSON", {
   transform: (document, returnedObject) => {
