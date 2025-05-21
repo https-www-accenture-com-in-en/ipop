@@ -11,7 +11,7 @@ import {
   httpGetCluster,
   httpGetMasterProject,
 } from "../controllers/admin/cluster.controller.js";
-import { httpMetadata } from '../controllers/admin/metadata.controller.js';
+import { httpAddMetadata, httpGetMetadata } from '../controllers/admin/metadata.controller.js';
 
 const adminRouter = express.Router();
 
@@ -34,6 +34,7 @@ adminRouter.get("/masterprojects", httpGetMasterProject);
 
 
 //SCREEN 4 
-adminRouter.post('/ticket-metadata',httpMetadata);
+adminRouter.post('/ticket-metadata',httpAddMetadata);
+adminRouter.get('/ticket-metadata',httpGetMetadata)
 
 export default adminRouter;
