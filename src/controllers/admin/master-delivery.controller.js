@@ -3,11 +3,23 @@ import { MasterWorkType, DeliveryWorkType } from "../../models/master.model.js";
 const httpGetDeliveryWT = async (req, res) => {
   try {
     // Fetch all master work types and populate their delivery work types
-    const data = await DeliveryWorkType.find();
+    const data = await DeliveryWorkType.find({}, { deliveryWorkTypes: 1 });
 
     res.status(200).json(data);
   } catch (error) {
-    console.error("Error fetching master/delivery work types:", error);
+    console.error("Error fetching delivery work types:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const httpGetMasterWT = async (req, res) => {
+  try {
+    // Fetch all master work types and populate their delivery work types
+    const data = await MasterWorkType.find({}, { masterWorkTypes: 1 });
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("Error fetching master work types:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -46,4 +58,4 @@ const httpCreateMasterDeliveryWT = async (req, res) => {
   }
 };
 
-export { httpGetDeliveryWT, httpCreateMasterDeliveryWT };
+export { httpGetDeliveryWT, httpGetMasterWT, httpCreateMasterDeliveryWT };
