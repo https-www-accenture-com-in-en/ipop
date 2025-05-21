@@ -97,23 +97,30 @@ export default function Step_10() {
           </FormControl>
         </Box>
         <Box my={2} sx={{ width: 300 }}>
+          {/* <TextBox
+            InputLabel="Create AD Project"
+            value={adProject}
+            onChange={(e) => {
+              setAdProject(e.target.value);
+            }}
+            label="Enter Project Name"
+            size="small"
+          /> */}
           <TextBox
             inputValue={adProject}
             setInputValue={setAdProject}
             InputLabel="Create AD Project"
             InputInnerLabel="Enter Project Name"
           />
+          <CustomButton
+            handleClick={() => {
+              setShowTable(true);
+            }}
+            innerContent="Create V-Model Project Tasks"
+          />
         </Box>
-        <CustomButton
-          handleClick={() => {
-            setShowTable(true);
-          }}
-          innerContent="Create V-Model Project Tasks"
-        />
       </div>
-      <Box my={2}>
-        {showTable && <VModelTable style={{ marginTop: "20px" }} />}
-      </Box>
+      {showTable && <VModelTable style={{ marginTop: "20px" }} />}
     </div>
   );
 }

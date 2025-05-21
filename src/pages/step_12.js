@@ -101,17 +101,15 @@ export default function Step_12() {
               ))}
             </Select>
           </FormControl>
+          <CustomButton
+            handleClick={() => {
+              setShowTable(true);
+            }}
+            innerContent="Create V-Model Project Tasks"
+          />
         </Box>
-        <CustomButton
-          handleClick={() => {
-            setShowTable(true);
-          }}
-          innerContent="Create V-Model Project Tasks"
-        />
       </div>
-      <Box my={2}>
-        {showTable && <VModelTable style={{ marginTop: "20px" }} />}
-      </Box>
+      {showTable && <VModelTable style={{ marginTop: "20px" }} />}
     </div>
   );
 }
