@@ -46,16 +46,7 @@ export default function Step_12() {
 
   return (
     <div style={{ marginTop: "20px" }}>
-      <div
-        style={{
-          border: "1px solid #7500c0",
-          borderRadius: "10px",
-          paddingTop: "20px",
-          paddingLeft: "60px",
-          paddingRight: "60px",
-          paddingBottom: "20px",
-        }}
-      >
+      <div className="page-wrapper">
         <label style={{ fontWeight: "bold", display: "block" }}>
           Select Master Project
         </label>

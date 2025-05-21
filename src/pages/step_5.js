@@ -48,107 +48,85 @@ const FieldRow = () => {
   };
 
   return (
-    <>
-      <div style={{ marginTop: "20px" }}>
-        <div
-          style={{
-            border: "1px solid #7500c0",
-            borderRadius: "10px",
-            padding: "20px",
-            display: "flex",
-            alignContent: "center",
-            flexDirection: "column",
-          }}
+    <div className="page-wrapper" style={{ marginTop: "20px" }}>
+      <TextBox
+        inputValue={workTypeCategory}
+        setInputValue={setWorkTypeCategory}
+        InputLabel="WorkTypeCategory"
+        InputInnerLabel="Enter WorkTypeCategory"
+      />
+
+      <label style={{ display: "block", marginBottom: 8, fontWeight: "bold" }}>
+        Task Type
+      </label>
+      <FormControl fullWidth size="small">
+        <InputLabel>Select Task Type</InputLabel>
+        <Select
+          value={selectedTaskType}
+          onChange={(e) => setSelectedTaskType(e.target.value)}
+          label="Select Task Type"
         >
-          <TextBox
-            inputValue={workTypeCategory}
-            setInputValue={setWorkTypeCategory}
-            InputLabel="WorkTypeCategory"
-            InputInnerLabel="Enter WorkTypeCategory"
-          />
+          {taskTypeOptions.map((type) => (
+            <MenuItem key={type} value={type}>
+              {type}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
-          <br />
+      <DropdownWithTextBox
+        allNames={workCategory}
+        setAllNames={setWorkCategory}
+        setUiType={setUiType}
+        setSequence={setSequence}
+        setSelectedName={setSelectedName}
+        label={"Create Non Ticket Delivery Work Category: "}
+      />
 
-          <label
-            style={{ display: "block", marginBottom: 8, fontWeight: "bold" }}
-          >
-            Task Type
-          </label>
-          <FormControl fullWidth size="small">
-            <InputLabel>Select Task Type</InputLabel>
-            <Select
-              value={selectedTaskType}
-              onChange={(e) => setSelectedTaskType(e.target.value)}
-              label="Select Task Type"
-            >
-              {taskTypeOptions.map((type) => (
-                <MenuItem key={type} value={type}>
-                  {type}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+      <DropdownWithTextBox
+        allNames={subCategory}
+        setAllNames={setSubCategory}
+        setUiType={setUiType}
+        setSequence={setSequence}
+        setSelectedName={() => {}}
+        label={"Create Non Ticket Delivery Work Sub-Category: "}
+        disabled={!selectedName}
+      />
 
-          <br />
-          <DropdownWithTextBox
-            allNames={workCategory}
-            setAllNames={setWorkCategory}
-            setUiType={setUiType}
-            setSequence={setSequence}
-            setSelectedName={setSelectedName}
-            label={"Create Non Ticket Delivery Work Category: "}
-          />
+      <DropdownWithTextBox
+        allNames={workItem}
+        setAllNames={setWorkItem}
+        setUiType={setUiType}
+        setSequence={setSequence}
+        setSelectedName={() => {}}
+        label={"Create Non Ticket Delivery Work Item: "}
+        disabled={!selectedName}
+      />
 
-          <br />
-
-          <DropdownWithTextBox
-            allNames={subCategory}
-            setAllNames={setSubCategory}
-            setUiType={setUiType}
-            setSequence={setSequence}
-            setSelectedName={() => {}}
-            label={"Create Non Ticket Delivery Work Sub-Category: "}
-            disabled={!selectedName}
-          />
-
-          <br />
-
-          <DropdownWithTextBox
-            allNames={workItem}
-            setAllNames={setWorkItem}
-            setUiType={setUiType}
-            setSequence={setSequence}
-            setSelectedName={() => {}}
-            label={"Create Non Ticket Delivery Work Item: "}
-            disabled={!selectedName}
-          />
-
-          <Button
-            onClick={handleNext}
-            variant="contained"
-            sx={{
-              mt: 0.5,
-              px: 0.5,
-              py: 0.5,
-              fontSize: "10px",
-              fontWeight: "bold",
-              borderRadius: "6px",
-              backgroundColor: "#7500c0",
-              color: "white",
-              width: "100%",
-              marginTop: "10px",
-              textTransform: "none",
-              "&:hover": {
-                backgroundColor: "#7500c0",
-                transform: "scale(1.05)",
-              },
-            }}
-          >
-            Save
-          </Button>
-        </div>
-      </div>
-    </>
+      <Button
+        onClick={handleNext}
+        variant="contained"
+        sx={{
+          mt: 0.5,
+          px: 0.5,
+          py: 0.5,
+          fontSize: "10px",
+          fontWeight: "bold",
+          borderRadius: "6px",
+          backgroundColor: "#7500c0",
+          color: "white",
+          width: "100%",
+          marginTop: "10px",
+          textTransform: "none",
+          "&:hover": {
+            backgroundColor: "#7500c0",
+            transform: "scale(1.05)",
+          },
+        }}
+      >
+        Save
+      </Button>
+    </div>
   );
 };
 

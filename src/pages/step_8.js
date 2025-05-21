@@ -40,21 +40,12 @@ export default function Step_10() {
   );
 
   return (
-    <div style={{ marginTop: "20px" }}>
-      <div
-        style={{
-          border: "1px solid #7500c0",
-          borderRadius: "10px",
-          paddingTop: "20px",
-          paddingLeft: "60px",
-          paddingRight: "60px",
-          paddingBottom: "20px",
-        }}
-      >
+    <div className="page-wrapper" style={{ marginTop: "20px" }}>
+      <div>
         <label style={{ fontWeight: "bold", display: "block" }}>
           Select Cluster
         </label>
-        <Box my={2} sx={{ width: 300 }}>
+        <Box my={2}>
           <FormControl fullWidth size="small">
             <InputLabel>Cluster</InputLabel>
             <Select
@@ -75,12 +66,11 @@ export default function Step_10() {
           style={{
             fontWeight: "bold",
             display: "block",
-            marginTop: "20px",
           }}
         >
           Select Cluster Value
         </label>
-        <Box my={2} sx={{ width: 300 }}>
+        <Box my={2} sx={{ minWidth: 300 }}>
           <FormControl fullWidth size="small" disabled={!selectedCluster}>
             <InputLabel>Cluster Value</InputLabel>
             <Select
@@ -96,7 +86,7 @@ export default function Step_10() {
             </Select>
           </FormControl>
         </Box>
-        <Box my={2} sx={{ width: 300 }}>
+        <Box my={2} sx={{ minWidth: 300 }}>
           {/* <TextBox
             InputLabel="Create AD Project"
             value={adProject}

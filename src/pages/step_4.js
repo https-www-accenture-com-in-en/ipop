@@ -128,73 +128,62 @@ export default function Step_4() {
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: 500, mx: "auto" }}>
-      <div
-        style={{
-          border: "1px solid #7500c0",
-          borderRadius: "10px",
-          padding: "20px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "10px",
+    <div className="page-wrapper" style={{ marginTop: "20px" }}>
+      <Typography
+        variant="h5"
+        gutterBottom
+        sx={{
+          whiteSpace: "normal",
+          wordWrap: "break-word",
+          overflowWrap: "break-word",
+          fontWeight: "bold",
+          fontSize: "18px",
         }}
       >
-        <Typography
-          variant="h5"
-          gutterBottom
-          sx={{
-            whiteSpace: "normal",
-            wordWrap: "break-word",
-            overflowWrap: "break-word",
-            fontWeight: "bold",
-            fontSize: "18px",
-          }}
+        Define Meta Data (Ticket Attributes)
+      </Typography>
+
+      <label
+        htmlFor="nameInput"
+        style={{ display: "block", fontWeight: "bold" }}
+      >
+        Ticket Type
+      </label>
+      <FormControl fullWidth size="small">
+        <InputLabel>Select Ticket Type</InputLabel>
+        <Select
+          value={selectedTicketType}
+          onChange={(e) => setSelectedTicketType(e.target.value)}
+          label="Select Ticket Type"
         >
-          Define Meta Data (Ticket Attributes)
-        </Typography>
+          {hardcodedTicketTypes.map((type) => (
+            <MenuItem key={type} value={type}>
+              {type}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
-        <label
-          htmlFor="nameInput"
-          style={{ display: "block", fontWeight: "bold" }}
-        >
-          Ticket Type
-        </label>
-        <FormControl fullWidth size="small">
-          <InputLabel>Select Ticket Type</InputLabel>
-          <Select
-            value={selectedTicketType}
-            onChange={(e) => setSelectedTicketType(e.target.value)}
-            label="Select Ticket Type"
-          >
-            {hardcodedTicketTypes.map((type) => (
-              <MenuItem key={type} value={type}>
-                {type}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+      <DropdownWithTextBox
+        allNames={allNames}
+        setAllNames={setAllNames}
+        setUiType={setUiType}
+        setSequence={setSequence}
+        setSelectedName={setSelectedName}
+        label={"Define Explicit Attributes"}
+      />
 
-        <DropdownWithTextBox
-          allNames={allNames}
-          setAllNames={setAllNames}
-          setUiType={setUiType}
-          setSequence={setSequence}
-          setSelectedName={setSelectedName}
-          label={"Define Explicit Attributes"}
-        />
+      <DropdownWithTextBox
+        allNames={implicitAttr}
+        setAllNames={setImplicitAttr}
+        setUiType={setUiType}
+        setSequence={setSequence}
+        setSelectedName={() => {}}
+        label={"Define Implicit Attributes"}
+        disabled={!setSelectedName}
+      />
 
-        <DropdownWithTextBox
-          allNames={implicitAttr}
-          setAllNames={setImplicitAttr}
-          setUiType={setUiType}
-          setSequence={setSequence}
-          setSelectedName={() => {}}
-          label={"Define Implicit Attributes"}
-          disabled={!setSelectedName}
-        />
-
-        <CustomButton handleClick={handleSave} innerContent={"Save"} />
-      </div>
-    </Box>
+      <CustomButton handleClick={handleSave} innerContent={"Save"} />
+    </div>
   );
 }
