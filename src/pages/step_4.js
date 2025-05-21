@@ -11,32 +11,42 @@ import {
   List,
   ListItem,
   ListItemText,
-  IconButton
+  IconButton,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import DropdownWithTextBox from './DropDown.js';
+import DropdownWithTextBox from "./DropDown.js";
 import CustomButton from "../components/CustomButton.jsx";
 
 // Hardcoded list of Ticket Types
 const hardcodedTicketTypes = [
   "Assistance",
-"Correction",
-"PMON",
-"Habilitation",
-"Evolution",
-"RITM"
+  "Correction",
+  "PMON",
+  "Habilitation",
+  "Evolution",
+  "RITM",
 ];
-
 
 const workTypeCategoryMap = {
   "Application Maintainance": [
-    "Correction", "Assistance", "PMON", "RITM", "Habilitation",
-    "Incidents", "Scoping", "Study", "Prototyping"
+    "Correction",
+    "Assistance",
+    "PMON",
+    "RITM",
+    "Habilitation",
+    "Incidents",
+    "Scoping",
+    "Study",
+    "Prototyping",
   ],
   "Application Development": [
-    "Category-1", "Category-2", "Category-3",
-    "Category-4", "Category-5", "Category-6"
-  ]
+    "Category-1",
+    "Category-2",
+    "Category-3",
+    "Category-4",
+    "Category-5",
+    "Category-6",
+  ],
 };
 
 const deliveryWorkTypes = Object.keys(workTypeCategoryMap);
@@ -47,25 +57,38 @@ export default function Step_4() {
   const [selectedTicketType, setSelectedTicketType] = useState("");
   const [ticketNumber, setTicketNumber] = useState("");
   const [selectedName, setSelectedName] = useState(null);
-  const [uiType, setUiType] = useState('');
-  const [sequence, setSequence] = useState('');
+  const [uiType, setUiType] = useState("");
+  const [sequence, setSequence] = useState("");
 
-
-  
-  const [allNames, setAllNames] = useState(["Ticket Number", "Ticket description", "Ticket Priority"]);
-  const [implicitAttr, setImplicitAttr] = useState(["Estimated Effort", "Burnt Effort", "Remaining Effort", "Effort To Be Clocked", "Additional Effort To Be Clocked"]);
+  const [allNames, setAllNames] = useState([
+    "Ticket Number",
+    "Ticket description",
+    "Ticket Priority",
+  ]);
+  const [implicitAttr, setImplicitAttr] = useState([
+    "Estimated Effort",
+    "Burnt Effort",
+    "Remaining Effort",
+    "Effort To Be Clocked",
+    "Additional Effort To Be Clocked",
+  ]);
   const [mappings, setMappings] = useState([]);
 
   const handleAddMapping = () => {
-    if (selectedTicketType && ticketNumber && selectedDelivery && selectedCategory) {
+    if (
+      selectedTicketType &&
+      ticketNumber &&
+      selectedDelivery &&
+      selectedCategory
+    ) {
       setMappings([
         ...mappings,
         {
           ticketType: selectedTicketType,
           ticketNumber,
           deliveryWorkType: selectedDelivery,
-          workTypeCategory: selectedCategory
-        }
+          workTypeCategory: selectedCategory,
+        },
       ]);
       setTicketNumber("");
     }
@@ -77,70 +100,71 @@ export default function Step_4() {
     setMappings(updated);
   };
 
- const handleSave = async () => {
-  const ticketData = {
-    ticketType: selectedTicketType,
-    explicitAttributes: allNames,
-    implicitAttributes: implicitAttr,
+  const handleSave = async () => {
+    const ticketData = {
+      ticketType: selectedTicketType,
+      explicitAttributes: allNames,
+      implicitAttributes: implicitAttr,
+    };
+
+    try {
+      const response = await fetch(
+        "http://localhost:5000/v1/api/admin/ticket-metadata",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(ticketData),
+        }
+      );
+
+      if (response.ok) {
+        alert("Ticket metadata saved successfully!");
+      } else {
+        console.error("Error saving metadata");
+      }
+    } catch (err) {
+      console.error("Request failed:", err);
+    }
   };
 
-  try {
-    const response = await fetch('http://localhost:5000/v1/api/admin/ticket-metadata', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(ticketData),
-    });
-
-    if (response.ok) {
-      alert("Ticket metadata saved successfully!");
-    } else {
-      console.error("Error saving metadata");
-    }
-  } catch (err) {
-    console.error("Request failed:", err);
-  }
-};
-
-
   return (
-    
-
-      
-    <Box sx={{ p: 3, maxWidth: 500, mx: 'auto' }}>
+    <Box sx={{ p: 3, maxWidth: 500, mx: "auto" }}>
       <div
         style={{
-          border: '1px solid #7500c0',
-          borderRadius: '10px',
-          padding: '20px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px',
+          border: "1px solid #7500c0",
+          borderRadius: "10px",
+          padding: "20px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
         }}
       >
         <Typography
           variant="h5"
           gutterBottom
           sx={{
-            whiteSpace: 'normal',
-            wordWrap: 'break-word',
-            overflowWrap: 'break-word',
-            fontWeight: 'bold',
-            fontSize: '18px',
+            whiteSpace: "normal",
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
+            fontWeight: "bold",
+            fontSize: "18px",
           }}
         >
           Define Meta Data (Ticket Attributes)
         </Typography>
 
-<label htmlFor="nameInput" style={{ display: 'block',  fontWeight: 'bold' }}>
-        Ticket Type
-      </label>
-        <FormControl  fullWidth size="small">
+        <label
+          htmlFor="nameInput"
+          style={{ display: "block", fontWeight: "bold" }}
+        >
+          Ticket Type
+        </label>
+        <FormControl fullWidth size="small">
           <InputLabel>Select Ticket Type</InputLabel>
           <Select
-            
             value={selectedTicketType}
             onChange={(e) => setSelectedTicketType(e.target.value)}
-            label="Ticket Type"
+            label="Select Ticket Type"
           >
             {hardcodedTicketTypes.map((type) => (
               <MenuItem key={type} value={type}>
