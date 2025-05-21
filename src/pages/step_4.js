@@ -77,17 +77,30 @@ export default function Step_4() {
     setMappings(updated);
   };
 
-  const handleSave = () => {
-    
-    const ticketData = {
-      ticketType: selectedTicketType,
-      explicitAttributes: allNames,
-      implicitAttributes: implicitAttr,
-    };
-    console.log("Saving Ticket Type Data:", ticketData);
-    
-    
+ const handleSave = async () => {
+  const ticketData = {
+    ticketType: selectedTicketType,
+    explicitAttributes: allNames,
+    implicitAttributes: implicitAttr,
   };
+
+  try {
+    const response = await fetch('http://localhost:5000/v1/api/admin/ticket-metadata', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ticketData),
+    });
+
+    if (response.ok) {
+      alert("Ticket metadata saved successfully!");
+    } else {
+      console.error("Error saving metadata");
+    }
+  } catch (err) {
+    console.error("Request failed:", err);
+  }
+};
+
 
   return (
     
