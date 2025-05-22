@@ -3,6 +3,7 @@ import { CgAdd } from "react-icons/cg";
 import { GrEdit } from "react-icons/gr";
 import { MdDeleteOutline } from "react-icons/md";
 import { IoIosArrowDropdown } from "react-icons/io";
+import { TextField } from "@mui/material";
 const ComboBox = ({
   allNames,
   setAllNames,
@@ -92,25 +93,21 @@ const ComboBox = ({
     <div ref={wrapperRef} style={{ position: "relative", minWidth: "300px" }}>
       <label
         htmlFor="nameInput"
-        style={{ display: "block", marginBottom: 6, fontWeight: "bold" }}
+        style={{ display: "block", marginBottom: 15, fontWeight: "bold" }}
       >
         {label}
       </label>
       <div style={{ position: "relative", width: "100%" }}>
-        <input
+        <TextField
           id="nameInput"
           style={{
             width: "100%",
-            padding: "8px 8px 8px 8px",
-            boxSizing: "border-box",
-            border: "1px solid #ccc",
             borderRadius: "4px",
-            outline: "none",
           }}
           value={value}
+          size="small"
           onChange={onInputChange}
-          onFocus={(e) => {
-            e.target.style.border = "1px solid #7500c0";
+          onFocus={() => {
             setIsOpen(true);
           }}
           onKeyDown={onKeyDown}
