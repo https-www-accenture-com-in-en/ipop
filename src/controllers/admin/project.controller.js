@@ -116,23 +116,12 @@ const getSubProjectById = async (req, res) => {
 const updateSubProject = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, masterProject } = req.body;
+    const { name } = req.body;
 
     const sub = await SubProject.findById(id);
     if (!sub) return res.status(404).json({ message: "Not found" });
 
-    // If master project is changed, update references
-    if (sub.masterProject.toString() !== masterProject) {
-      await MasterProject.findByIdAndUpdate(sub.masterProject, {
-        $pull: { subprojects: sub._id },
-      });
-      await MasterProject.findByIdAndUpdate(masterProject, {
-        $push: { subprojects: sub._id },
-      });
-    }
-
     sub.name = name;
-    sub.masterProject = masterProject;
     await sub.save();
 
     res.status(200).json(sub);
