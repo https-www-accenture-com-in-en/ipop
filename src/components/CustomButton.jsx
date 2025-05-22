@@ -16,7 +16,7 @@ const CustomButton = ({ handleClick, innerContent, ...props }) => {
         backgroundColor: "#7500c0",
         color: "white",
         width: "100%",
-        marginTop: "10px",
+        marginTop: "15px",
         textTransform: "none",
         "&:hover": {
           backgroundColor: "#7500c0",

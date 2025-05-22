@@ -1,19 +1,5 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  MenuItem,
-  Select,
-  TextField,
-  FormControl,
-  InputLabel,
-  Checkbox,
-  ListItemText,
-  OutlinedInput,
-  Typography,
-  IconButton,
-} from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { Box, Button, MenuItem, TextField, IconButton } from "@mui/material";
 import DropdownWithTextBox from "./DropDown.js";
 import {
   Table,
@@ -26,136 +12,34 @@ import {
 } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-
-const initialOptions = {
-  Support: [
-    "Application Maintainance",
-    "Application Development",
-    "Application Management Services",
-    "Cloud Management Services",
-  ],
-  Project: ["Application Development Project", "System Integration Project"],
-};
-
-const DropdownBlock = ({
-  id,
-  typeOptions,
-  usedTypes,
-  onAdd,
-  onDelete,
-  onUpdate,
-}) => {
-  const [selectedType, setSelectedType] = useState("");
-  const [subOptions, setSubOptions] = useState([]);
-  const [selectedSubs, setSelectedSubs] = useState([]);
-  const [newOption, setNewOption] = useState("");
-  console.log(typeOptions, "typeOptions");
-  const availableTypes = typeOptions.filter((opt) => !usedTypes.includes(opt));
-  console.log(availableTypes, "vamsi");
-
-  const handleTypeChange = (e) => {
-    const newType = e.target.value;
-    setSelectedType(newType);
-    setSubOptions(initialOptions[newType] || []);
-    setSelectedSubs([]);
-    onUpdate(id, newType, []);
-  };
-
-  const handleSubChange = (event) => {
-    const value = event.target.value;
-    setSelectedSubs(value);
-    onUpdate(id, selectedType, value);
-  };
-
-  const handleAddOption = () => {
-    if (newOption && !subOptions.includes(newOption)) {
-      const updated = [...subOptions, newOption];
-      setSubOptions(updated);
-      setNewOption("");
-    }
-  };
-
-  return (
-    <Box border={1} borderRadius={2} p={2} mb={2} position="relative">
-      <IconButton
-        size="small"
-        onClick={() => onDelete(id)}
-        sx={{ position: "absolute", top: 8, right: 8 }}
-      >
-        <DeleteIcon />
-      </IconButton>
-
-      <>
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Delivery Work Types</InputLabel>
-          <Select
-            multiple
-            value={selectedSubs}
-            onChange={handleSubChange}
-            input={<OutlinedInput label="Delivery Work Types" />}
-            renderValue={(selected) => selected.join(", ")}
-          >
-            {subOptions.map((name) => (
-              <MenuItem key={name} value={name}>
-                <Checkbox checked={selectedSubs.includes(name)} />
-                <ListItemText primary={name} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <Box display="flex" gap={2} alignItems="center" mt={1}>
-          <TextField
-            label="Add Delivery Work Type"
-            value={newOption}
-            onChange={(e) => setNewOption(e.target.value)}
-            size="small"
-          />
-          <Button onClick={handleAddOption} variant="outlined">
-            Add Delivery Work Types
-          </Button>
-        </Box>
-      </>
-
-      <Button
-        variant="contained"
-        sx={{ mt: 2 }}
-        disabled={!selectedType}
-        onClick={() => onAdd(selectedType)}
-      >
-        Pending Master Work Type
-      </Button>
-    </Box>
-  );
-};
+import CustomButton from "../components/CustomButton.jsx";
 
 export default function Step_2() {
   const [blocks, setBlocks] = useState([
     { id: 0, masterWorkTypes: "", deliveryWorkTypes: [] },
   ]);
 
-  const handleAddBlock = (addedType) => {
-    const nextId = Math.max(...blocks.map((b) => b.id)) + 1;
-    setBlocks([
-      ...blocks,
-      { id: nextId, masterWorkTypes: "", deliveryWorkTypes: [] },
-    ]);
-  };
+  // const handleAddBlock = (addedType) => {
+  //   const nextId = Math.max(...blocks.map((b) => b.id)) + 1;
+  //   setBlocks([
+  //     ...blocks,
+  //     { id: nextId, masterWorkTypes: "", deliveryWorkTypes: [] },
+  //   ]);
+  // };
 
-  const handleDeleteBlock = (id) => {
-    setBlocks(blocks.filter((block) => block.id !== id));
-  };
+  // const handleDeleteBlock = (id) => {
+  //   setBlocks(blocks.filter((block) => block.id !== id));
+  // };
 
-  const handleUpdateBlock = (id, masterWorkTypes, deliveryWorkTypes) => {
-    setBlocks((prev) =>
-      prev.map((block) =>
-        block.id === id
-          ? { ...block, masterWorkTypes, deliveryWorkTypes }
-          : block
-      )
-    );
-  };
+  // const handleUpdateBlock = (id, masterWorkTypes, deliveryWorkTypes) => {
+  //   setBlocks((prev) =>
+  //     prev.map((block) =>
+  //       block.id === id
+  //         ? { ...block, masterWorkTypes, deliveryWorkTypes }
+  //         : block
+  //     )
+  //   );
+  // };
 
   const handleSave = () => {
     console.log(
@@ -164,7 +48,13 @@ export default function Step_2() {
     );
   };
 
-  const usedTypes = blocks.map((b) => b.masterWorkTypes).filter(Boolean);
+  const handleMultipleSave = () => {
+    handleSave();
+    setShowTable(true); // Show table
+    setIsAssigned(true); // Hide Assign section
+  };
+
+  // const usedTypes = blocks.map((b) => b.masterWorkTypes).filter(Boolean);
   const deliveryTypes = [
     "Application Maintenance",
     "Application Development",
@@ -261,16 +151,8 @@ export default function Step_2() {
 
   return (
     <>
-     
-        <div
-          style={{
-            border: "1px solid #7500c0",
-            borderRadius: "10px",
-            padding: "20px",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+      <div style={{ marginTop: "20px" }}>
+        <div className="page-wrapper">
           <label
             htmlFor="deliveryWT"
             style={{ fontWeight: "bold", display: "block" }}
@@ -293,55 +175,26 @@ export default function Step_2() {
                 </MenuItem>
               ))}
             </TextField>
-          <div style={{marginTop: "20px"}}>
-          <DropdownWithTextBox
-            allNames={allNames}
-            setAllNames={setAllNames}
-            setUiType={setUiType}
-            setSequence={setSequence}
-            setSelectedName={setSelectedName}
-            label={"Create Work Type Categories: "}
-          />
-          </div>
-          <Button
-            onClick={() => {
-              handleSave();
-              setShowTable(true); // Show table
-              setIsAssigned(true); // Hide Assign section
-            }}
-            variant="contained"
-            sx={{
-              mt: 1,
-              px: 0.5,
-              py: 0.5,
-              fontSize: "10px",
-              width: "100%",
-              fontWeight: "bold",
-              marginTop: "10px",
-              borderRadius: "6px",
-              backgroundColor: "#7500c0",
-              color: "white",
-              textTransform: "none",
-              "&:hover": {
-                backgroundColor: "#7500c0",
-                transform: "scale(1.05)",
-              },
-            }}
-          >
-            Assign Work Type Categories <ArrowForwardIcon />
-          </Button>
-      </Box>
+            <div style={{ marginTop: "20px" }}>
+              <DropdownWithTextBox
+                allNames={allNames}
+                setAllNames={setAllNames}
+                setUiType={setUiType}
+                setSequence={setSequence}
+                setSelectedName={setSelectedName}
+                label={"Create Work Type Categories: "}
+              />
+            </div>
+            <CustomButton
+              handleClick={handleMultipleSave}
+              innerContent="Assign Work Type Categories"
+            />
+          </Box>
         </div>
- 
+      </div>
+
       {showTable && (
-        <div
-          style={{
-            border: "1px solid #7500c0",
-            borderRadius: "10px",
-            padding: "10px",
-            marginTop: "20px",
-          }}
-        >
+        <div className="table-wrapper">
           <TableContainer
             component={Paper}
             sx={{ overflow: "hidden", borderRadius: "12px", mb: 2 }}
@@ -422,28 +275,7 @@ export default function Step_2() {
           </TableContainer>
         </div>
       )}
-      <Button
-        onClick={handleNext}
-        variant="contained"
-        sx={{
-          mt: 1,
-          px: 0.5,
-          py: 0.5,
-          fontSize: "10px",
-          width: "100%",
-          fontWeight: "bold",
-          borderRadius: "6px",
-          backgroundColor: "#7500c0",
-          color: "white",
-          textTransform: "none",
-          "&:hover": {
-            backgroundColor: "#7500c0",
-            transform: "scale(1.05)",
-          },
-        }}
-      >
-        Save
-      </Button>
+      <CustomButton handleClick={handleNext} innerContent="Save" />
     </>
   );
 }

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import DropdownWithTextBox from "./DropDown.js";
-import { Button } from "@mui/material";
 import CustomButton from "../components/CustomButton.jsx";
+import { Alert, MenuItem, Snackbar, TextField } from "@mui/material";
+import axios from "axios";
+import "../index.css";
 
 const FieldRow = () => {
   const [masterWorkType, setMasterWorkType] = useState([]);
@@ -10,79 +12,90 @@ const FieldRow = () => {
   const [sequence, setSequence] = useState("");
   const [selectedMasterName, setSelectedMasterName] = useState(null);
   const [masterData, setMasterData] = useState([]);
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
-  const handleSave = () => {
-    // Save the currently selected master’s data if needed
+  const uiTypes = ["checkbox", "radio", "button"]; // Match lowercase with backend if required
+
+  const handleSave = async () => {
     let updatedData = [...masterData];
+
     if (selectedMasterName) {
-      // Remove existing entry for selected master
+      // Update masterData with current master info
       updatedData = updatedData.filter(
-        (entry) => entry.masterWorkType !== selectedMasterName
+        (entry) => entry.masterWorkTypes !== selectedMasterName
       );
-      // Add the latest data
       updatedData.push({
-        masterWorkType: selectedMasterName,
+        masterWorkTypes: selectedMasterName,
         deliveryWorkTypes,
         uiType,
-        sequence,
+        sequence: Number(sequence),
       });
     }
 
-    // You now have complete data per master
-    console.log("🚀 Final Data to send:", updatedData);
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/v1/api/admin/master-and-delivery-work-types",
+        updatedData
+      );
+      if (res.status === 201) {
+        console.log("✅ Data saved successfully");
+        setAlert({
+          open: true,
+          message: "Data saved successfully!",
+          severity: "success",
+        });
+      } else {
+        console.error("❌ Error saving data:", res.status);
+      }
+    } catch (err) {
+      console.error("❌ API Error:", err);
+    }
   };
 
   const handleMasterSelect = (newMasterName) => {
-    // Save current delivery work types under the previous master
     if (selectedMasterName) {
       setMasterData((prev) => {
         const updated = prev.filter(
-          (entry) => entry.masterWorkType !== selectedMasterName
+          (entry) => entry.masterWorkTypes !== selectedMasterName
         );
         return [
           ...updated,
           {
-            masterWorkType: selectedMasterName,
+            masterWorkTypes: selectedMasterName,
             deliveryWorkTypes,
             uiType,
-            sequence,
+            sequence: Number(sequence),
           },
         ];
       });
     }
 
-    // Load delivery work types for newly selected master (if any)
     const existing = masterData.find(
-      (entry) => entry.masterWorkType === newMasterName
+      (entry) => entry.masterWorkTypes === newMasterName
     );
+
     setDeliveryWorkTypes(existing ? existing.deliveryWorkTypes : []);
+    setSequence(existing ? existing.sequence.toString() : "");
+    setUiType(existing ? existing.uiType : "");
     setSelectedMasterName(newMasterName);
   };
 
   return (
-    <>
-      <div style={{ marginTop: "20px" }}>
-        <div
-          style={{
-            border: "1px solid #7500c0",
-            borderRadius: "10px",
-            padding: "30px",
-            display: "flex",
-            alignContent: "center",
-            flexDirection: "column",
-          }}
-        >
-          <DropdownWithTextBox
-            allNames={masterWorkType}
-            setAllNames={setMasterWorkType}
-            setUiType={setUiType}
-            setSequence={setSequence}
-            setSelectedName={handleMasterSelect}
-            label={"Create Master Work Types: "}
-          />
-
-          <br />
-
+    <div style={{ marginTop: "20px" }}>
+      <div className="page-wrapper">
+        <DropdownWithTextBox
+          allNames={masterWorkType}
+          setAllNames={setMasterWorkType}
+          setUiType={setUiType}
+          setSequence={setSequence}
+          setSelectedName={handleMasterSelect}
+          label={"Create Master Work Types: "}
+        />
+        <div style={{ marginTop: "20px" }}>
           <DropdownWithTextBox
             allNames={deliveryWorkTypes}
             setAllNames={setDeliveryWorkTypes}
@@ -93,62 +106,62 @@ const FieldRow = () => {
             disabled={!selectedMasterName}
           />
         </div>
-        <div
-          style={{
-            border: "1px solid #7500c0",
-            borderRadius: "10px",
-            padding: "30px",
-            marginTop: "20px",
-          }}
-        >
-          <div>
-            <label
-              htmlFor="uiTypeSelect"
-              style={{
-                fontWeight: "bold",
-                display: "block",
-                marginBottom: "8px",
-              }}
-            >
-              UI Type For Master Work Types
-            </label>
-            <select
-              id="uiTypeSelect"
-              style={{
-                width: "100%",
-                padding: "8px 60px 8px 8px",
-                boxSizing: "border-box",
-              }}
-              onChange={(e) => {
-                const newUiType = e.target.value;
-                setUiType(newUiType);
-
-                // Update UI type for every master entry
-                setMasterData((prev) =>
-                  prev.map((entry) => ({
-                    ...entry,
-                    uiType: newUiType,
-                  }))
-                );
-              }}
-              defaultValue=""
-            >
-              <option value="" disabled>
-                Select a GUI Type
-              </option>
-              <option value="check_box">Check Box</option>
-              <option value="radio_button">Radio Button</option>
-              <option value="button">Button</option>
-            </select>
-          </div>
-        </div>
-        <CustomButton
-          handleClick={handleSave}
-          innerContent="Save"
-          disabled={!uiType}
-        />
       </div>
-    </>
+      <Snackbar
+        open={alert.open}
+        autoHideDuration={3000}
+        onClose={() => setAlert({ ...alert, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert severity={alert.severity} sx={{ width: "100%" }}>
+          {alert.message}
+        </Alert>
+      </Snackbar>
+
+      <div className="page-wrapper" style={{ marginTop: "20px" }}>
+        <label
+          htmlFor="uiTypeSelect"
+          style={{ fontWeight: "bold", display: "block", marginBottom: 15 }}
+        >
+          UI Type For Master Work Types
+        </label>
+        <TextField
+          id="uiTypeSelect"
+          label="Select UI Type"
+          variant="outlined"
+          select
+          value={uiType}
+          onChange={(e) => {
+            const newUiType = e.target.value;
+            setUiType(newUiType);
+            setMasterData((prev) =>
+              prev.map((entry) => ({
+                ...entry,
+                uiType: newUiType,
+              }))
+            );
+          }}
+          style={{
+            width: "100%",
+            borderRadius: "4px",
+            boxSizing: "border-box",
+          }}
+          size="small"
+        >
+          {uiTypes.map((type) => (
+            <MenuItem key={type} value={type}>
+              {type}
+            </MenuItem>
+          ))}
+        </TextField>
+      </div>
+
+      <CustomButton
+        handleClick={handleSave}
+        innerContent="Save"
+        disabled={!uiType}
+      />
+    </div>
   );
 };
 
