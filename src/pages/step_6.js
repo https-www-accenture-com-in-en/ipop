@@ -56,7 +56,7 @@ const FieldRow = () => {
 
       <label
         htmlFor="nameInput"
-        style={{ display: "block", marginBottom: 6, fontWeight: "bold" }}
+        style={{ display: "block", marginBottom: 8, fontWeight: "bold" }}
       >
         Task Type
       </label>
@@ -65,7 +65,7 @@ const FieldRow = () => {
         <Select
           value={selectedTaskType}
           onChange={(e) => setSelectedTaskType(e.target.value)}
-          label="Ticket Type"
+          label="Select Task Type"
         >
           {taskTypeOptions.map((type) => (
             <MenuItem key={type} value={type}>
@@ -74,16 +74,16 @@ const FieldRow = () => {
           ))}
         </Select>
       </FormControl>
-
-      <DropdownWithTextBox
-        allNames={workCategory}
-        setAllNames={setWorkCategory}
-        setUiType={setUiType}
-        setSequence={setSequence}
-        setSelectedName={setSelectedName}
-        label={"Create Non Delivery Work Category: "}
-      />
-
+      <Box my={2}>
+        <DropdownWithTextBox
+          allNames={workCategory}
+          setAllNames={setWorkCategory}
+          setUiType={setUiType}
+          setSequence={setSequence}
+          setSelectedName={setSelectedName}
+          label={"Create Non Delivery Work Category: "}
+        />
+      </Box>
       <DropdownWithTextBox
         allNames={subCategory}
         setAllNames={setSubCategory}
@@ -94,16 +94,17 @@ const FieldRow = () => {
         disabled={!selectedName}
       />
 
-      <DropdownWithTextBox
-        allNames={workItem}
-        setAllNames={setWorkItem}
-        setUiType={setUiType}
-        setSequence={setSequence}
-        setSelectedName={() => {}}
-        label={"Create Non Delivery Work Item: "}
-        disabled={!selectedName}
-      />
-
+      <Box my={2}>
+        <DropdownWithTextBox
+          allNames={workItem}
+          setAllNames={setWorkItem}
+          setUiType={setUiType}
+          setSequence={setSequence}
+          setSelectedName={() => {}}
+          label={"Create Non Delivery Work Item: "}
+          disabled={!selectedName}
+        />
+      </Box>
       <Button
         onClick={handleNext}
         variant="contained"

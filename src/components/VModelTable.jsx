@@ -110,19 +110,8 @@ const VModelTable = () => {
 
   return (
     <div>
-      <div
-        style={{
-          border: "1px solid #7500c0",
-          borderRadius: "10px",
-          paddingTop: "20px",
-          paddingLeft: "60px",
-          paddingRight: "60px",
-          paddingBottom: "20px",
-          marginTop: "20px",
-          marginBottom: "20px",
-        }}
-      >
-        <Box my={2} sx={{ width: 300 }}>
+      <div className="page-wrapper" style={{ marginTop: 20, marginBottom: 20 }}>
+        <Box>
           <TextBox
             inputValue={estimation}
             setInputValue={setEstimation}
