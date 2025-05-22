@@ -1,78 +1,109 @@
-import { Cluster, MasterProject } from "../../models/project.model.js";
+import {Cluster, ClusterValue, ADProject} from '../../models/cluster.model.js';
 
-const httpAddCluster = async (req, res) => {
+export const httpAddCluster = async (req, res) => {
   try {
-    const { clusterName, clusterValues } = req.body;
-
-    if (!clusterName || !clusterValues || !Array.isArray(clusterValues)) {
-      return res.status(400).json({ error: "Invalid data" });
-    }
-    const newCluster = new Cluster({ clusterName, clusterValues });
-    const savedCluster = await newCluster.save();
-    if (!savedCluster) {
-      return res.status(500).json({ error: "Failed to save cluster" });
-    }
-    res
-      .status(201)
-      .json({ message: "Cluster created successfully", cluster: savedCluster });
-  } catch (error) {
-    console.error("Error creating cluster:", error);
-    res.status(500).json({ error: "Server error" });
+    const cluster = await Cluster.create(req.body);
+    res.status(201).json(cluster);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 
-const httpAddMasterProject = async (req, res) => {
-  try {
-    const { masterProjectName, subProjectNames } = req.body;
-
-    if (
-      !masterProjectName ||
-      !subProjectNames ||
-      !Array.isArray(subProjectNames)
-    ) {
-      return res.status(400).json({ error: "Invalid data" });
-    }
-    const newMasterProject = new MasterProject({
-      masterProjectName,
-      subProjectNames,
-    });
-    const savedMasterProject = await newMasterProject.save();
-    if (!savedMasterProject) {
-      return res.status(500).json({ error: "Failed to save master project" });
-    }
-    res.status(201).json({
-      message: "Master Project created successfully",
-      master: savedMasterProject,
-    });
-  } catch (error) {
-    console.error("Error creating master project:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
-const httpGetCluster = async (req, res) => {
+export const httpGetCluster = async (req, res) => {
   try {
     const clusters = await Cluster.find();
     res.status(200).json(clusters);
-  } catch (error) {
-    console.error("Error fetching clusters:", error);
-    res.status(500).json({ error: "Server error" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 
-const httpGetMasterProject = async (req, res) => {
+export const httpUpdateCluster = async (req, res) => {
   try {
-    const masterProjects = await MasterProject.find();
-    res.status(200).json(masterProjects);
-  } catch (error) {
-    console.error("Error fetching master projects:", error);
-    res.status(500).json({ error: "Server error" });
+    const updated = await Cluster.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.status(200).json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 
-export {
-  httpAddCluster,
-  httpAddMasterProject,
-  httpGetCluster,
-  httpGetMasterProject,
+export const httpDeleteCluster = async (req, res) => {
+  try {
+    await Cluster.findByIdAndDelete(req.params.id);
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const httpAddClusterValue = async (req, res) => {
+  try {
+    const clusterValue = await ClusterValue.create(req.body);
+    res.status(201).json(clusterValue);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const httpGetClusterValues = async (req, res) => {
+  try {
+    const clusterValues = await ClusterValue.find({ cluster: req.params.clusterId });
+    res.status(200).json(clusterValues);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const httpUpdateClusterValue = async (req, res) => {
+  try {
+    const updated = await ClusterValue.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.status(200).json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const httpDeleteClusterValue = async (req, res) => {
+  try {
+    await ClusterValue.findByIdAndDelete(req.params.id);
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const httpAddADProject = async (req, res) => {
+  try {
+    const project = await ADProject.create(req.body);
+    res.status(201).json(project);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const httpGetADProject = async (req, res) => {
+  try {
+    const projects = await ADProject.find().populate('cluster clusterValue');
+    res.status(200).json(projects);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const httpUpdateADProject = async (req, res) => {
+  try {
+    const updated = await ADProject.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.status(200).json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const httpDeleteADProject = async (req, res) => {
+  try {
+    await ADProject.findByIdAndDelete(req.params.id);
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
