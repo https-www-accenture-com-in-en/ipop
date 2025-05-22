@@ -1,115 +1,118 @@
 import { useEffect, useState } from "react";
-import { Box, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import { Box } from "@mui/material";
 import VModelTable from "../components/VModelTable.jsx";
 import TextBox from "../components/TextBox.jsx";
-
-import axios from "axios";
+import CrudDropdown from "../components/Dropdown";
 import CustomButton from "../components/CustomButton.jsx";
+import { apiGet } from "../utils/api";
 
 export default function Step_10() {
   const [clusters, setClusters] = useState([]);
+  const [selectedCluster, setSelectedCluster] = useState(null); // full cluster object
+
+  const [clusterValues, setClusterValues] = useState([]);
+  const [selectedClusterValue, setSelectedClusterValue] = useState(null);
+
   const [adProject, setAdProject] = useState("");
+  const [showTable, setShowTable] = useState(false);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/v1/api/admin/clusters")
-      .then((response) => {
-        console.log("Clusters fetched successfully:", response.data);
-        setClusters(response.data);
-      })
-      .catch((error) => {
+    const fetchClusters = async () => {
+      try {
+        const data = await apiGet("/clusters");
+        setClusters(data || []);
+      } catch (error) {
         console.error("Error fetching clusters:", error);
-      });
+      }
+    };
+    fetchClusters();
   }, []);
 
-  const [showTable, setShowTable] = useState(false);
-  const [selectedCluster, setSelectedCluster] = useState("");
-  const [selectedValue, setSelectedValue] = useState("");
+  useEffect(() => {
+    const fetchClusterValues = async () => {
+      if (!selectedCluster || !selectedCluster._id) {
+        setClusterValues([]);
+        setSelectedClusterValue(null); // Also reset selected value
+        return;
+      }
+      try {
+        const data = await apiGet(`/clustervalues/${selectedCluster._id}`);
+        setClusterValues(data || []);
+      } catch (error) {
+        console.error("Error fetching cluster values:", error);
+        setClusterValues([]);
+      }
+    };
+    fetchClusterValues();
+  }, [selectedCluster]);
 
-  const handleClusterChange = (event) => {
-    setSelectedCluster(event.target.value);
-    setSelectedValue("");
+  const handleClusterSelected = (clusterItem, index) => {
+    if (selectedCluster?._id !== clusterItem?._id) {
+      setSelectedCluster(clusterItem);
+    }
   };
 
-  const handleValueChange = (event) => {
-    setSelectedValue(event.target.value);
+  const handleClusterValueSelected = (valueItem, index) => {
+    setSelectedClusterValue(valueItem);
   };
 
-  const currentCluster = clusters.find(
-    (c) => c.clusterName === selectedCluster
-  );
+  const clusterValueAdditionalPayload = selectedCluster?._id
+    ? { cluster: selectedCluster._id }
+    : {}; // If no cluster selected, payload is empty (dropdown should be disabled anyway)
+
+  const handleCreateVModelTasks = () => {
+    if (selectedCluster && selectedClusterValue && adProject.trim()) {
+      setShowTable(true);
+    } else {
+      alert("Please select a cluster, a value, and enter a project name.");
+    }
+  };
 
   return (
-    <div className="page-wrapper" style={{ marginTop: "20px" }}>
+    <div className="page-wrapper" style={{ marginTop: "20px", padding: "20px" }}>
       <div>
-        <label style={{ fontWeight: "bold", display: "block" }}>
-          Select Cluster
-        </label>
-        <Box my={2}>
-          <FormControl fullWidth size="small">
-            <InputLabel>Cluster</InputLabel>
-            <Select
-              value={selectedCluster}
-              label="Cluster"
-              onChange={handleClusterChange}
-            >
-              {clusters.map((cluster) => (
-                <MenuItem key={cluster.clusterName} value={cluster.clusterName}>
-                  {cluster.clusterName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+        <Box my={2} sx={{ maxWidth: 400 }}>
+          <CrudDropdown
+            label="Select or Manage Cluster"
+            items={clusters}
+            onItemsChange={setClusters}
+            onItemSelected={handleClusterSelected}
+            endpoint="/clusters"
+            displayField="name"
+            valueField="_id"
+          />
         </Box>
 
-        <label
-          style={{
-            fontWeight: "bold",
-            display: "block",
-          }}
-        >
-          Select Cluster Value
-        </label>
-        <Box my={2} sx={{ minWidth: 300 }}>
-          <FormControl fullWidth size="small" disabled={!selectedCluster}>
-            <InputLabel>Cluster Value</InputLabel>
-            <Select
-              value={selectedValue}
-              label="Cluster Value"
-              onChange={handleValueChange}
-            >
-              {currentCluster?.clusterValues.map((value) => (
-                <MenuItem key={value} value={value}>
-                  {value}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+        <Box my={2} sx={{ maxWidth: 400 }}>
+          <CrudDropdown
+            label="Select or Manage Cluster Value"
+            items={clusterValues}
+            onItemsChange={setClusterValues}
+            onItemSelected={handleClusterValueSelected}
+            endpoint="/clustervalues"
+            additionalCreatePayload={clusterValueAdditionalPayload}
+            displayField="name"
+            valueField="_id"
+            disabled={!selectedCluster || !selectedCluster._id}
+            placeholder={!selectedCluster || !selectedCluster._id ? "Select a cluster first" : "Type or select value"}
+          />
         </Box>
-        <Box my={2} sx={{ minWidth: 300 }}>
-          {/* <TextBox
-            InputLabel="Create AD Project"
-            value={adProject}
-            onChange={(e) => {
-              setAdProject(e.target.value);
-            }}
-            label="Enter Project Name"
-            size="small"
-          /> */}
+
+        <Box my={2} sx={{ maxWidth: 400, display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <TextBox
             inputValue={adProject}
             setInputValue={setAdProject}
-            InputLabel="Create AD Project"
+            InputLabel="AD Project Name"
             InputInnerLabel="Enter Project Name"
           />
           <CustomButton
-            handleClick={() => {
-              setShowTable(true);
-            }}
+            handleClick={handleCreateVModelTasks}
             innerContent="Create V-Model Project Tasks"
+            disabled={!selectedCluster || !selectedClusterValue || !adProject.trim()}
           />
         </Box>
       </div>
+
       {showTable && <VModelTable style={{ marginTop: "20px" }} />}
     </div>
   );
