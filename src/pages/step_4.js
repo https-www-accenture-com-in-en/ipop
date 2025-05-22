@@ -128,34 +128,25 @@ export default function Step_4() {
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: 500, mx: "auto" }}>
-      <div
-        style={{
-          border: "1px solid #7500c0",
-          borderRadius: "10px",
-          padding: "20px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "10px",
+    <div className="page-wrapper">
+      {/* <Typography
+        variant="h5"
+        gutterBottom
+        sx={{
+          whiteSpace: "normal",
+          wordWrap: "break-word",
+          overflowWrap: "break-word",
+          fontWeight: "bold",
+          fontSize: "18px",
         }}
       >
-        <Typography
-          variant="h5"
-          gutterBottom
-          sx={{
-            whiteSpace: "normal",
-            wordWrap: "break-word",
-            overflowWrap: "break-word",
-            fontWeight: "bold",
-            fontSize: "18px",
-          }}
-        >
-          Define Meta Data (Ticket Attributes)
-        </Typography>
+        Define Meta Data (Ticket Attributes)
+      </Typography> */}
 
+      <Box my={2}>
         <label
           htmlFor="nameInput"
-          style={{ display: "block", fontWeight: "bold" }}
+          style={{ display: "block", fontWeight: "bold", marginBottom: 8 }}
         >
           Ticket Type
         </label>
@@ -173,7 +164,9 @@ export default function Step_4() {
             ))}
           </Select>
         </FormControl>
+      </Box>
 
+      <Box>
         <DropdownWithTextBox
           allNames={allNames}
           setAllNames={setAllNames}
@@ -182,7 +175,8 @@ export default function Step_4() {
           setSelectedName={setSelectedName}
           label={"Define Explicit Attributes"}
         />
-
+      </Box>
+      <Box my={2}>
         <DropdownWithTextBox
           allNames={implicitAttr}
           setAllNames={setImplicitAttr}
@@ -192,9 +186,9 @@ export default function Step_4() {
           label={"Define Implicit Attributes"}
           disabled={!setSelectedName}
         />
+      </Box>
 
-        <CustomButton handleClick={handleSave} innerContent={"Save"} />
-      </div>
-    </Box>
+      <CustomButton handleClick={handleSave} innerContent={"Save"} />
+    </div>
   );
 }

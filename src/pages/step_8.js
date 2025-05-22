@@ -40,21 +40,14 @@ export default function Step_10() {
   );
 
   return (
-    <div style={{ marginTop: "20px" }}>
-      <div
-        style={{
-          border: "1px solid #7500c0",
-          borderRadius: "10px",
-          paddingTop: "20px",
-          paddingLeft: "60px",
-          paddingRight: "60px",
-          paddingBottom: "20px",
-        }}
-      >
-        <label style={{ fontWeight: "bold", display: "block" }}>
-          Select Cluster
-        </label>
-        <Box my={2} sx={{ width: 300 }}>
+    <div>
+      <div className="page-wrapper">
+        <Box>
+          <label
+            style={{ fontWeight: "bold", display: "block", marginBottom: 8 }}
+          >
+            Select Cluster
+          </label>
           <FormControl fullWidth size="small">
             <InputLabel>Cluster</InputLabel>
             <Select
@@ -71,16 +64,12 @@ export default function Step_10() {
           </FormControl>
         </Box>
 
-        <label
-          style={{
-            fontWeight: "bold",
-            display: "block",
-            marginTop: "20px",
-          }}
-        >
-          Select Cluster Value
-        </label>
-        <Box my={2} sx={{ width: 300 }}>
+        <Box my={1}>
+          <label
+            style={{ fontWeight: "bold", display: "block", marginBottom: 8 }}
+          >
+            Select Cluster Value
+          </label>
           <FormControl fullWidth size="small" disabled={!selectedCluster}>
             <InputLabel>Cluster Value</InputLabel>
             <Select
@@ -96,29 +85,19 @@ export default function Step_10() {
             </Select>
           </FormControl>
         </Box>
-        <Box my={2} sx={{ width: 300 }}>
-          {/* <TextBox
-            InputLabel="Create AD Project"
-            value={adProject}
-            onChange={(e) => {
-              setAdProject(e.target.value);
-            }}
-            label="Enter Project Name"
-            size="small"
-          /> */}
-          <TextBox
-            inputValue={adProject}
-            setInputValue={setAdProject}
-            InputLabel="Create AD Project"
-            InputInnerLabel="Enter Project Name"
-          />
-          <CustomButton
-            handleClick={() => {
-              setShowTable(true);
-            }}
-            innerContent="Create V-Model Project Tasks"
-          />
-        </Box>
+
+        <TextBox
+          inputValue={adProject}
+          setInputValue={setAdProject}
+          InputLabel="Create AD Project"
+          InputInnerLabel="Enter Project Name"
+        />
+        <CustomButton
+          handleClick={() => {
+            setShowTable(true);
+          }}
+          innerContent="Create V-Model Project Tasks"
+        />
       </div>
       {showTable && <VModelTable style={{ marginTop: "20px" }} />}
     </div>

@@ -1,4 +1,4 @@
-import { TextField } from "@mui/material";
+import { Box, TextField } from "@mui/material";
 
 const TextBox = ({
   inputValue,
@@ -7,10 +7,8 @@ const TextBox = ({
   InputInnerLabel,
 }) => {
   return (
-    <div>
-      <label
-        style={{ fontWeight: "bold", display: "block", marginTop: "20px" }}
-      >
+    <Box my={2}>
+      <label style={{ fontWeight: "bold", display: "block", marginBottom: 8 }}>
         {InputLabel}
       </label>
       <TextField
@@ -25,10 +23,9 @@ const TextBox = ({
         style={{
           fontWeight: "bold",
           display: "block",
-          marginTop: "20px",
         }}
       />
-    </div>
+    </Box>
   );
 };
 

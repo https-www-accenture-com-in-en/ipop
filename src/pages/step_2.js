@@ -20,27 +20,27 @@ export default function Step_2() {
     { id: 0, masterWorkTypes: "", deliveryWorkTypes: [] },
   ]);
 
-  const handleAddBlock = (addedType) => {
-    const nextId = Math.max(...blocks.map((b) => b.id)) + 1;
-    setBlocks([
-      ...blocks,
-      { id: nextId, masterWorkTypes: "", deliveryWorkTypes: [] },
-    ]);
-  };
+  // const handleAddBlock = (addedType) => {
+  //   const nextId = Math.max(...blocks.map((b) => b.id)) + 1;
+  //   setBlocks([
+  //     ...blocks,
+  //     { id: nextId, masterWorkTypes: "", deliveryWorkTypes: [] },
+  //   ]);
+  // };
 
-  const handleDeleteBlock = (id) => {
-    setBlocks(blocks.filter((block) => block.id !== id));
-  };
+  // const handleDeleteBlock = (id) => {
+  //   setBlocks(blocks.filter((block) => block.id !== id));
+  // };
 
-  const handleUpdateBlock = (id, masterWorkTypes, deliveryWorkTypes) => {
-    setBlocks((prev) =>
-      prev.map((block) =>
-        block.id === id
-          ? { ...block, masterWorkTypes, deliveryWorkTypes }
-          : block
-      )
-    );
-  };
+  // const handleUpdateBlock = (id, masterWorkTypes, deliveryWorkTypes) => {
+  //   setBlocks((prev) =>
+  //     prev.map((block) =>
+  //       block.id === id
+  //         ? { ...block, masterWorkTypes, deliveryWorkTypes }
+  //         : block
+  //     )
+  //   );
+  // };
 
   const handleSave = () => {
     console.log(
@@ -204,14 +204,7 @@ export default function Step_2() {
       </div>
 
       {showTable && (
-        <div
-          style={{
-            border: "1px solid #7500c0",
-            borderRadius: "10px",
-            padding: "10px",
-            marginTop: "20px",
-          }}
-        >
+        <div className="table-wrapper">
           <TableContainer
             component={Paper}
             sx={{ overflow: "hidden", borderRadius: "12px", mb: 2 }}
@@ -292,28 +285,7 @@ export default function Step_2() {
           </TableContainer>
         </div>
       )}
-      <Button
-        onClick={handleNext}
-        variant="contained"
-        sx={{
-          mt: 1,
-          px: 0.5,
-          py: 0.5,
-          fontSize: "10px",
-          width: "100%",
-          fontWeight: "bold",
-          borderRadius: "6px",
-          backgroundColor: "#7500c0",
-          color: "white",
-          textTransform: "none",
-          "&:hover": {
-            backgroundColor: "#7500c0",
-            transform: "scale(1.05)",
-          },
-        }}
-      >
-        Save
-      </Button>
+      <CustomButton handleClick={handleNext} innerContent="Save" />
     </>
   );
 }
