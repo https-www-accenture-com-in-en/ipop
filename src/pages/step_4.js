@@ -128,8 +128,8 @@ export default function Step_4() {
   };
 
   return (
-    <div className="page-wrapper" style={{ marginTop: "20px" }}>
-      <Typography
+    <div className="page-wrapper">
+      {/* <Typography
         variant="h5"
         gutterBottom
         sx={{
@@ -141,47 +141,52 @@ export default function Step_4() {
         }}
       >
         Define Meta Data (Ticket Attributes)
-      </Typography>
+      </Typography> */}
 
-      <label
-        htmlFor="nameInput"
-        style={{ display: "block", fontWeight: "bold" }}
-      >
-        Ticket Type
-      </label>
-      <FormControl fullWidth size="small">
-        <InputLabel>Select Ticket Type</InputLabel>
-        <Select
-          value={selectedTicketType}
-          onChange={(e) => setSelectedTicketType(e.target.value)}
-          label="Select Ticket Type"
+      <Box my={2}>
+        <label
+          htmlFor="nameInput"
+          style={{ display: "block", fontWeight: "bold", marginBottom: 8 }}
         >
-          {hardcodedTicketTypes.map((type) => (
-            <MenuItem key={type} value={type}>
-              {type}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+          Ticket Type
+        </label>
+        <FormControl fullWidth size="small">
+          <InputLabel>Select Ticket Type</InputLabel>
+          <Select
+            value={selectedTicketType}
+            onChange={(e) => setSelectedTicketType(e.target.value)}
+            label="Select Ticket Type"
+          >
+            {hardcodedTicketTypes.map((type) => (
+              <MenuItem key={type} value={type}>
+                {type}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
 
-      <DropdownWithTextBox
-        allNames={allNames}
-        setAllNames={setAllNames}
-        setUiType={setUiType}
-        setSequence={setSequence}
-        setSelectedName={setSelectedName}
-        label={"Define Explicit Attributes"}
-      />
-
-      <DropdownWithTextBox
-        allNames={implicitAttr}
-        setAllNames={setImplicitAttr}
-        setUiType={setUiType}
-        setSequence={setSequence}
-        setSelectedName={() => {}}
-        label={"Define Implicit Attributes"}
-        disabled={!setSelectedName}
-      />
+      <Box>
+        <DropdownWithTextBox
+          allNames={allNames}
+          setAllNames={setAllNames}
+          setUiType={setUiType}
+          setSequence={setSequence}
+          setSelectedName={setSelectedName}
+          label={"Define Explicit Attributes"}
+        />
+      </Box>
+      <Box my={2}>
+        <DropdownWithTextBox
+          allNames={implicitAttr}
+          setAllNames={setImplicitAttr}
+          setUiType={setUiType}
+          setSequence={setSequence}
+          setSelectedName={() => {}}
+          label={"Define Implicit Attributes"}
+          disabled={!setSelectedName}
+        />
+      </Box>
 
       <CustomButton handleClick={handleSave} innerContent={"Save"} />
     </div>

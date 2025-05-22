@@ -48,7 +48,7 @@ const FieldRow = () => {
   };
 
   return (
-    <div className="page-wrapper" style={{ marginTop: "20px" }}>
+    <div className="page-wrapper">
       <TextBox
         inputValue={workTypeCategory}
         setInputValue={setWorkTypeCategory}
@@ -74,15 +74,16 @@ const FieldRow = () => {
         </Select>
       </FormControl>
 
-      <DropdownWithTextBox
-        allNames={workCategory}
-        setAllNames={setWorkCategory}
-        setUiType={setUiType}
-        setSequence={setSequence}
-        setSelectedName={setSelectedName}
-        label={"Create Non Ticket Delivery Work Category: "}
-      />
-
+      <Box my={2}>
+        <DropdownWithTextBox
+          allNames={workCategory}
+          setAllNames={setWorkCategory}
+          setUiType={setUiType}
+          setSequence={setSequence}
+          setSelectedName={setSelectedName}
+          label={"Create Non Ticket Delivery Work Category: "}
+        />
+      </Box>
       <DropdownWithTextBox
         allNames={subCategory}
         setAllNames={setSubCategory}
@@ -93,16 +94,17 @@ const FieldRow = () => {
         disabled={!selectedName}
       />
 
-      <DropdownWithTextBox
-        allNames={workItem}
-        setAllNames={setWorkItem}
-        setUiType={setUiType}
-        setSequence={setSequence}
-        setSelectedName={() => {}}
-        label={"Create Non Ticket Delivery Work Item: "}
-        disabled={!selectedName}
-      />
-
+      <Box my={2}>
+        <DropdownWithTextBox
+          allNames={workItem}
+          setAllNames={setWorkItem}
+          setUiType={setUiType}
+          setSequence={setSequence}
+          setSelectedName={() => {}}
+          label={"Create Non Ticket Delivery Work Item: "}
+          disabled={!selectedName}
+        />
+      </Box>
       <Button
         onClick={handleNext}
         variant="contained"

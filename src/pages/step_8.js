@@ -64,7 +64,7 @@ export default function Step_10() {
           </FormControl>
         </Box>
 
-        <Box my={2}>
+        <Box my={1}>
           <label
             style={{ fontWeight: "bold", display: "block", marginBottom: 8 }}
           >
