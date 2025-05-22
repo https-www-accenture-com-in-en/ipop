@@ -15,7 +15,6 @@ import {
   httpGetCluster,
   httpGetMasterProject,
 } from "../controllers/admin/cluster.controller.js";
-<<<<<<< Updated upstream
 import { httpAddMetadata, httpGetMetadata } from '../controllers/admin/metadata.controller.js';
 import {
   httpGetTimeOffCategories,
@@ -23,9 +22,6 @@ import {
   httpUpdateTimeOffCategory,
   httpDeleteTimeOffCategory,
 } from "../controllers/admin/timeoff.controller.js";
-=======
-import { httpMetadata } from "../controllers/admin/metadata.controller.js";
->>>>>>> Stashed changes
 
 const adminRouter = express.Router();
 
@@ -48,7 +44,6 @@ adminRouter.get("/clusters", httpGetCluster);
 adminRouter.post("/masterprojects", httpAddMasterProject);
 adminRouter.get("/masterprojects", httpGetMasterProject);
 
-<<<<<<< Updated upstream
 
 //SCREEN 4 
 adminRouter.post('/ticket-metadata',httpAddMetadata);
@@ -58,9 +53,5 @@ adminRouter.get("/timeoff", httpGetTimeOffCategories);
 adminRouter.post("/timeoff", httpAddTimeOffCategory);
 adminRouter.put("/timeoff/:id", httpUpdateTimeOffCategory);
 adminRouter.delete("/timeoff/:id", httpDeleteTimeOffCategory);
-=======
-//SCREEN 4
-adminRouter.post("/ticket-metadata", httpMetadata);
->>>>>>> Stashed changes
 
 export default adminRouter;
