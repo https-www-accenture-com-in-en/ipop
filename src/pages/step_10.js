@@ -45,12 +45,14 @@ export default function Step_12() {
   );
 
   return (
-    <div style={{ marginTop: "20px" }}>
+    <div>
       <div className="page-wrapper">
-        <label style={{ fontWeight: "bold", display: "block" }}>
-          Select Master Project
-        </label>
-        <Box my={2} sx={{ width: 300 }}>
+        <Box>
+          <label
+            style={{ fontWeight: "bold", display: "block", marginBottom: 8 }}
+          >
+            Select Master Project
+          </label>
           <FormControl fullWidth size="small">
             <InputLabel>Master Project</InputLabel>
             <Select
@@ -69,15 +71,12 @@ export default function Step_12() {
             </Select>
           </FormControl>
         </Box>
-        <label
-          style={{
-            fontWeight: "bold",
-            display: "block",
-          }}
-        >
-          Select Sub-Project
-        </label>
-        <Box my={2} sx={{ width: 300 }}>
+        <Box my={2}>
+          <label
+            style={{ fontWeight: "bold", display: "block", marginBottom: 8 }}
+          >
+            Select Sub-Project
+          </label>
           <FormControl fullWidth size="small" disabled={!selectedMaster}>
             <InputLabel>Sub Project</InputLabel>
             <Select
@@ -92,13 +91,13 @@ export default function Step_12() {
               ))}
             </Select>
           </FormControl>
-          <CustomButton
-            handleClick={() => {
-              setShowTable(true);
-            }}
-            innerContent="Create V-Model Project Tasks"
-          />
         </Box>
+        <CustomButton
+          handleClick={() => {
+            setShowTable(true);
+          }}
+          innerContent="Create V-Model Project Tasks"
+        />
       </div>
       {showTable && <VModelTable style={{ marginTop: "20px" }} />}
     </div>
