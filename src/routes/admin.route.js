@@ -31,6 +31,20 @@ import {
   updateMasterProject,
   updateSubProject,
 } from "../controllers/admin/project.controller.js";
+import {
+  httpAddCluster,
+  httpGetCluster,
+  httpUpdateCluster,
+  httpDeleteCluster,
+  httpAddClusterValue,
+  httpGetClusterValues,
+  httpUpdateClusterValue,
+  httpDeleteClusterValue,
+  httpAddADProject,
+  httpGetADProject,
+  httpUpdateADProject,
+  httpDeleteADProject,
+} from "../controllers/admin/cluster.controller.js";
 
 const adminRouter = express.Router();
 
@@ -68,5 +82,20 @@ adminRouter.get("/timeoff", httpGetTimeOffCategories);
 adminRouter.post("/timeoff", httpAddTimeOffCategory);
 adminRouter.put("/timeoff/:id", httpUpdateTimeOffCategory);
 adminRouter.delete("/timeoff/:id", httpDeleteTimeOffCategory);
+
+adminRouter.post("/clusters", httpAddCluster);
+adminRouter.get("/clusters", httpGetCluster);
+adminRouter.put("/clusters/:id", httpUpdateCluster);
+adminRouter.delete("/clusters/:id", httpDeleteCluster);
+
+adminRouter.post("/clustervalues", httpAddClusterValue);
+adminRouter.get("/clustervalues/:clusterId", httpGetClusterValues);
+adminRouter.put("/clustervalues/:id", httpUpdateClusterValue);
+adminRouter.delete("/clustervalues/:id", httpDeleteClusterValue);
+
+adminRouter.post("/adprojects", httpAddADProject);
+adminRouter.get("/adprojects", httpGetADProject);
+adminRouter.put("/adprojects/:id", httpUpdateADProject);
+adminRouter.delete("/adprojects/:id", httpDeleteADProject);
 
 export default adminRouter;
