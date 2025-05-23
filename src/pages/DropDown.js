@@ -4,6 +4,7 @@ import { GrEdit } from "react-icons/gr";
 import { MdDeleteOutline } from "react-icons/md";
 import { IoIosArrowDropdown } from "react-icons/io";
 import { TextField } from "@mui/material";
+
 const ComboBox = ({
   allNames,
   setAllNames,
@@ -16,9 +17,9 @@ const ComboBox = ({
   const [value, setValue] = useState("");
   const [editingName, setEditingName] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [isEditingAllowed, setIsEditingAllowed] = useState(true); // NEW FLAG
   const wrapperRef = useRef(null);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const onClickOutside = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
@@ -30,6 +31,7 @@ const ComboBox = ({
   }, []);
 
   const onInputChange = (e) => {
+    if (!isEditingAllowed) return; // Block typing unless editing
     setValue(e.target.value);
     setIsOpen(true);
   };
@@ -59,33 +61,29 @@ const ComboBox = ({
 
     const updated = allNames.filter((name) => name !== target);
     setAllNames(updated);
-    resetInput();
+    resetInput(); // Disable after delete
   };
 
   const onSelect = (name, index) => {
     setValue(name);
     setEditingName(null);
+    setIsEditingAllowed(false); // disable editing when just selected
     setIsOpen(false);
     setSelectedName(name);
-    setSequence(index);
-  };
-
-  const onKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      onCommit();
-    }
+    setSequence(index + 1);
   };
 
   const resetInput = () => {
     setValue("");
     setEditingName(null);
+    setIsEditingAllowed(true);
     setIsOpen(false);
   };
 
-  const isExisting = allNames.includes(value.trim());
   const showSave =
-    value.trim().length > 0 && (editingName !== null || !isExisting);
+    value.trim().length > 0 &&
+    (editingName !== null ||
+      (!allNames.includes(value.trim()) && isEditingAllowed));
   const showDeleteInput = editingName !== null;
   const showToggle = !showSave && !showDeleteInput;
 
@@ -97,6 +95,7 @@ const ComboBox = ({
       >
         {label}
       </label>
+
       <div style={{ position: "relative", width: "100%" }}>
         <TextField
           id="nameInput"
@@ -110,7 +109,12 @@ const ComboBox = ({
           onFocus={() => {
             setIsOpen(true);
           }}
-          onKeyDown={onKeyDown}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              onCommit();
+            }
+          }}
           placeholder="Type or select"
           disabled={disabled}
         />
@@ -210,16 +214,17 @@ const ComboBox = ({
                 padding: "8px",
                 cursor: "pointer",
               }}
-              onClick={() => onSelect(name, index + 1)}
+              onClick={() => onSelect(name, index)}
             >
               <span>{`${index + 1}. ${name}`}</span>
               <div style={{ display: "flex", alignItems: "center" }}>
-                {/* Edit */}
+                {/* Edit button */}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setValue(name);
                     setEditingName(name);
+                    setIsEditingAllowed(true); // now allowed
                     setIsOpen(false);
                     setSelectedName(null);
                     setSequence(null);
