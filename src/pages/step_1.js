@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DropdownWithTextBox from "./DropDown.js";
 import CustomButton from "../components/CustomButton.jsx";
 import { Alert, MenuItem, Snackbar, TextField } from "@mui/material";
@@ -57,6 +57,7 @@ const FieldRow = () => {
   };
 
   const handleMasterSelect = (newMasterName) => {
+    // Save current selection to masterData before switching
     if (selectedMasterName) {
       setMasterData((prev) => {
         const updated = prev.filter(
@@ -74,15 +75,45 @@ const FieldRow = () => {
       });
     }
 
+    // Load selected master's data
     const existing = masterData.find(
       (entry) => entry.masterWorkTypes === newMasterName
     );
 
-    setDeliveryWorkTypes(existing ? existing.deliveryWorkTypes : []);
-    setSequence(existing ? existing.sequence.toString() : "");
-    setUiType(existing ? existing.uiType : "");
+    setDeliveryWorkTypes(existing?.deliveryWorkTypes || []);
+    setSequence(existing?.sequence != null ? existing.sequence.toString() : "");
+    setUiType(existing?.uiType || "");
     setSelectedMasterName(newMasterName);
   };
+
+  const getMWTandDWT = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:5000/v1/api/admin/master-work-types-with-delivery"
+      );
+      if (res.status === 200) {
+        const data = res.data.map((item) => ({
+          masterWorkTypes: item.masterWorkTypes,
+          deliveryWorkTypes: item.deliveryWorkTypes.map(
+            (dwt) => dwt.deliveryWorkType
+          ),
+          uiType: item.uiType || "",
+          sequence: 0, // Assuming default sequence = 0 since it's missing
+        }));
+
+        setMasterData(data);
+        setMasterWorkType(data.map((item) => item.masterWorkTypes));
+      } else {
+        console.error("❌ Error fetching data:", res.status);
+      }
+    } catch (err) {
+      console.error("❌ Fetch Error:", err);
+    }
+  };
+
+  useEffect(() => {
+    getMWTandDWT();
+  }, []);
 
   return (
     <div style={{ marginTop: "20px" }}>
@@ -94,6 +125,19 @@ const FieldRow = () => {
           setSequence={setSequence}
           setSelectedName={handleMasterSelect}
           label={"Create Master Work Types: "}
+          onEditName={(oldName, newName) => {
+            setMasterData((prev) =>
+              prev.map((entry) =>
+                entry.masterWorkTypes === oldName
+                  ? { ...entry, masterWorkTypes: newName }
+                  : entry
+              )
+            );
+
+            if (selectedMasterName === oldName) {
+              setSelectedMasterName(newName);
+            }
+          }}
         />
         <div style={{ marginTop: "20px" }}>
           <DropdownWithTextBox

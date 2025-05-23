@@ -1,5 +1,6 @@
+// Replace the current Step_2 code with this:
 import React, { useEffect, useState } from "react";
-import { Box, Button, MenuItem, TextField, IconButton } from "@mui/material";
+import { Box, MenuItem, TextField, IconButton, Paper } from "@mui/material";
 import DropdownWithTextBox from "./DropDown.js";
 import {
   Table,
@@ -8,7 +9,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
 } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
@@ -16,122 +16,17 @@ import CustomButton from "../components/CustomButton.jsx";
 import axios from "axios";
 
 export default function Step_2() {
-  const [blocks, setBlocks] = useState([
-    { id: 0, masterWorkTypes: "", deliveryWorkTypes: [] },
-  ]);
-
-  // const handleAddBlock = (addedType) => {
-  //   const nextId = Math.max(...blocks.map((b) => b.id)) + 1;
-  //   setBlocks([
-  //     ...blocks,
-  //     { id: nextId, masterWorkTypes: "", deliveryWorkTypes: [] },
-  //   ]);
-  // };
-
-  // const handleDeleteBlock = (id) => {
-  //   setBlocks(blocks.filter((block) => block.id !== id));
-  // };
-
-  // const handleUpdateBlock = (id, masterWorkTypes, deliveryWorkTypes) => {
-  //   setBlocks((prev) =>
-  //     prev.map((block) =>
-  //       block.id === id
-  //         ? { ...block, masterWorkTypes, deliveryWorkTypes }
-  //         : block
-  //     )
-  //   );
-  // };
-
-  const handleSave = () => {
-    console.log(
-      "Saved Data:",
-      blocks.filter((b) => b.masterWorkTypes)
-    );
-  };
-
-  const handleMultipleSave = () => {
-    handleSave();
-    setShowTable(true); // Show table
-    setIsAssigned(true); // Hide Assign section
-  };
-
-  // const usedTypes = blocks.map((b) => b.masterWorkTypes).filter(Boolean);
-
   const [fields, setFields] = useState({
     deliveryType: "",
-    screenFieldName: "",
-    screenFieldSequence: "",
   });
-
-  const [workTypeValue, setWorkTypeValue] = useState("");
-  const [error, setError] = useState(""); // Error state to track validation
-
-  const handleFieldChange = (key) => (event) => {
-    const value = event.target.value;
-    setFields((prev) => ({ ...prev, [key]: value }));
-
-    // Check if user filled the Screen Field Sequence but Work Type Category is not selected
-    if (key === "screenFieldSequence" && value !== "") {
-      if (workTypeValue.trim() === "") {
-        setError(
-          "Please select Work Type Category before filling the Sequence."
-        );
-      } else {
-        setError(""); // Clear the error if Work Type Category is selected
-      }
-    }
-  };
-  const [selectedName, setSelectedName] = useState(null);
-  const [uiType, setUiType] = useState("");
-  const [workTypes, setWorkTypes] = useState("");
-  const [sequence, setSequence] = useState("");
   const [allNames, setAllNames] = useState([]);
-  const [isAssigned, setIsAssigned] = useState(false);
+  const [uiType, setUiType] = useState("");
+  const [sequence, setSequence] = useState("");
+  const [selectedName, setSelectedName] = useState(null);
   const [dwt, setDwt] = useState([]);
-
-  const names = allNames.map((name, index) => ({
-    name,
-    sequence: index + 1,
-  }));
-
-  const initialRows = [
-    { sequence: 1, dwt: "AM", wtc: "Ticket Delivery", screenField: "" },
-    { sequence: 2, dwt: "AM", wtc: "NTD", screenField: "" },
-    { sequence: 3, dwt: "AM", wtc: "NTND", screenField: "" },
-    { sequence: 4, dwt: "AD", wtc: "Ticket Delivery", screenField: "" },
-    { sequence: 5, dwt: "AD", wtc: "NTD", screenField: "" },
-    { sequence: 6, dwt: "AD", wtc: "NTND", screenField: "" },
-    { sequence: 7, dwt: "AD Project", wtc: "Delivery", screenField: "" },
-    { sequence: 8, dwt: "AD Project", wtc: "Non Delivery", screenField: "" },
-    { sequence: 9, dwt: "SI Project", wtc: "Delivery", screenField: "" },
-    { sequence: 10, dwt: "SI Project", wtc: "Non Delivery", screenField: "" },
-  ];
-  const [rows, setRows] = useState(initialRows);
-  const [showTable, setShowTable] = useState(false); // Flag to show/hide table
-
-  const handleChange = (index, value) => {
-    const updatedRows = [...rows];
-    updatedRows[index].screenField = value;
-    setRows(updatedRows);
-  };
-
-  const moveRow = (index, direction) => {
-    const newIndex = index + direction;
-    if (newIndex < 0 || newIndex >= rows.length) return;
-
-    const updatedRows = [...rows];
-    const temp = updatedRows[index];
-    updatedRows[index] = updatedRows[newIndex];
-    updatedRows[newIndex] = temp;
-
-    // Reassign sequences
-    const reSequenced = updatedRows.map((row, i) => ({
-      ...row,
-      sequence: i + 1,
-    }));
-
-    setRows(reSequenced);
-  };
+  const [groupedData, setGroupedData] = useState([]); // [{ deliveryType, workTypeCategories }]
+  const [rows, setRows] = useState([]);
+  const [showTable, setShowTable] = useState(false);
 
   const getDWT = async () => {
     const res = await axios.get(
@@ -148,15 +43,118 @@ export default function Step_2() {
   useEffect(() => {
     getDWT();
   }, []);
-  const handleNext = async () => {
-    //    await axios.post(
-    //   `http://localhost:5000/addGuiwithSequence/`,
-    //   { gui_type: uiType,
-    //     master_work_types: names.map((item) => item.name),
-    //     sequences: names.map((item) => item.sequence),
-    //   }
-    // );
-    console.log("data saved");
+
+  // When switching DWT, save current allNames and load new one
+  const handleDeliveryTypeChange = (event) => {
+    const newDWT = event.target.value;
+
+    // Save current WTCs for previously selected DWT
+    if (fields.deliveryType) {
+      const prevDWT = fields.deliveryType;
+      const existingIndex = groupedData.findIndex(
+        (g) => g.deliveryType === prevDWT
+      );
+      const updatedGrouped = [...groupedData];
+      if (existingIndex > -1) {
+        updatedGrouped[existingIndex].workTypeCategories = allNames;
+      } else {
+        updatedGrouped.push({
+          deliveryType: prevDWT,
+          workTypeCategories: allNames,
+        });
+      }
+      setGroupedData(updatedGrouped);
+    }
+
+    // Load WTCs for selected DWT if they exist
+    const found = groupedData.find((g) => g.deliveryType === newDWT);
+    setAllNames(found ? found.workTypeCategories : []);
+
+    setFields((prev) => ({
+      ...prev,
+      deliveryType: newDWT,
+    }));
+  };
+
+  // Final "Create Task Types" – flattens groupedData to table rows
+  const handleCreateTaskTypes = () => {
+    const currentDWT = fields.deliveryType;
+    const updatedGrouped = [...groupedData];
+
+    if (currentDWT) {
+      const existingIndex = updatedGrouped.findIndex(
+        (g) => g.deliveryType === currentDWT
+      );
+
+      if (existingIndex > -1) {
+        updatedGrouped[existingIndex].workTypeCategories = allNames;
+      } else {
+        updatedGrouped.push({
+          deliveryType: currentDWT,
+          workTypeCategories: allNames,
+        });
+      }
+    }
+
+    // ✅ NOW generate rows using the freshly updatedGrouped
+    const newRows = updatedGrouped.flatMap((group) =>
+      group.workTypeCategories.map((name, idx) => ({
+        dwt: group.deliveryType,
+        wtc: name,
+        sequence: idx + 1,
+        screenField: "",
+      }))
+    );
+
+    setGroupedData(updatedGrouped);
+    setRows(newRows);
+    setShowTable(true);
+  };
+
+  const handleChange = (index, value) => {
+    const updated = [...rows];
+    updated[index].screenField = value;
+    setRows(updated);
+  };
+
+  const moveRow = (index, direction) => {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= rows.length) return;
+
+    const updated = [...rows];
+    const temp = updated[index];
+    updated[index] = updated[newIndex];
+    updated[newIndex] = temp;
+
+    updated.forEach((row, i) => {
+      row.sequence = i + 1;
+    });
+
+    setRows(updated);
+  };
+
+  const handleSave = async () => {
+    const payload = rows.map((row) => ({
+      deliveryWorkTypes: row.dwt,
+      workTypeCategory: row.wtc,
+      taskType: row.screenField,
+      sequence: row.sequence,
+    }));
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/v1/api/admin/delivery-work-type-category",
+        payload
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        console.log("✅ Task types submitted successfully:", response.data);
+      } else {
+        console.error("❌ Submission failed with status:", response.status);
+      }
+    } catch (error) {
+      console.error("❌ Error submitting task types:", error);
+    }
   };
 
   return (
@@ -177,7 +175,7 @@ export default function Step_2() {
               size="small"
               select
               value={fields.deliveryType}
-              onChange={handleFieldChange("deliveryType")}
+              onChange={handleDeliveryTypeChange}
             >
               {dwt.map((type) => (
                 <MenuItem key={type} value={type}>
@@ -185,6 +183,7 @@ export default function Step_2() {
                 </MenuItem>
               ))}
             </TextField>
+
             <div style={{ marginTop: "20px" }}>
               <DropdownWithTextBox
                 allNames={allNames}
@@ -193,13 +192,15 @@ export default function Step_2() {
                 setSequence={setSequence}
                 setSelectedName={setSelectedName}
                 label={"Create Work Type Categories: "}
+                disabled={!fields.deliveryType}
               />
             </div>
-            <div style={{ marginTop:" 20px"}}>
-            <CustomButton
-              handleClick={handleMultipleSave}
-              innerContent="Create Task Types"
-            />
+
+            <div style={{ marginTop: "20px" }}>
+              <CustomButton
+                handleClick={handleCreateTaskTypes}
+                innerContent="Create Task Types"
+              />
             </div>
           </Box>
         </div>
@@ -214,45 +215,26 @@ export default function Step_2() {
             <Table>
               <TableHead>
                 <TableRow sx={{ backgroundColor: "#7500c0" }}>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      fontWeight: "bold",
-                      paddingY: "6px",
-                      // '&:last-of-type': { }
-                    }}
-                  >
+                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
                     Sequence
                   </TableCell>
-                  <TableCell
-                    sx={{ color: "white", fontWeight: "bold", paddingY: "6px" }}
-                  >
-                    DWT
+                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                    Delivery Work Type
                   </TableCell>
-                  <TableCell
-                    sx={{ color: "white", fontWeight: "bold", paddingY: "6px" }}
-                  >
-                    WTC
+                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                    Work Type Category
                   </TableCell>
-                  <TableCell
-                    sx={{ color: "white", fontWeight: "bold", paddingY: "6px" }}
-                  >
-                    Screen Field Name For Task Type
+                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                    Screen Field Name
                   </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      fontWeight: "bold",
-                      paddingY: "6px",
-                    }}
-                  >
+                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
                     Up/Down
                   </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {rows.map((row, index) => (
-                  <TableRow key={row.sequence}>
+                  <TableRow key={index}>
                     <TableCell>{row.sequence}</TableCell>
                     <TableCell>{row.dwt}</TableCell>
                     <TableCell>{row.wtc}</TableCell>
@@ -287,7 +269,8 @@ export default function Step_2() {
           </TableContainer>
         </div>
       )}
-      <CustomButton handleClick={handleNext} innerContent="Save" />
+
+      <CustomButton handleClick={handleSave} innerContent="Save" />
     </>
   );
 }

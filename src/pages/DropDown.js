@@ -12,6 +12,7 @@ const ComboBox = ({
   setSelectedName,
   setSequence,
   label,
+  onEditName,
   disabled = false,
 }) => {
   const [value, setValue] = useState("");
@@ -44,10 +45,21 @@ const ComboBox = ({
     }
 
     if (editingName) {
+      // Prevent duplicate rename
+      if (allNames.includes(trimmed) && editingName !== trimmed) {
+        resetInput();
+        return;
+      }
+
       const updated = allNames.map((name) =>
         name === editingName ? trimmed : name
       );
       setAllNames(updated);
+
+      // ✅ Call the edit handler for master/delivery work mapping
+      if (onEditName) {
+        onEditName(editingName, trimmed);
+      }
     } else if (!allNames.includes(trimmed)) {
       setAllNames([...allNames, trimmed]);
     }
