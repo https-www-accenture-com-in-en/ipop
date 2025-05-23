@@ -1,11 +1,11 @@
 import { DeliveryWorkTypeCategory } from "../../models/delivery-worktype-category.model.js";
-import { DeliveryWorkType } from "../../models/master.model.js";
+import { MasterWorkType, DeliveryWorkType } from "../../models/master.model.js";
 
-const httpGetTaskTypes = async (req, res) => {
+// @desc    Get all task types
+// @route   GET /api/v1/admin/task-types
+export const httpGetTaskTypes = async (req, res) => {
   try {
-    // Fetch all master work types and populate their delivery work types
     const data = await DeliveryWorkTypeCategory.find({}, { taskType: 1 });
-
     res.status(200).json(data);
   } catch (error) {
     console.error("Error fetching task types work types:", error);
@@ -13,7 +13,89 @@ const httpGetTaskTypes = async (req, res) => {
   }
 };
 
-const httpCreateDeliveryWorkTypeCategory = async (req, res) => {
+// @desc    Get all DeliveryWorkTypeCategory
+
+export const getAllWorkTypes = async (req, res) => {
+  try {
+    const data = await MasterWorkType.aggregate([
+      {
+        $lookup: {
+          from: "deliveryworktypes",
+          localField: "_id",
+          foreignField: "MasterWorkTypeId",
+          as: "deliveryWorkTypes",
+        },
+      },
+      {
+        $unwind: {
+          path: "$deliveryWorkTypes",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "deliveryworktypecategories", // 👈 Updated collection name here
+          localField: "deliveryWorkTypes._id",
+          foreignField: "deliveryWorkTypesId",
+          as: "deliveryWorkTypes.taskTypes",
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          masterWorkTypes: { $first: "$masterWorkTypes" },
+          deliveryWorkTypes: {
+            $push: {
+              id: "$deliveryWorkTypes._id",
+              deliveryWorkTypes: "$deliveryWorkTypes.deliveryWorkTypes",
+              sequence: "$deliveryWorkTypes.sequence",
+              taskTypes: "$deliveryWorkTypes.taskTypes",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          id: "$_id",
+          masterWorkTypes: 1,
+          deliveryWorkTypes: {
+            $map: {
+              input: "$deliveryWorkTypes",
+              as: "d",
+              in: {
+                id: "$$d.id",
+                deliveryWorkTypes: "$$d.deliveryWorkTypes",
+                sequence: "$$d.sequence",
+                taskTypes: {
+                  $map: {
+                    input: "$$d.taskTypes",
+                    as: "t",
+                    in: {
+                      id: "$$t._id",
+                      taskType: "$$t.taskType",
+                      workTypeCategory: "$$t.workTypeCategory",
+                      sequence: "$$t.sequence",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// @desc    Create DeliveryWorkTypeCategory
+// @route   POST /api/v1/admin/delivery-work-type-category
+export const httpCreateDeliveryWorkTypeCategory = async (req, res) => {
   try {
     const payload = req.body;
     const result = [];
@@ -49,5 +131,3 @@ const httpCreateDeliveryWorkTypeCategory = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-export { httpGetTaskTypes, httpCreateDeliveryWorkTypeCategory };

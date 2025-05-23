@@ -8,6 +8,7 @@ import {
 } from "../controllers/admin/master-delivery.controller.js";
 import {
   httpGetTaskTypes,
+  getAllWorkTypes,
   httpCreateDeliveryWorkTypeCategory,
 } from "../controllers/admin/delivery-worktype-category.controller.js";
 
@@ -62,7 +63,8 @@ adminRouter.post("/master-and-delivery-work-types", httpCreateMasterDeliveryWT);
 adminRouter.patch("/work-types/bulk-edit", editWorkTypes);
 
 //SCREEN 2 DELIVERY WORK TYPE CATEGORY
-adminRouter.get("/tasktypes", httpGetTaskTypes);
+adminRouter.get("/only-task-types", httpGetTaskTypes);
+adminRouter.get("/task-types-with-mwt-dwt", getAllWorkTypes);
 adminRouter.post(
   "/delivery-work-type-category",
   httpCreateDeliveryWorkTypeCategory
