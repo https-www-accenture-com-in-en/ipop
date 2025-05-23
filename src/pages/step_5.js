@@ -29,11 +29,40 @@ const FieldRow = () => {
   const [subCategory, setSubCategory] = useState([]);
   const [selectedName, setSelectedName] = useState(null);
   const [workItem, setWorkItem] = useState([]);
-  const [selectedTaskType, setSelectedTaskType] = useState();
   const [uiType, setUiType] = useState("");
   const [sequence, setSequence] = useState("");
   const [subCategoryInputValue, setSubCategoryInputValue] = useState("");
+  const [taskTypeData, setTaskTypeData] = useState({});
+  const [selectedTaskType, setSelectedTaskType] = useState("");
 
+  const handleTaskTypeChange = (newTaskType) => {
+  // Save current state for previous task type
+  if (selectedTaskType) {
+    setTaskTypeData(prev => ({
+      ...prev,
+      [selectedTaskType]: {
+        workData,
+        workCategories,
+        subCategories,
+        selectedCategory,
+        selectedSubCategory,
+        workItems,
+        subCategoryInputValue,
+      }
+    }));
+  }
+
+  // Load state for new task type, or defaults if not present
+  const data = taskTypeData[newTaskType] || {};
+  setWorkData(data.workData || []);
+  setWorkCategories(data.workCategories || []);
+  setSubCategories(data.subCategories || []);
+  setSelectedCategory(data.selectedCategory || null);
+  setSelectedSubCategory(data.selectedSubCategory || null);
+  setWorkItems(data.workItems || []);
+  setSubCategoryInputValue(data.subCategoryInputValue || "");
+  setSelectedTaskType(newTaskType);
+};
 
   const handleCategorySelect = (category) => {
     // Save current subCategories and workItems for the previous category
@@ -247,7 +276,7 @@ const FieldRow = () => {
         <InputLabel>Select Task Type</InputLabel>
         <Select
           value={selectedTaskType}
-          onChange={(e) => setSelectedTaskType(e.target.value)}
+          onChange={(e) => handleTaskTypeChange(e.target.value)}
           label="Select Task Type"
         >
           {taskTypeOptions.map((type) => (
