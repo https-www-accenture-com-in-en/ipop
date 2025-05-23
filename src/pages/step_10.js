@@ -12,24 +12,26 @@ import axios from "axios";
 
 import VModelTable from "../components/VModelTable";
 import CustomButton from "../components/CustomButton.jsx";
+import { apiGet } from "../utils/api.js";
 
 export default function Step_12() {
-  const [dummyData, setDummyData] = useState([]);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/v1/api/admin/masterprojects")
-      .then((response) => {
-        console.log("Master projects fetched successfully:", response.data);
-        setDummyData(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching master projects:", error);
-      });
-  }, []);
+  const [masterProjects, setMasterProjects] = useState([]);
   const [showTable, setShowTable] = useState(false);
   const [selectedMaster, setSelectedMaster] = useState("");
   const [selectedSubProject, setSelectedSubProject] = useState("");
+
+  useEffect(() => {
+    const loadMasterProjects = async () => {
+      try {
+        const data = await apiGet("/master-projects");
+        console.log("Master Projects:", data);
+        setMasterProjects(data);
+      } catch (err) {
+        console.error("Error loading master projects:", err);
+      }
+    };
+    loadMasterProjects();
+  }, []);
 
   const handleMasterChange = (event) => {
     setSelectedMaster(event.target.value);
@@ -40,9 +42,7 @@ export default function Step_12() {
     setSelectedSubProject(event.target.value);
   };
 
-  const currentMaster = dummyData.find(
-    (p) => p.masterProjectName === selectedMaster
-  );
+  const currentMaster = masterProjects.find((p) => p.name === selectedMaster);
 
   return (
     <div>
@@ -60,12 +60,9 @@ export default function Step_12() {
               label="Master Project"
               onChange={handleMasterChange}
             >
-              {dummyData.map((project) => (
-                <MenuItem
-                  key={project.masterProjectName}
-                  value={project.masterProjectName}
-                >
-                  {project.masterProjectName}
+              {masterProjects.map((project) => (
+                <MenuItem key={project.id} value={project.name}>
+                  {project.name}
                 </MenuItem>
               ))}
             </Select>
@@ -84,9 +81,9 @@ export default function Step_12() {
               label="Sub Project"
               onChange={handleSubProjectChange}
             >
-              {currentMaster?.subProjectNames.map((sub) => (
-                <MenuItem key={sub} value={sub}>
-                  {sub}
+              {currentMaster?.subprojects.map((sub) => (
+                <MenuItem key={sub._id} value={sub.name}>
+                  {sub.name}
                 </MenuItem>
               ))}
             </Select>
