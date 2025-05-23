@@ -41,14 +41,26 @@ const FieldRow = () => {
       setWorkData((prev) => {
         // Remove old entry for this category
         const filtered = prev.filter((entry) => entry.category !== selectedCategory);
+        // Prepare subCategories for saving (including "__none__" if needed)
+        let newSubCats = subCategories.map((sub) => {
+          return {
+            name: sub,
+            workItems:
+              workData.find(e => e.category === selectedCategory)?.subCategories?.find(s => s.name === sub)?.workItems || 
+              (selectedSubCategory === sub ? workItems : [])
+          };
+        });
+        // If no sub-category selected, save workItems under "__none__"
+        if (!selectedSubCategory && workItems.length > 0) {
+          // Remove any existing "__none__"
+          newSubCats = newSubCats.filter(sc => sc.name !== "__none__");
+          newSubCats.push({ name: "__none__", workItems });
+        }
         return [
           ...filtered,
           {
             category: selectedCategory,
-            subCategories: subCategories.map((sub, i) => ({
-              name: sub,
-              workItems: workData.find(e => e.category === selectedCategory)?.subCategories?.find(s => s.name === sub)?.workItems || (selectedSubCategory === sub ? workItems : [])
-            }))
+            subCategories: newSubCats
           }
         ];
       });
@@ -56,76 +68,91 @@ const FieldRow = () => {
 
     // Load subCategories for the new category if exists
     const found = workData.find((entry) => entry.category === category);
-    setSubCategories(found ? found.subCategories.map(s => s.name) : []);
+    let loadedSubCategories = found ? found.subCategories.map(s => s.name) : [];
+    loadedSubCategories = loadedSubCategories.filter(name => name !== "__none__");
+    setSubCategories(loadedSubCategories);
+
     setSelectedCategory(category);
     setSelectedSubCategory(null);
-    setWorkItems([]);
+
+    // Restore work items for "__none__" if present
+    const noneSub = found?.subCategories.find(s => s.name === "__none__");
+    setWorkItems(noneSub ? noneSub.workItems : []);
     setSubCategoryInputValue("");
   };
+   
+    
 
   const handleSubCategorySelect = (subCategory) => {
-  // Save current workItems for the previous subCategory (including "none")
-  if (selectedSubCategory !== null) {
-    setWorkData((prev) =>
-      prev.map((entry) =>
-        entry.category === selectedCategory
-          ? {
-              ...entry,
-              subCategories: entry.subCategories.map((sub) =>
-                sub.name === (selectedSubCategory || "__none__")
-                  ? { ...sub, workItems }
-                  : sub
-              ),
-            }
-          : entry
-      )
-    );
-  }
-
-    // Load workItems for the new subCategory if exists
-    const found = workData
-    .find((entry) => entry.category === selectedCategory)
-    ?.subCategories.find((s) => s.name === (subCategory || "__none__"));
-  setWorkItems(found ? found.workItems : []);
-  setSelectedSubCategory(subCategory);
-};
-
-
-  const handleWorkItemsChange = (newWorkItems) => {
-  setWorkItems(newWorkItems);
-  if (selectedCategory) {
+    // Save current workItems for the previous subCategory (including "none")
     setWorkData((prev) =>
       prev.map((entry) =>
         entry.category === selectedCategory
           ? {
               ...entry,
               subCategories: (() => {
-                // If no sub-category selected, use "__none__"
-                if (!selectedSubCategory) {
-                  const exists = entry.subCategories.find((sub) => sub.name === "__none__");
-                  if (exists) {
-                    // Update workItems for "__none__"
-                    return entry.subCategories.map((sub) =>
-                      sub.name === "__none__" ? { ...sub, workItems: newWorkItems } : sub
-                    );
-                  } else {
-                    // Add "__none__" sub-category
-                    return [...entry.subCategories, { name: "__none__", workItems: newWorkItems }];
-                  }
-                }
-                // Else, update as usual
-                return entry.subCategories.map((sub) =>
-                  sub.name === selectedSubCategory
-                    ? { ...sub, workItems: newWorkItems }
+                // Save workItems for previous subCategory or "__none__"
+                let updated = entry.subCategories.map((sub) =>
+                  sub.name === (selectedSubCategory || "__none__")
+                    ? { ...sub, workItems }
                     : sub
                 );
+                // If previous subCategory was "__none__" and doesn't exist, add it
+                if (!selectedSubCategory && !entry.subCategories.find(s => s.name === "__none__") && workItems.length > 0) {
+                  updated = [...updated, { name: "__none__", workItems }];
+                }
+                return updated;
               })(),
             }
           : entry
       )
     );
-  }
-};
+
+    // Load workItems for the new subCategory if exists
+    const found = workData
+      .find((entry) => entry.category === selectedCategory)
+      ?.subCategories.find((s) => s.name === (subCategory || "__none__"));
+    setWorkItems(found ? found.workItems : []);
+    setSelectedSubCategory(subCategory);
+  };
+
+
+  const handleWorkItemsChange = (newWorkItems) => {
+    setWorkItems(newWorkItems);
+    if (selectedCategory) {
+      setWorkData((prev) =>
+        prev.map((entry) =>
+          entry.category === selectedCategory
+            ? {
+                ...entry,
+                subCategories: (() => {
+                  // If no sub-category selected, use "__none__"
+                  if (!selectedSubCategory) {
+                    const exists = entry.subCategories.find((sub) => sub.name === "__none__");
+                    if (exists) {
+                      // Update workItems for "__none__"
+                      return entry.subCategories.map((sub) =>
+                        sub.name === "__none__" ? { ...sub, workItems: newWorkItems } : sub
+                      );
+                    } else {
+                      // Add "__none__" sub-category
+                      return [...entry.subCategories, { name: "__none__", workItems: newWorkItems }];
+                    }
+                  }
+                  // Else, update as usual
+                  return entry.subCategories.map((sub) =>
+                    sub.name === selectedSubCategory
+                      ? { ...sub, workItems: newWorkItems }
+                      : sub
+                  );
+                })(),
+              }
+            : entry
+        )
+      );
+    }
+  };
+
 
   const handleWorkCategoriesChange = (newCategories) => {
   setWorkCategories(newCategories);
