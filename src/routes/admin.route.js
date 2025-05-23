@@ -28,6 +28,7 @@ import {
   getAllSubProjects,
   getMasterProjectById,
   getSubProjectById,
+  getSubProjectsById,
   updateMasterProject,
   updateSubProject,
 } from "../controllers/admin/project.controller.js";
@@ -74,7 +75,8 @@ adminRouter.delete("/master-projects/:id", deleteMasterProject);
 // SubProject Routes
 adminRouter.post("/sub-projects", addSubProject);
 adminRouter.get("/sub-projects", getAllSubProjects);
-adminRouter.get("/sub-projects/:id", getSubProjectById);
+adminRouter.get("/sub-projects/:id", getSubProjectsById);
+// adminRouter.get("/sub-projects/:id", getSubProjectById);
 adminRouter.put("/sub-projects/:id", updateSubProject);
 adminRouter.delete("/sub-projects/:id", deleteSubProject);
 

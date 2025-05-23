@@ -100,10 +100,25 @@ const getAllSubProjects = async (req, res) => {
   }
 };
 
+// Get SubProject by Master Project ID
+const getSubProjectsById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const subs = await SubProject.find({ masterProject: id }).populate(
+      "masterProject"
+    );
+    if (!subs) return res.status(404).json({ message: "Not found" });
+    res.status(200).json(subs);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // Get SubProject by ID
 const getSubProjectById = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log("ID", id);
     const sub = await SubProject.findById(id).populate("masterProject");
     if (!sub) return res.status(404).json({ message: "Not found" });
     res.status(200).json(sub);
@@ -158,6 +173,7 @@ export {
   deleteMasterProject,
   addSubProject,
   getAllSubProjects,
+  getSubProjectsById,
   getSubProjectById,
   updateSubProject,
   deleteSubProject,
