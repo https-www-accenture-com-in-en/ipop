@@ -14,13 +14,18 @@ const ComboBox = ({
   label,
   onEditName,
   disabled = false,
+  inputValue,           // NEW
+  setInputValue, 
 }) => {
-  const [value, setValue] = useState("");
+  //const [value, setValue] = useState("");
   const [editingName, setEditingName] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isEditingAllowed, setIsEditingAllowed] = useState(true); // NEW FLAG
   const wrapperRef = useRef(null);
-
+  const [internalValue, setInternalValue] = useState("");
+  const value = inputValue !== undefined ? inputValue : internalValue;
+  const setValue = setInputValue || setInternalValue;
+  // Close dropdown on outside click
   useEffect(() => {
     const onClickOutside = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
