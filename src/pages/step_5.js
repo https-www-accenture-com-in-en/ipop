@@ -195,14 +195,26 @@ const FieldRow = () => {
 
   return (
     <div className="page-wrapper">
-      <TextBox
+      {/* <TextBox
         inputValue={workTypeCategory}
         setInputValue={setWorkTypeCategory}
         InputLabel="WorkTypeCategory"
         InputInnerLabel="Enter WorkTypeCategory"
-      />
-
+      /> */}
       <label style={{ display: "block", marginBottom: 8, fontWeight: "bold" }}>
+        WorkType Category
+      </label>
+      <TextField
+                        name="workType category"
+                        value="Non Ticket Delivery"
+                        fullWidth
+                        InputProps={{
+                          readOnly: true
+                        }}
+                        
+                      />
+
+      <label style={{ display: "block", marginBottom: 8, fontWeight: "bold", marginTop: 16 }}>
         Task Type
       </label>
       <FormControl fullWidth size="small">
