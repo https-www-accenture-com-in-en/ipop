@@ -96,3 +96,50 @@ export const httpCreateMasterDeliveryWT = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const editWorkTypes = async (req, res) => {
+  try {
+    const updates = req.body;
+
+    if (!Array.isArray(updates)) {
+      return res
+        .status(400)
+        .json({ error: "Request body should be an array of updates" });
+    }
+
+    const updateOperations = updates.map(async (item) => {
+      const { id } = item;
+      if (!id) return;
+
+      // Build dynamic payloads
+      const masterPayload = {};
+      const deliveryPayload = {};
+
+      if (item.masterWorkTypes)
+        masterPayload.masterWorkTypes = item.masterWorkTypes;
+      if (item.uiType) masterPayload.uiType = item.uiType;
+      if (item.sequence !== undefined) {
+        masterPayload.sequence = item.sequence;
+        deliveryPayload.sequence = item.sequence;
+      }
+      if (item.deliveryWorkTypes)
+        deliveryPayload.deliveryWorkTypes = item.deliveryWorkTypes;
+
+      // Determine which collection the ID belongs to
+      const isMaster = await MasterWorkType.exists({ _id: id });
+
+      if (isMaster) {
+        return MasterWorkType.findByIdAndUpdate(id, masterPayload);
+      } else {
+        return DeliveryWorkType.findByIdAndUpdate(id, deliveryPayload);
+      }
+    });
+
+    await Promise.all(updateOperations);
+
+    res.status(200).json({ message: "All updates applied successfully" });
+  } catch (error) {
+    console.error("Error processing updates:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
