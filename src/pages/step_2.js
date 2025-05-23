@@ -195,10 +195,12 @@ export default function Step_2() {
                 label={"Create Work Type Categories: "}
               />
             </div>
+            <div style={{ marginTop:" 20px"}}>
             <CustomButton
               handleClick={handleMultipleSave}
-              innerContent="Assign Work Type Categories"
+              innerContent="Create Task Types"
             />
+            </div>
           </Box>
         </div>
       </div>
