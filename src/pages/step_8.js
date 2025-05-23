@@ -69,7 +69,10 @@ export default function Step_10() {
   };
 
   return (
-    <div className="page-wrapper" style={{ marginTop: "20px", padding: "20px" }}>
+    <div
+      className="page-wrapper"
+      style={{ marginTop: "20px", padding: "20px" }}
+    >
       <div>
         <Box my={2} sx={{ maxWidth: 400 }}>
           <CrudDropdown
@@ -94,21 +97,27 @@ export default function Step_10() {
             displayField="name"
             valueField="_id"
             disabled={!selectedCluster || !selectedCluster._id}
-            placeholder={!selectedCluster || !selectedCluster._id ? "Select a cluster first" : "Type or select value"}
+            placeholder={
+              !selectedCluster || !selectedCluster._id
+                ? "Select a cluster first"
+                : "Type or select value"
+            }
           />
         </Box>
 
-        <Box my={2} sx={{ maxWidth: 400, display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <TextBox
-            inputValue={adProject}
-            setInputValue={setAdProject}
-            InputLabel="AD Project Name"
-            InputInnerLabel="Enter Project Name"
-          />
+        <TextBox
+          inputValue={adProject}
+          setInputValue={setAdProject}
+          InputLabel="AD Project Name"
+          InputInnerLabel="Enter Project Name"
+        />
+        <Box my={2}>
           <CustomButton
             handleClick={handleCreateVModelTasks}
             innerContent="Create V-Model Project Tasks"
-            disabled={!selectedCluster || !selectedClusterValue || !adProject.trim()}
+            disabled={
+              !selectedCluster || !selectedClusterValue || !adProject.trim()
+            }
           />
         </Box>
       </div>
