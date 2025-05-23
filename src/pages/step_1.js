@@ -124,7 +124,7 @@ const FieldRow = () => {
           setUiType={setUiType}
           setSequence={setSequence}
           setSelectedName={handleMasterSelect}
-          label={"Create Master Work Types: "}
+          label={"Manage Master Work Types: "}
           onEditName={(oldName, newName) => {
             setMasterData((prev) =>
               prev.map((entry) =>
@@ -146,7 +146,7 @@ const FieldRow = () => {
             setUiType={setUiType}
             setSequence={setSequence}
             setSelectedName={() => {}}
-            label={"Create Delivery Work Types: "}
+            label={"Manage Delivery Work Types: "}
             disabled={!selectedMasterName}
           />
         </div>
