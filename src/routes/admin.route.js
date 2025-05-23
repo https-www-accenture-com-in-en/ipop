@@ -2,6 +2,7 @@ import express from "express";
 import {
   httpGetMasterWT,
   httpGetDeliveryWT,
+  httpGetMasterWithDeliveryWorkTypes,
   httpCreateMasterDeliveryWT,
 } from "../controllers/admin/master-delivery.controller.js";
 import {
@@ -52,6 +53,10 @@ const adminRouter = express.Router();
 //SCREEN1 MASTER DELIVERY WORK TYPE
 adminRouter.get("/master-work-types", httpGetMasterWT);
 adminRouter.get("/delivery-work-types", httpGetDeliveryWT);
+adminRouter.get(
+  "/master-work-types-with-delivery",
+  httpGetMasterWithDeliveryWorkTypes
+);
 adminRouter.post("/master-and-delivery-work-types", httpCreateMasterDeliveryWT);
 
 //SCREEN 2 DELIVERY WORK TYPE CATEGORY
