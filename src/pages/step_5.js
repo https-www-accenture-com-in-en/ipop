@@ -208,9 +208,8 @@ const FieldRow = () => {
                         name="workType category"
                         value="Non Ticket Delivery"
                         fullWidth
-                        InputProps={{
-                          readOnly: true
-                        }}
+                        slotProps={{ input: { readOnly: true } }}
+                        size="small"
                         
                       />
 
