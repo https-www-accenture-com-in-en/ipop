@@ -14,8 +14,8 @@ export const httpGetTaskTypes = async (req, res) => {
 };
 
 // @desc    Get all DeliveryWorkTypeCategory
-
-export const getAllWorkTypes = async (req, res) => {
+// @route   GET /api/v1/admin/task-types-with-mwt-dwt
+export const httpGetAllWorkTypes = async (req, res) => {
   try {
     const data = await MasterWorkType.aggregate([
       {
@@ -129,5 +129,35 @@ export const httpCreateDeliveryWorkTypeCategory = async (req, res) => {
   } catch (error) {
     console.error("Error creating DeliveryWorkTypeCategory:", error);
     res.status(500).json({ error: error.message });
+  }
+};
+
+// @desc    Edit DeliveryWorkTypeCategory
+// @route   PATCH /api/v1/admin/task-types/bulk-edit
+export const httpEditTaskTypes = async (req, res) => {
+  try {
+    const updates = req.body;
+
+    const updatePromises = updates.map(async (item) => {
+      const { id, ...updateFields } = item;
+
+      if (!id) return;
+
+      return DeliveryWorkTypeCategory.findByIdAndUpdate(
+        id,
+        { $set: updateFields },
+        { new: true }
+      );
+    });
+
+    const results = await Promise.all(updatePromises);
+
+    res.status(200).json({
+      message: "Delivery Work Type Categories updated successfully",
+      updated: results.filter(Boolean), // remove undefined in case of missing ids
+    });
+  } catch (error) {
+    console.error("Error updating DeliveryWorkTypeCategory:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

@@ -97,7 +97,7 @@ export const httpCreateMasterDeliveryWT = async (req, res) => {
   }
 };
 
-export const editWorkTypes = async (req, res) => {
+export const httpEditWorkTypes = async (req, res) => {
   try {
     const updates = req.body;
 

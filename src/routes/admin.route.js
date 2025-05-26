@@ -4,12 +4,13 @@ import {
   httpGetDeliveryWT,
   httpGetMasterWithDeliveryWorkTypes,
   httpCreateMasterDeliveryWT,
-  editWorkTypes,
+  httpEditWorkTypes,
 } from "../controllers/admin/master-delivery.controller.js";
 import {
   httpGetTaskTypes,
-  getAllWorkTypes,
+  httpGetAllWorkTypes,
   httpCreateDeliveryWorkTypeCategory,
+  httpEditTaskTypes,
 } from "../controllers/admin/delivery-worktype-category.controller.js";
 
 import {
@@ -60,15 +61,16 @@ adminRouter.get(
   httpGetMasterWithDeliveryWorkTypes
 );
 adminRouter.post("/master-and-delivery-work-types", httpCreateMasterDeliveryWT);
-adminRouter.patch("/work-types/bulk-edit", editWorkTypes);
+adminRouter.patch("/work-types/bulk-edit", httpEditWorkTypes);
 
 //SCREEN 2 DELIVERY WORK TYPE CATEGORY
 adminRouter.get("/only-task-types", httpGetTaskTypes);
-adminRouter.get("/task-types-with-mwt-dwt", getAllWorkTypes);
+adminRouter.get("/task-types-with-mwt-dwt", httpGetAllWorkTypes);
 adminRouter.post(
   "/delivery-work-type-category",
   httpCreateDeliveryWorkTypeCategory
 );
+adminRouter.patch("/task-types/bulk-edit", httpEditTaskTypes);
 
 //SCREEN 4
 adminRouter.post("/ticket-metadata", httpAddMetadata);
