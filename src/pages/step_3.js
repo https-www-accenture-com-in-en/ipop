@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   MenuItem,
@@ -9,16 +9,7 @@ import {
 } from "@mui/material";
 import DropdownWithTextBox from "./DropDown.js";
 import CustomButton from "../components/CustomButton.jsx";
-
-// L1 -> L2 mapping
-const workTypeCategoryMap = {
-  "AM Ticket Delivery": [],
-  "AD Ticket Delivery": [],
-  "CM Ticket Delivery": [],
-  "CBS Ticket Delivery": [],
-};
-
-const deliveryWorkTypes = Object.keys(workTypeCategoryMap);
+import axios from "axios";
 
 export default function Step_3() {
   const [selectedDelivery, setSelectedDelivery] = useState("");
@@ -29,6 +20,7 @@ export default function Step_3() {
   const [uiType, setUiType] = useState("");
   const [workTypes, setWorkTypes] = useState("");
   const [sequence, setSequence] = useState("");
+  const [taskType, setTaskType] = useState([]);
   const [allNames, setAllNames] = useState([]);
   const names = allNames.map((name, index) => ({
     name,
@@ -74,6 +66,25 @@ export default function Step_3() {
     // );
     console.log("data saved");
   };
+
+  const getTaskTypes = async () => {
+    const res = await axios.get(
+      "http://localhost:5000/v1/api/admin/only-task-types"
+    );
+    if (res.status === 200) {
+      const data = res.data.map((item) => ({
+        taskType: item.taskType,
+      }));
+      setTaskType(data);
+    } else {
+      console.error("❌ Error fetching data:", res.status);
+    }
+  };
+
+  useEffect(() => {
+    getTaskTypes();
+  }, []);
+
   return (
     <div style={{ marginTop: "20px" }}>
       <div className="page-wrapper">
@@ -83,7 +94,7 @@ export default function Step_3() {
             style={{
               fontWeight: "bold",
               display: "block",
-              marginBottom: "8px",
+              marginBottom: 15,
             }}
           >
             Work Type Category
@@ -103,7 +114,7 @@ export default function Step_3() {
               fontWeight: "bold",
               display: "block",
               marginTop: "20px",
-              marginBottom: 8,
+              marginBottom: 15,
             }}
           >
             Select Task Type
@@ -116,9 +127,9 @@ export default function Step_3() {
               value={selectedDelivery}
               onChange={handleDeliveryChange}
             >
-              {deliveryWorkTypes.map((type) => (
-                <MenuItem key={type} value={type}>
-                  {type}
+              {taskType.map((type) => (
+                <MenuItem key={type.id} value={type.taskType}>
+                  {type.taskType}
                 </MenuItem>
               ))}
             </Select>
