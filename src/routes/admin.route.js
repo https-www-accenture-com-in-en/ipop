@@ -2,11 +2,15 @@ import express from "express";
 import {
   httpGetMasterWT,
   httpGetDeliveryWT,
+  httpGetMasterWithDeliveryWorkTypes,
   httpCreateMasterDeliveryWT,
+  httpEditWorkTypes,
 } from "../controllers/admin/master-delivery.controller.js";
 import {
   httpGetTaskTypes,
+  httpGetAllWorkTypes,
   httpCreateDeliveryWorkTypeCategory,
+  httpEditTaskTypes,
 } from "../controllers/admin/delivery-worktype-category.controller.js";
 
 import {
@@ -28,6 +32,7 @@ import {
   getAllSubProjects,
   getMasterProjectById,
   getSubProjectById,
+  getSubProjectsById,
   updateMasterProject,
   updateSubProject,
 } from "../controllers/admin/project.controller.js";
@@ -54,14 +59,21 @@ const adminRouter = express.Router();
 //SCREEN1 MASTER DELIVERY WORK TYPE
 adminRouter.get("/master-work-types", httpGetMasterWT);
 adminRouter.get("/delivery-work-types", httpGetDeliveryWT);
+adminRouter.get(
+  "/master-work-types-with-delivery",
+  httpGetMasterWithDeliveryWorkTypes
+);
 adminRouter.post("/master-and-delivery-work-types", httpCreateMasterDeliveryWT);
+adminRouter.patch("/work-types/bulk-edit", httpEditWorkTypes);
 
 //SCREEN 2 DELIVERY WORK TYPE CATEGORY
-adminRouter.get("/tasktypes", httpGetTaskTypes);
+adminRouter.get("/only-task-types", httpGetTaskTypes);
+adminRouter.get("/task-types-with-mwt-dwt", httpGetAllWorkTypes);
 adminRouter.post(
   "/delivery-work-type-category",
   httpCreateDeliveryWorkTypeCategory
 );
+adminRouter.patch("/task-types/bulk-edit", httpEditTaskTypes);
 
 //SCREEN 4
 adminRouter.post("/ticket-metadata", httpAddMetadata);
@@ -77,7 +89,8 @@ adminRouter.delete("/master-projects/:id", deleteMasterProject);
 // SubProject Routes
 adminRouter.post("/sub-projects", addSubProject);
 adminRouter.get("/sub-projects", getAllSubProjects);
-adminRouter.get("/sub-projects/:id", getSubProjectById);
+adminRouter.get("/sub-projects/:id", getSubProjectsById);
+// adminRouter.get("/sub-projects/:id", getSubProjectById);
 adminRouter.put("/sub-projects/:id", updateSubProject);
 adminRouter.delete("/sub-projects/:id", deleteSubProject);
 

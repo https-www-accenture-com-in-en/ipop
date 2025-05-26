@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
-const masterWorkTypeSchema = new mongoose.Schema(
+import { Schema } from "mongoose";
+const masterWorkTypeSchema = new Schema(
   {
     masterWorkTypes: {
-      type: String, // or an Array/Object depending on your data
+      type: String,
       required: true,
     },
     uiType: {
@@ -17,16 +18,6 @@ const masterWorkTypeSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// masterWorkTypeSchema.virtual("deliveryWorkTypes", {
-//   ref: "DeliveryWorkType",
-//   localField: "_id",
-//   foreignField: "MasterWorkTypeId",
-//   justOne: false,
-// });
-
-// masterWorkTypeSchema.set("toObject", { virtuals: true });
-// masterWorkTypeSchema.set("toJSON", { virtuals: true });
-
 masterWorkTypeSchema.set("toJSON", {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();
@@ -37,12 +28,8 @@ masterWorkTypeSchema.set("toJSON", {
 
 const MasterWorkType = mongoose.model("MasterWorkType", masterWorkTypeSchema);
 
-const DeliveryWorkTypeSchema = new mongoose.Schema(
+const DeliveryWorkTypeSchema = new Schema(
   {
-    masterWorkTypes: {
-      type: String, // same as in the first model
-      required: true,
-    },
     deliveryWorkTypes: {
       type: String,
       required: true,
