@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -72,8 +72,6 @@ export default function Step_4() {
     "Effort To Be Clocked",
     "Additional Effort To Be Clocked",
   ]);
-<<<<<<< Updated upstream
-=======
 
   const fetchTicketMetadata = async () => {
     try {
@@ -112,7 +110,6 @@ export default function Step_4() {
     fetchTicketMetadata();
   }, [selectedTicketType]);
 
->>>>>>> Stashed changes
   const [mappings, setMappings] = useState([]);
 
   const handleAddMapping = () => {
