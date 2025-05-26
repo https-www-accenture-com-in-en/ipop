@@ -72,6 +72,47 @@ export default function Step_4() {
     "Effort To Be Clocked",
     "Additional Effort To Be Clocked",
   ]);
+<<<<<<< Updated upstream
+=======
+
+  const fetchTicketMetadata = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/v1/api/admin/ticket-metadata"
+      );
+      const data = await response.json();
+      const allObject = data.find(
+        (item) => item.ticketType === selectedTicketType
+      );
+      if (allObject !== undefined) {
+        setAllNames(allObject.explicitAttributes.map((attr) => attr.name));
+        setImplicitAttr(allObject.implicitAttributes.map((attr) => attr.name));
+      } else {
+        if (selectedTicketType !== "") {
+          setAllNames([
+            "Ticket Number",
+            "Ticket description",
+            "Ticket Priority",
+          ]);
+          setImplicitAttr([
+            "Estimated Effort",
+            "Burnt Effort",
+            "Remaining Effort",
+            "Effort To Be Clocked",
+            "Additional Effort To Be Clocked",
+          ]);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching ticket metadata:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchTicketMetadata();
+  }, [selectedTicketType]);
+
+>>>>>>> Stashed changes
   const [mappings, setMappings] = useState([]);
 
   const handleAddMapping = () => {
@@ -103,8 +144,8 @@ export default function Step_4() {
   const handleSave = async () => {
     const ticketData = {
       ticketType: selectedTicketType,
-      explicitAttributes: allNames,
-      implicitAttributes: implicitAttr,
+      explicitAttributes: allNames.map((name) => ({ name })),
+      implicitAttributes: implicitAttr.map((name) => ({ name })),
     };
 
     try {
