@@ -34,7 +34,7 @@ const FieldRow = () => {
   const [subCategoryInputValue, setSubCategoryInputValue] = useState("");
   const [taskTypeData, setTaskTypeData] = useState({});
   const [selectedTaskType, setSelectedTaskType] = useState("");
-
+  const [categoryInputValue, setCategoryInputValue] = useState("");
   const handleTaskTypeChange = (newTaskType) => {
   // Save current state for previous task type
   if (selectedTaskType) {
@@ -51,6 +51,15 @@ const FieldRow = () => {
       }
     }));
   }
+
+  setWorkData([]);
+  setWorkCategories([]);
+  setSubCategories([]);
+  setSelectedCategory(null);
+  setSelectedSubCategory(null);
+  setWorkItems([]);
+  setSubCategoryInputValue("");
+  setCategoryInputValue("");
 
   // Load state for new task type, or defaults if not present
   const data = taskTypeData[newTaskType] || {};
@@ -295,6 +304,9 @@ const FieldRow = () => {
           setSequence={setSequence}
           setSelectedName={handleCategorySelect}
           label={"Create Non Ticket Delivery Work Category: "}
+          inputValue={categoryInputValue}
+          setInputValue={setCategoryInputValue}
+          disabled={!selectedTaskType}
         />
       </Box>
       <DropdownWithTextBox
