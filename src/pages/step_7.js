@@ -1,104 +1,44 @@
-import React, { useState } from "react";
-import {
-  Select,
-  MenuItem,
-  TextField,
-  Typography,
-  FormControl,
-  Box,
-  Button
-} from "@mui/material";
-import Tb from "./tb";
+import { useState } from "react";
+import DropdownWithTextBox from "./DropDown.js";
+import CustomButton from "../components/CustomButton.jsx";
+import { Box } from "@mui/material";
 
-const Step_7 = () => {
-  const deliveryTypes = [
-    "Application Maintenance",
-    "Application Development",
-    "Application Management Services",
-    "Application Development Project",
-    "System Integration Project"
-  ];
+const FieldRow = () => {
+  const [selectedName, setSelectedName] = useState(null);
+  const [uiType, setUiType] = useState("");
+  const [sequence, setSequence] = useState("");
+  const [clusters, setClusters] = useState([]);
+  const [clusterValues, setClusterValues] = useState([]);
 
-  const fieldTypes = ["checkbox", "radio", "dropdown", "textField", "button"];
-
-  const [fields, setFields] = useState({
-    deliveryType: "",
-    type: ""
-  });
-
-  const handleFieldChange = (key) => (event) => {
-    const value = event.target.value;
-    setFields((prev) => ({ ...prev, [key]: value }));
+  const handleNext = async () => {
+    console.log("data saved");
   };
 
   return (
-    <FormControl sx={{ p: 4 }} fullWidth>
-      <Typography variant="h6" gutterBottom>
-      Non Ticket Delivery
-      </Typography>
-
-      {/* 1. Delivery Work Type */}
-      <Box my={2} sx={{ width: 300 }}>
-        <TextField
-          label="Delivery Work Type"
-          name="deliveryType"
-          fullWidth
-          margin="dense"
-          size="small"
-          select
-          value={fields.deliveryType}
-          onChange={handleFieldChange("deliveryType")}
-        >
-          <MenuItem value="">
-            <em>Select</em>
-          </MenuItem>
-          {deliveryTypes.map((type) => (
-            <MenuItem key={type} value={type}>
-              {type}
-            </MenuItem>
-          ))}
-        </TextField>
-      </Box>
-
-      {/* 2. Work Type Category - Static Default */}
-      <Box my={2} sx={{ width: 300 }}>
-        <TextField
-          label="Work Type Category"
-          value="Non Ticket Delivery"
-          fullWidth
-          InputProps={{
-            readOnly: true
-          }}
+    <div className="page-wrapper">
+      <Box>
+        <DropdownWithTextBox
+          allNames={clusters}
+          setAllNames={setClusters}
+          setUiType={setUiType}
+          setSequence={setSequence}
+          setSelectedName={setSelectedName}
+          label={"Create Project Clusters: "}
         />
       </Box>
-      <Box my={2} sx={{ width: 300 }}>
-       
-        <Tb label="Work Type Categories" />
+      <Box my={2}>
+        <DropdownWithTextBox
+          allNames={clusterValues}
+          setAllNames={setClusterValues}
+          setUiType={setUiType}
+          setSequence={setSequence}
+          setSelectedName={setSelectedName}
+          label={"Create Values for Cluster: "}
+        />
       </Box>
-      <Box my={2} sx={{ width: 300 }}>
-       
-        <Tb label="Work Type Sub-Categories" />
-      </Box>
-      <Box my={2} sx={{ width: 300 }}>
-       
-        <Tb label=" Non Ticket Delivery Work Item" />
-      </Box>
-
-      {/* Save Button */}
-      <Box my={2} sx={{ width: "30%" }}>
-        <Button
-          variant="contained"
-          color="success"
-          onClick={() => {
-            console.log("Saved values:", fields);
-          }}
-          fullWidth
-        >
-          Save
-        </Button>
-      </Box>
-    </FormControl>
+      <CustomButton handleClick={handleNext} innerContent={"Save"} />
+    </div>
   );
 };
 
-export default Step_7;
+export default FieldRow;

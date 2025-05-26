@@ -10,10 +10,9 @@ import { Button, Tab, TextField } from "@mui/material";
 
 import { useState } from "react";
 import CustomButton from "./CustomButton";
+import { MdDeleteOutline } from "react-icons/md";
 
-const EstimationTable = ({ initialRows }) => {
-  const [rows, setRows] = useState(initialRows);
-
+const EstimationTable = ({ rows, setRows }) => {
   const handleProjectTaskChange = (index, value) => {
     const updatedRows = [...rows];
     updatedRows[index].projectTask = value;
@@ -37,54 +36,91 @@ const EstimationTable = ({ initialRows }) => {
     }
   };
 
-  return (
-    <div>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead sx={{ backgroundColor: "purple" }}>
-            <TableRow>
-              <TableCell sx={{ color: "white" }}>Project Task</TableCell>
-              <TableCell sx={{ color: "white" }}>% Distribution</TableCell>
-              <TableCell sx={{ color: "white" }}>Estimated Effort</TableCell>
-              <TableCell sx={{ color: "white" }}>Burnt Effort</TableCell>
+  const handleDeleteRow = (index) => {
+    const updatedRows = [...rows];
+    updatedRows.splice(index, 1);
+    setRows(updatedRows);
+  };
 
-              <TableCell sx={{ color: "white" }}>Delete</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row, index) => (
-              <TableRow key={index}>
-                <TableCell>
-                  <TextField
-                    variant="standard"
-                    fullWidth
-                    value={row.projectTask}
-                    onChange={(e) =>
-                      handleProjectTaskChange(index, e.target.value)
-                    }
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    variant="standard"
-                    fullWidth
-                    type="number"
-                    value={row.distribution}
-                    onChange={(e) =>
-                      handleDistributionChange(index, e.target.value)
-                    }
-                  />
-                </TableCell>
-                <TableCell>{row.estimatedEffort}</TableCell>
-                <TableCell>{row.burntEffort}</TableCell>
-                <TableCell>🗑️</TableCell>
+  const handleAddNewRow = () => {
+    const newRow = {
+      projectTask: "Enter Project Task",
+      distribution: 0,
+      estimatedEffort: 0,
+      burntEffort: 0,
+    };
+    setRows([...rows, newRow]);
+  };
+
+  return (
+    <>
+      <div className="table-wrapper">
+        <TableContainer
+          component={Paper}
+          sx={{ overflow: "hidden", borderRadius: "12px", mb: 2 }}
+        >
+          <Table>
+            <TableHead sx={{ backgroundColor: "purple" }}>
+              <TableRow sx={{ backgroundColor: "#7500c0" }}>
+                <TableCell sx={{ color: "white" }}>Project Task</TableCell>
+                <TableCell sx={{ color: "white" }}>% Distribution</TableCell>
+                <TableCell sx={{ color: "white" }}>Estimated Effort</TableCell>
+                <TableCell sx={{ color: "white" }}>Burnt Effort</TableCell>
+
+                <TableCell sx={{ color: "white" }}>Delete</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {rows.map((row, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <TextField
+                      variant="standard"
+                      fullWidth
+                      placeholder="Enter Project Task"
+                      type="text"
+                      value={row.projectTask}
+                      onChange={(e) =>
+                        handleProjectTaskChange(index, e.target.value)
+                      }
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      placeholder="% Distribution"
+                      variant="standard"
+                      fullWidth
+                      type="number"
+                      value={row.distribution}
+                      onChange={(e) =>
+                        handleDistributionChange(index, e.target.value)
+                      }
+                    />
+                  </TableCell>
+                  <TableCell>{row.estimatedEffort}</TableCell>
+                  <TableCell>{row.burntEffort}</TableCell>
+                  <TableCell>
+                    <MdDeleteOutline
+                      onClick={() => handleDeleteRow(index)}
+                      aria-label="Delete"
+                      style={{
+                        background: "transparent",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: "1.2em",
+                        color: "#7500c0",
+                      }}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
+      <CustomButton handleClick={handleAddNewRow} innerContent="Add New Row" />
       <CustomButton handleClick={validate} innerContent="Save" />
-    </div>
+    </>
   );
 };
 

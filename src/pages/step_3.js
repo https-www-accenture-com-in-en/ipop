@@ -1,45 +1,30 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
-  Button,
   MenuItem,
   Select,
   TextField,
   FormControl,
   InputLabel,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  IconButton
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Tb from "./tb";
-import DropdownWithTextBox from './DropDown.js';
+import DropdownWithTextBox from "./DropDown.js";
+import CustomButton from "../components/CustomButton.jsx";
+import axios from "axios";
 
-// L1 -> L2 mapping
-const workTypeCategoryMap = {
-  "AM Ticket Delivery":[],
-  "AD Ticket Delivery":[],
-  "CM Ticket Delivery":[],
-  "CBS Ticket Delivery":[],
-};
-
-const deliveryWorkTypes = Object.keys(workTypeCategoryMap);
-
-export default function Step_4() {
+export default function Step_3() {
   const [selectedDelivery, setSelectedDelivery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [ticketType, setTicketType] = useState("");
   const [mappings, setMappings] = useState([]);
   const [selectedName, setSelectedName] = useState(null);
-  const [uiType, setUiType] = useState('');
-  const [workTypes, setWorkTypes] = useState('');
-  const [sequence, setSequence] = useState('');
+  const [uiType, setUiType] = useState("");
+  const [workTypes, setWorkTypes] = useState("");
+  const [sequence, setSequence] = useState("");
+  const [taskType, setTaskType] = useState([]);
   const [allNames, setAllNames] = useState([]);
   const names = allNames.map((name, index) => ({
     name,
-    sequence: index + 1
+    sequence: index + 1,
   }));
 
   const handleAddMapping = () => {
@@ -49,8 +34,8 @@ export default function Step_4() {
         {
           ticketType,
           deliveryWorkType: selectedDelivery,
-          workTypeCategory: selectedCategory
-        }
+          workTypeCategory: selectedCategory,
+        },
       ]);
       setTicketType("");
     }
@@ -71,76 +56,98 @@ export default function Step_4() {
     setSelectedDelivery(value);
     setSelectedCategory(""); // Reset category when delivery changes
   };
- const handleNext = async () => {
-
-//    await axios.post(
-//   `http://localhost:5000/addGuiwithSequence/`,
-//   { gui_type: uiType,
-//     master_work_types: names.map((item) => item.name),
-//     sequences: names.map((item) => item.sequence),
-//   }
-// );
+  const handleNext = async () => {
+    //    await axios.post(
+    //   `http://localhost:5000/addGuiwithSequence/`,
+    //   { gui_type: uiType,
+    //     master_work_types: names.map((item) => item.name),
+    //     sequences: names.map((item) => item.sequence),
+    //   }
+    // );
     console.log("data saved");
   };
+
+  const getTaskTypes = async () => {
+    const res = await axios.get(
+      "http://localhost:5000/v1/api/admin/only-task-types"
+    );
+    if (res.status === 200) {
+      const data = res.data.map((item) => ({
+        taskType: item.taskType,
+      }));
+      setTaskType(data);
+    } else {
+      console.error("❌ Error fetching data:", res.status);
+    }
+  };
+
+  useEffect(() => {
+    getTaskTypes();
+  }, []);
+
   return (
-    <div style={{ border: "1px solid #7500c0", borderRadius: "10px", padding: "20px"}}>
-      <Box p={4}>
-        <label htmlFor="workType" style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
-          Work Type Category
-        </label>
-         <TextField
-                  name="workType"
-                  value="Ticket Delivery"
-                  fullWidth
-                  InputProps={{
-                    readOnly: true
-                  }}
-                />
-        <label htmlFor="ticketTypes" style={{ fontWeight: 'bold', display: 'block',marginTop: '20px' }}>
-          Select Task Type
-        </label>
-
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Select Delivery Work Type</InputLabel>
-          <Select
-            value={selectedDelivery}
-            onChange={handleDeliveryChange}
-            label="Delivery Work Type"
+    <div style={{ marginTop: "20px" }}>
+      <div className="page-wrapper">
+        <Box>
+          <label
+            htmlFor="workType"
+            style={{
+              fontWeight: "bold",
+              display: "block",
+              marginBottom: 15,
+            }}
           >
-            {deliveryWorkTypes.map((type) => (
-              <MenuItem key={type} value={type}>
-                {type}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+            Work Type Category
+          </label>
+          <TextField
+            id="workType"
+            value="Ticket Delivery"
+            size="small"
+            fullWidth
+            InputProps={{
+              readOnly: true,
+            }}
+          />
+          <label
+            htmlFor="ticketTypes"
+            style={{
+              fontWeight: "bold",
+              display: "block",
+              marginTop: "20px",
+              marginBottom: 15,
+            }}
+          >
+            Select Task Type
+          </label>
 
-        <div style={{ marginTop: "20px" }}>
-        <DropdownWithTextBox allNames={allNames} setAllNames={setAllNames} setUiType={setUiType} setSequence={setSequence} setSelectedName={setSelectedName} label={"Create Ticket Types: "} />
-        </div>
-  <Button
-           onClick={handleNext}
-           variant="contained"
-           sx={{
-             mt: 2,
-             px: 0.5,
-             py: 0.5,
-             fontSize: '10px',
-             width: '100%',
-             fontWeight: 'bold',
-             borderRadius: '6px',
-             backgroundColor: '#7500c0',
-             color: 'white',
-             textTransform: 'none',
-             '&:hover': {
-               backgroundColor: '#7500c0',
-               transform: 'scale(1.05)',
-             },
-           }}
-         >
-           Save
-         </Button>
-      </Box>
+          <FormControl fullWidth size="small">
+            <InputLabel>Select Task Type</InputLabel>
+            <Select
+              label="Select Task Type"
+              value={selectedDelivery}
+              onChange={handleDeliveryChange}
+            >
+              {taskType.map((type) => (
+                <MenuItem key={type.id} value={type.taskType}>
+                  {type.taskType}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <div style={{ marginTop: "20px" }}>
+            <DropdownWithTextBox
+              allNames={allNames}
+              setAllNames={setAllNames}
+              setUiType={setUiType}
+              setSequence={setSequence}
+              setSelectedName={setSelectedName}
+              label={"Create Ticket Types: "}
+            />
+          </div>
+        </Box>
+      </div>
+      <CustomButton handleClick={handleNext} innerContent="Save" />
     </div>
   );
 }

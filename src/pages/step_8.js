@@ -1,103 +1,128 @@
-import React, { useState } from "react";
-import {
-  Select,
-  MenuItem,
-  TextField,
-  Typography,
-  FormControl,
-  Box,
-  Button
-} from "@mui/material";
-import Tb from "./tb";
- 
-const Step_8 = () => {
-  const deliveryTypes = [
-    "Application Maintenance",
-    "Application Development",
-    "Application Management Services",
-    "Application Development Project",
-    "System Integration Project"
-  ];
- 
- 
-  const [fields, setFields] = useState({
-    deliveryType: "",
-    type: ""
-  });
- 
-  const handleFieldChange = (key) => (event) => {
-    const value = event.target.value;
-    setFields((prev) => ({ ...prev, [key]: value }));
+import { useEffect, useState } from "react";
+import { Box } from "@mui/material";
+import VModelTable from "../components/VModelTable.jsx";
+import TextBox from "../components/TextBox.jsx";
+import CrudDropdown from "../components/Dropdown";
+import CustomButton from "../components/CustomButton.jsx";
+import { apiGet } from "../utils/api";
+
+export default function Step_10() {
+  const [clusters, setClusters] = useState([]);
+  const [selectedCluster, setSelectedCluster] = useState(null); // full cluster object
+
+  const [clusterValues, setClusterValues] = useState([]);
+  const [selectedClusterValue, setSelectedClusterValue] = useState(null);
+
+  const [adProject, setAdProject] = useState("");
+  const [showTable, setShowTable] = useState(false);
+
+  useEffect(() => {
+    const fetchClusters = async () => {
+      try {
+        const data = await apiGet("/clusters");
+        setClusters(data || []);
+      } catch (error) {
+        console.error("Error fetching clusters:", error);
+      }
+    };
+    fetchClusters();
+  }, []);
+
+  useEffect(() => {
+    const fetchClusterValues = async () => {
+      if (!selectedCluster || !selectedCluster._id) {
+        setClusterValues([]);
+        setSelectedClusterValue(null); // Also reset selected value
+        return;
+      }
+      try {
+        const data = await apiGet(`/clustervalues/${selectedCluster._id}`);
+        setClusterValues(data || []);
+      } catch (error) {
+        console.error("Error fetching cluster values:", error);
+        setClusterValues([]);
+      }
+    };
+    fetchClusterValues();
+  }, [selectedCluster]);
+
+  const handleClusterSelected = (clusterItem, index) => {
+    if (selectedCluster?._id !== clusterItem?._id) {
+      setSelectedCluster(clusterItem);
+    }
   };
- 
+
+  const handleClusterValueSelected = (valueItem, index) => {
+    setSelectedClusterValue(valueItem);
+  };
+
+  const clusterValueAdditionalPayload = selectedCluster?._id
+    ? { cluster: selectedCluster._id }
+    : {}; // If no cluster selected, payload is empty (dropdown should be disabled anyway)
+
+  const handleCreateVModelTasks = () => {
+    if (selectedCluster && selectedClusterValue && adProject.trim()) {
+      setShowTable(true);
+    } else {
+      alert("Please select a cluster, a value, and enter a project name.");
+    }
+  };
+
   return (
-    <FormControl sx={{ p: 4 }} fullWidth>
-      <Typography variant="h6" gutterBottom>
-      Non Ticket Non Delivery
-      </Typography>
- 
-      {/* 1. Delivery Work Type */}
-      <Box my={2} sx={{ width: 300 }}>
-        <TextField
-          label="Delivery Work Type"
-          name="deliveryType"
-          fullWidth
-          margin="dense"
-          size="small"
-          select
-          value={fields.deliveryType}
-          onChange={handleFieldChange("deliveryType")}
-        >
-          <MenuItem value="">
-            <em>Select</em>
-          </MenuItem>
-          {deliveryTypes.map((type) => (
-            <MenuItem key={type} value={type}>
-              {type}
-            </MenuItem>
-          ))}
-        </TextField>
-      </Box>
- 
-      {/* 2. Work Type Category - Static Default */}
-      <Box my={2} sx={{ width: 300 }}>
-        <TextField
-          label="Work Type Category"
-          value="Non Ticket Non Delivery"
-          fullWidth
-          InputProps={{
-            readOnly: true
-          }}
+    <div
+      className="page-wrapper"
+      style={{ marginTop: "20px", padding: "20px" }}
+    >
+      <div>
+        <Box my={2} sx={{ maxWidth: 400 }}>
+          <CrudDropdown
+            label="Select or Manage Cluster"
+            items={clusters}
+            onItemsChange={setClusters}
+            onItemSelected={handleClusterSelected}
+            endpoint="/clusters"
+            displayField="name"
+            valueField="_id"
+          />
+        </Box>
+
+        <Box my={2} sx={{ maxWidth: 400 }}>
+          <CrudDropdown
+            label="Select or Manage Cluster Value"
+            items={clusterValues}
+            onItemsChange={setClusterValues}
+            onItemSelected={handleClusterValueSelected}
+            endpoint="/clustervalues"
+            additionalCreatePayload={clusterValueAdditionalPayload}
+            displayField="name"
+            valueField="_id"
+            disabled={!selectedCluster || !selectedCluster._id}
+            placeholder={
+              !selectedCluster || !selectedCluster._id
+                ? "Select a cluster first"
+                : "Type or select value"
+            }
+          />
+        </Box>
+
+        <TextBox
+          inputValue={adProject}
+          setInputValue={setAdProject}
+          InputLabel="AD Project Name"
+          InputInnerLabel="Enter Project Name"
         />
-      </Box>
-      <Box my={2} sx={{ width: 300 }}>
-       
-        <Tb label="Create Non Ticket Non Delivery Work Category" />
-      </Box>
-      <Box my={2} sx={{ width: 300 }}>
-       
-        <Tb label="Create Non Ticket Non Delivery Work Sub-Category" />
-      </Box>
-      <Box my={2} sx={{ width: 300 }}>
-       
-        <Tb label="Create Non Ticket Non Delivery Work Item" />
-      </Box>
- 
-      {/* Save Button */}
-      <Box my={2} sx={{ width: "30%" }}>
-        <Button
-          variant="contained"
-          color="success"
-          onClick={() => {
-            console.log("Saved values:", fields);
-          }}
-          fullWidth
-        >
-          Save
-        </Button>
-      </Box>
-    </FormControl>
+        <Box my={2}>
+          <CustomButton
+            handleClick={handleCreateVModelTasks}
+            innerContent="Create V-Model Project Tasks"
+            disabled={
+              !selectedCluster || !selectedClusterValue || !adProject.trim()
+            }
+          />
+        </Box>
+      </div>
+
+      {showTable && <VModelTable style={{ marginTop: "20px" }} />}
+    </div>
   );
-};
- 
-export default Step_8;
+}
