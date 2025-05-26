@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -60,18 +60,55 @@ export default function Step_4() {
   const [uiType, setUiType] = useState("");
   const [sequence, setSequence] = useState("");
 
+
   const [allNames, setAllNames] = useState([
-    "Ticket Number",
-    "Ticket description",
-    "Ticket Priority",
+    // "Ticket Number",
+    // "Ticket description",
+    // "Ticket Priority",
   ]);
   const [implicitAttr, setImplicitAttr] = useState([
-    "Estimated Effort",
-    "Burnt Effort",
-    "Remaining Effort",
-    "Effort To Be Clocked",
-    "Additional Effort To Be Clocked",
+    // "Estimated Effort",
+    // "Burnt Effort",
+    // "Remaining Effort",
+    // "Effort To Be Clocked",
+    // "Additional Effort To Be Clocked",
   ]);
+
+  const fetchTicketMetadata = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/v1/api/admin/ticket-metadata"
+        );
+        const data = await response.json();
+        const allObject = data.find((item)=>item.ticketType===selectedTicketType);
+        if (allObject !== undefined) {
+          setAllNames(allObject.explicitAttributes);
+          setImplicitAttr(allObject.implicitAttributes);
+        } else {
+          if (selectedTicketType !== "") {
+          setAllNames([
+            "Ticket Number",
+            "Ticket description",
+            "Ticket Priority"
+          ]);
+          setImplicitAttr([
+            "Estimated Effort",
+            "Burnt Effort",
+            "Remaining Effort",
+            "Effort To Be Clocked",
+            "Additional Effort To Be Clocked",
+          ]);
+        }
+        }
+      } catch (err) {
+        console.error("Error fetching ticket metadata:", err);
+      }
+    };
+
+  useEffect(() => {
+    fetchTicketMetadata();
+  },[selectedTicketType]);
+
   const [mappings, setMappings] = useState([]);
 
   const handleAddMapping = () => {
