@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { MasterProject, SubProject } from "../../models/project.model.js";
 
 // ========== Master Project ==========
@@ -12,7 +13,7 @@ const addMasterProject = async (req, res) => {
 
 // Get all Master Projects
 const getAllMasterProjects = async (req, res) => {
-  const projects = await MasterProject.find().populate("subprojects");
+  const projects = await MasterProject.find();
   res.status(200).json(projects);
 };
 
@@ -119,6 +120,235 @@ const deleteSubProject = async (req, res) => {
   await SubProject.findByIdAndDelete(id);
 
   res.status(200).json({ message: "Subproject deleted" });
+};
+
+export const httpBulkProjectOperations = async (req, res) => {
+  const { masterProject: mpOps, subProject: spOps } = req.body;
+  console.log("Bulk project operations request body:", req.body);
+  console.log("create", req.body.masterProject?.create);
+  const results = {
+    createdMasterProjects: [],
+    createdSubProjects: [],
+    updatedData: { masterProjects: [], subProjects: [] },
+    deletedData: { masterProjectIds: [], subProjectIds: [] },
+    errors: [],
+  };
+  const tempIdToNewIdMap = new Map(); // For mapping frontend temp IDs to DB-generated ObjectIds
+  const session = await mongoose.startSession();
+
+  try {
+    await session.withTransaction(async () => {
+      // 1. Deletions (SubProjects first, then MasterProjects to handle dependencies)
+      if (spOps && spOps.delete && spOps.delete.length > 0) {
+        const idsToDelete = spOps.delete
+          .map((op) => op.id)
+          .filter((id) => mongoose.Types.ObjectId.isValid(id));
+        if (idsToDelete.length > 0) {
+          await SubProject.deleteMany(
+            { _id: { $in: idsToDelete } },
+            { session }
+          );
+          results.deletedData.subProjectIds.push(...idsToDelete);
+        }
+      }
+
+      if (mpOps && mpOps.delete && mpOps.delete.length > 0) {
+        const idsToDelete = mpOps.delete
+          .map((op) => op.id)
+          .filter((id) => mongoose.Types.ObjectId.isValid(id));
+        if (idsToDelete.length > 0) {
+          // Delete all SubProjects associated with the MasterProjects being deleted
+          await SubProject.deleteMany(
+            { masterProject: { $in: idsToDelete } },
+            { session }
+          );
+          // Then delete the MasterProjects
+          await MasterProject.deleteMany(
+            { _id: { $in: idsToDelete } },
+            { session }
+          );
+          results.deletedData.masterProjectIds.push(...idsToDelete);
+        }
+      }
+
+      // 2. Creations (MasterProjects first, then SubProjects to resolve FKs)
+      if (mpOps && mpOps.create && mpOps.create.length > 0) {
+        for (const op of mpOps.create) {
+          const { _id: tempFrontendId, ...mpDataForDb } = op.data; // _id from frontend is ignored
+          const newMasterProject = new MasterProject(mpDataForDb);
+          await newMasterProject.save({ session });
+          tempIdToNewIdMap.set(op.tempId, newMasterProject._id.toString());
+          results.createdMasterProjects.push({
+            tempId: op.tempId,
+            newMasterProject: newMasterProject.toObject(),
+          });
+        }
+      }
+
+      if (spOps && spOps.create && spOps.create.length > 0) {
+        for (const op of spOps.create) {
+          const { _id: tempFrontendId, ...spDataForDb } = op.data; // _id from frontend is ignored
+          let masterProjectFk = spDataForDb.masterProject;
+
+          if (masterProjectFk && tempIdToNewIdMap.has(masterProjectFk)) {
+            spDataForDb.masterProject = tempIdToNewIdMap.get(masterProjectFk);
+          } else if (
+            masterProjectFk &&
+            String(masterProjectFk).startsWith("temp_")
+          ) {
+            results.errors.push({
+              type: "CREATE_SP_ERROR",
+              message: `SubProject creation error: Temp masterProject ID ${masterProjectFk} not resolved.`,
+              item: op,
+            });
+            continue;
+          }
+
+          if (
+            !spDataForDb.masterProject ||
+            !mongoose.Types.ObjectId.isValid(spDataForDb.masterProject)
+          ) {
+            results.errors.push({
+              type: "CREATE_SP_ERROR",
+              message: `SubProject creation error: Invalid or missing masterProject ID for ${spDataForDb.name}. MasterProject ID was: ${spDataForDb.masterProject}`,
+              item: op,
+            });
+            continue;
+          }
+
+          const newSubProject = new SubProject(spDataForDb);
+          await newSubProject.save({ session });
+          results.createdSubProjects.push({
+            tempId: op.tempId,
+            newSubProject: newSubProject.toObject(),
+          });
+          // No need to update MasterProject's subprojects array
+        }
+      }
+
+      // 3. Updates
+      if (mpOps && mpOps.update && mpOps.update.length > 0) {
+        for (const op of mpOps.update) {
+          if (op.id && mongoose.Types.ObjectId.isValid(op.id)) {
+            const { _id, ...updatePayload } = op.data; // _id from payload is ignored
+            const updatedMasterProject = await MasterProject.findByIdAndUpdate(
+              op.id,
+              updatePayload,
+              { new: true, runValidators: true, session }
+            );
+            if (updatedMasterProject)
+              results.updatedData.masterProjects.push(
+                updatedMasterProject.toObject()
+              );
+            else
+              results.errors.push({
+                type: "UPDATE_MP_ERROR",
+                message: `MasterProject with id ${op.id} not found for update.`,
+                item: op,
+              });
+          } else if (op.id && String(op.id).startsWith("temp_")) {
+            results.errors.push({
+              type: "UPDATE_MP_ERROR",
+              message: `Cannot update MasterProject with temporary ID ${op.id}. It should have been created.`,
+              item: op,
+            });
+          }
+        }
+      }
+      if (spOps && spOps.update && spOps.update.length > 0) {
+        for (const op of spOps.update) {
+          if (op.id && mongoose.Types.ObjectId.isValid(op.id)) {
+            let {
+              _id,
+              masterProject: masterProjectFk,
+              ...updatePayload
+            } = op.data; // _id from payload is ignored
+
+            if (masterProjectFk && tempIdToNewIdMap.has(masterProjectFk)) {
+              updatePayload.masterProject =
+                tempIdToNewIdMap.get(masterProjectFk);
+            } else if (
+              masterProjectFk &&
+              String(masterProjectFk).startsWith("temp_")
+            ) {
+              results.errors.push({
+                type: "UPDATE_SP_ERROR",
+                message: `SubProject update error: Temp masterProject ID ${masterProjectFk} not resolved.`,
+                item: op,
+              });
+              continue;
+            } else if (
+              masterProjectFk &&
+              !mongoose.Types.ObjectId.isValid(masterProjectFk)
+            ) {
+              results.errors.push({
+                type: "UPDATE_SP_ERROR",
+                message: `SubProject update error: Invalid masterProject ID ${masterProjectFk}.`,
+                item: op,
+              });
+              continue;
+            } else if (masterProjectFk) {
+              // It's a valid ObjectId string (or already converted from tempId)
+              updatePayload.masterProject = masterProjectFk;
+            }
+            // If masterProjectFk is not provided in op.data, updatePayload.masterProject will not be set,
+            // so findByIdAndUpdate will not change the existing masterProject reference in the DB, which is correct.
+
+            const updatedSp = await SubProject.findByIdAndUpdate(
+              op.id,
+              updatePayload,
+              { new: true, runValidators: true, session }
+            );
+            if (updatedSp) {
+              results.updatedData.subProjects.push(updatedSp.toObject());
+              // No need to update MasterProject's subprojects array
+            } else {
+              results.errors.push({
+                type: "UPDATE_SP_ERROR",
+                message: `SubProject with id ${op.id} not found for update.`,
+                item: op,
+              });
+            }
+          } else if (op.id && String(op.id).startsWith("temp_")) {
+            results.errors.push({
+              type: "UPDATE_SP_ERROR",
+              message: `Cannot update SubProject with temporary ID ${op.id}. It should have been created.`,
+              item: op,
+            });
+          }
+        }
+      }
+    }); // End of session.withTransaction
+
+    if (results.errors.length > 0) {
+      console.warn(
+        "Bulk project operation completed with errors:",
+        JSON.stringify(results.errors, null, 2)
+      );
+      res.status(400).json({
+        message: "Bulk operation completed with some errors.",
+        details: results,
+      });
+      return;
+    }
+    res.status(200).json(results);
+  } catch (err) {
+    console.error("Bulk project operation error (transaction aborted):", err);
+    if (!results.errors.some((e) => e.type === "TRANSACTION_ERROR")) {
+      results.errors.push({
+        type: "TRANSACTION_ERROR",
+        message: err.message,
+        stack: err.stack,
+        item: req.body,
+      });
+    }
+    res.status(500).json({
+      message: "Bulk operation failed. Changes rolled back.",
+      details: results.errors,
+    });
+  } finally {
+    session.endSession();
+  }
 };
 
 export {

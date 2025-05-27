@@ -33,6 +33,7 @@ import {
   getMasterProjectById,
   getSubProjectById,
   getSubProjectsById,
+  httpBulkProjectOperations,
   updateMasterProject,
   updateSubProject,
 } from "../controllers/admin/project.controller.js";
@@ -52,7 +53,7 @@ import {
   httpDeleteADProject,
 } from "../controllers/admin/cluster.controller.js";
 
-import * as workController from '../controllers/admin/non-ticket-delivery-worktype-category.controller.js';
+import * as workController from "../controllers/admin/non-ticket-delivery-worktype-category.controller.js";
 
 const adminRouter = express.Router();
 
@@ -94,6 +95,8 @@ adminRouter.get("/sub-projects/:id", getSubProjectsById);
 adminRouter.put("/sub-projects/:id", updateSubProject);
 adminRouter.delete("/sub-projects/:id", deleteSubProject);
 
+adminRouter.post("/bulk-project-operations", httpBulkProjectOperations);
+
 adminRouter.get("/timeoff", httpGetTimeOffCategories);
 adminRouter.post("/timeoff", httpAddTimeOffCategory);
 adminRouter.put("/timeoff/:id", httpUpdateTimeOffCategory);
@@ -116,30 +119,45 @@ adminRouter.get("/adprojects", httpGetADProject);
 adminRouter.put("/adprojects/:id", httpUpdateADProject);
 adminRouter.delete("/adprojects/:id", httpDeleteADProject);
 
-adminRouter.post('/tasktypes2', workController.httpAddTaskType);
-adminRouter.get('/tasktypes2', workController.httpGetTaskTypes);
-adminRouter.get('/tasktypes2/:id', workController.httpGetTaskTypeById);
-adminRouter.put('/tasktypes2/:id', workController.httpUpdateTaskType);
-adminRouter.delete('/tasktypes2/:id', workController.httpDeleteTaskType);
+adminRouter.post("/tasktypes2", workController.httpAddTaskType);
+adminRouter.get("/tasktypes2", workController.httpGetTaskTypes);
+adminRouter.get("/tasktypes2/:id", workController.httpGetTaskTypeById);
+adminRouter.put("/tasktypes2/:id", workController.httpUpdateTaskType);
+adminRouter.delete("/tasktypes2/:id", workController.httpDeleteTaskType);
 
-adminRouter.post('/workcategories', workController.httpAddWorkCategory);
-adminRouter.get('/workcategories', workController.httpGetWorkCategories); // "/workcategories?taskTypeId=..."
-adminRouter.get('/workcategories/:id', workController.httpGetWorkCategoryById);
-adminRouter.put('/workcategories/:id', workController.httpUpdateWorkCategory);
-adminRouter.delete('/workcategories/:id', workController.httpDeleteWorkCategory);
+adminRouter.post("/workcategories", workController.httpAddWorkCategory);
+adminRouter.get("/workcategories", workController.httpGetWorkCategories); // "/workcategories?taskTypeId=..."
+adminRouter.get("/workcategories/:id", workController.httpGetWorkCategoryById);
+adminRouter.put("/workcategories/:id", workController.httpUpdateWorkCategory);
+adminRouter.delete(
+  "/workcategories/:id",
+  workController.httpDeleteWorkCategory
+);
 
-adminRouter.post('/worksubcategories', workController.httpAddWorkSubCategory);
-adminRouter.get('/worksubcategories', workController.httpGetWorkSubCategories); // "/worksubcategories?workCategoryId=..."
-adminRouter.get('/worksubcategories/:id', workController.httpGetWorkSubCategoryById);
-adminRouter.put('/worksubcategories/:id', workController.httpUpdateWorkSubCategory);
-adminRouter.delete('/worksubcategories/:id', workController.httpDeleteWorkSubCategory);
+adminRouter.post("/worksubcategories", workController.httpAddWorkSubCategory);
+adminRouter.get("/worksubcategories", workController.httpGetWorkSubCategories); // "/worksubcategories?workCategoryId=..."
+adminRouter.get(
+  "/worksubcategories/:id",
+  workController.httpGetWorkSubCategoryById
+);
+adminRouter.put(
+  "/worksubcategories/:id",
+  workController.httpUpdateWorkSubCategory
+);
+adminRouter.delete(
+  "/worksubcategories/:id",
+  workController.httpDeleteWorkSubCategory
+);
 
-adminRouter.post('/workitems', workController.httpAddWorkItem);
-adminRouter.get('/workitems', workController.httpGetWorkItems); // "/workitems?workCategoryId=...&workSubCategoryId=..."
-adminRouter.get('/workitems/:id', workController.httpGetWorkItemById);
-adminRouter.put('/workitems/:id', workController.httpUpdateWorkItem);
-adminRouter.delete('/workitems/:id', workController.httpDeleteWorkItem);
+adminRouter.post("/workitems", workController.httpAddWorkItem);
+adminRouter.get("/workitems", workController.httpGetWorkItems); // "/workitems?workCategoryId=...&workSubCategoryId=..."
+adminRouter.get("/workitems/:id", workController.httpGetWorkItemById);
+adminRouter.put("/workitems/:id", workController.httpUpdateWorkItem);
+adminRouter.delete("/workitems/:id", workController.httpDeleteWorkItem);
 
-adminRouter.post('/bulk-work-operations', workController.httpBulkWorkOperations);
+adminRouter.post(
+  "/bulk-work-operations",
+  workController.httpBulkWorkOperations
+);
 
 export default adminRouter;

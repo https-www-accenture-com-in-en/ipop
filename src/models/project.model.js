@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 const masterProjectSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    subprojects: [{ type: mongoose.Schema.Types.ObjectId, ref: "SubProject" }],
   },
   { timestamps: true }
 );
