@@ -13,6 +13,8 @@ import {
   httpEditTaskTypes,
 } from "../controllers/admin/delivery-worktype-category.controller.js";
 
+import { httpCreateTicketType } from "../controllers/admin/ticket-type.controller.js";
+
 import {
   httpAddMetadata,
   httpGetMetadata,
@@ -75,6 +77,9 @@ adminRouter.post(
   httpCreateDeliveryWorkTypeCategory
 );
 adminRouter.patch("/task-types/bulk-edit", httpEditTaskTypes);
+
+//SCREEN 3
+adminRouter.post("/ticket-types", httpCreateTicketType);
 
 //SCREEN 4
 adminRouter.post("/ticket-metadata", httpAddMetadata);
