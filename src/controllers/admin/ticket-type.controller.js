@@ -67,3 +67,19 @@ export const httpCreateTicketType = async (req, res) => {
     });
   }
 };
+
+export const httpGetTicketTypes = async (req, res) => {
+  try {
+    const ticketTypes = await TicketType.find({}, { ticketType: 1 });
+    res.status(200).json({
+      message: "Ticket types fetched successfully.",
+      data: ticketTypes,
+    });
+  } catch (error) {
+    console.error("Error fetching ticket types:", error);
+    res.status(500).json({
+      message: "Internal server error.",
+      error: error.message,
+    });
+  }
+};

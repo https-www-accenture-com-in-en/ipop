@@ -28,7 +28,7 @@ masterWorkTypeSchema.set("toJSON", {
 
 const MasterWorkType = mongoose.model("MasterWorkType", masterWorkTypeSchema);
 
-const DeliveryWorkTypeSchema = new Schema(
+const deliveryWorkTypeSchema = new Schema(
   {
     deliveryWorkTypes: {
       type: String,
@@ -47,7 +47,7 @@ const DeliveryWorkTypeSchema = new Schema(
   { timestamps: true }
 );
 
-DeliveryWorkTypeSchema.set("toJSON", {
+deliveryWorkTypeSchema.set("toJSON", {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
@@ -57,7 +57,7 @@ DeliveryWorkTypeSchema.set("toJSON", {
 
 const DeliveryWorkType = mongoose.model(
   "DeliveryWorkType",
-  DeliveryWorkTypeSchema
+  deliveryWorkTypeSchema
 );
 
 export { MasterWorkType, DeliveryWorkType };
