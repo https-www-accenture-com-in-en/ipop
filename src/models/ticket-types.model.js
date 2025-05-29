@@ -23,6 +23,14 @@ const ticketTypeSchema = Schema(
   }
 );
 
+ticketTypeSchema.set("toJSON", {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+
 const TicketType = mongoose.model("TicketType", ticketTypeSchema);
 
 export { TicketType };

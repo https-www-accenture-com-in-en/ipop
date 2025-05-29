@@ -14,6 +14,11 @@ import {
 } from "../controllers/admin/delivery-worktype-category.controller.js";
 
 import {
+  httpCreateTicketType,
+  httpGetTicketTypes,
+} from "../controllers/admin/ticket-type.controller.js";
+
+import {
   httpAddMetadata,
   httpGetMetadata,
 } from "../controllers/admin/metadata.controller.js";
@@ -75,6 +80,10 @@ adminRouter.post(
   httpCreateDeliveryWorkTypeCategory
 );
 adminRouter.patch("/task-types/bulk-edit", httpEditTaskTypes);
+
+//SCREEN 3
+adminRouter.post("/ticket-types", httpCreateTicketType);
+adminRouter.get("/ticket-types", httpGetTicketTypes); // This should be renamed to httpGetTicketTypes
 
 //SCREEN 4
 adminRouter.post("/ticket-metadata", httpAddMetadata);

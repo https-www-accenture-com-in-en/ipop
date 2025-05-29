@@ -59,7 +59,7 @@ export const httpGetAllWorkTypes = async (req, res) => {
           _id: 0,
           id: "$_id",
           masterWorkTypes: 1,
-          deliveryWorkTypes: {
+          deliveryWorkType: {
             $map: {
               input: "$deliveryWorkTypes",
               as: "d",
