@@ -37,9 +37,11 @@ import {
   getAllMasterProjects,
   getAllSubProjects,
   getAllSubProjectsById,
+  getEffortTables,
   getMasterProjectById,
   getSubProjectById,
   httpBulkProjectOperations,
+  updateEffortTables,
   updateMasterProject,
   updateSubProject,
   updateSubProjectEstimation,
@@ -109,6 +111,8 @@ adminRouter.delete("/sub-projects/:id", deleteSubProject);
 adminRouter.post("/bulk-project-operations", httpBulkProjectOperations);
 adminRouter.get("/sub-projects/:id/estimate", getSubProjectById); // Note: Was getSubProjectById before, ensure this is intended
 adminRouter.patch("/sub-projects/:id/estimate", updateSubProjectEstimation); // Note: Was getSubProjectById before, ensure this is intended
+adminRouter.patch("/sub-projects/:id/effort-tables", updateEffortTables);
+adminRouter.get("/sub-projects/:id/effort-tables", getEffortTables);
 
 //Time Off
 adminRouter.get("/timeoff", httpGetTimeOffCategories);

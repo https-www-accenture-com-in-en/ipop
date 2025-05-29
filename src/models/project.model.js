@@ -9,6 +9,16 @@ const masterProjectSchema = new mongoose.Schema(
 
 const MasterProject = mongoose.model("MasterProject", masterProjectSchema);
 
+const taskEffortSchema = new mongoose.Schema(
+  {
+    projectTask: { type: String, required: true },
+    distribution: { type: Number, required: true, default: 0 },
+    estimatedEffort: { type: Number, required: true, default: 0 },
+    burntEffort: { type: Number, required: true, default: 0 },
+  },
+  { _id: false }
+);
+
 const subProjectSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -26,6 +36,14 @@ const subProjectSchema = new mongoose.Schema(
       type: Number,
       required: true,
       default: 0,
+    },
+    estimationEffortTable: {
+      type: [taskEffortSchema],
+      default: [],
+    },
+    etlEffortTable: {
+      type: [taskEffortSchema],
+      default: [],
     },
   },
   { timestamps: true }

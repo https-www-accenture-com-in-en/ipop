@@ -406,6 +406,57 @@ const updateSubProjectEstimation = async (req, res) => {
   }
 };
 
+const updateEffortTables = async (req, res) => {
+  const { id } = req.params;
+  const { estimationEffortTable, etlEffortTable } = req.body;
+  console.log("Updating effort tables for subproject ID:", req.body);
+  if (!Array.isArray(estimationEffortTable) || !Array.isArray(etlEffortTable)) {
+    return res.status(400).json({ message: "Both tables must be arrays." });
+  }
+
+  try {
+    const updated = await SubProject.findByIdAndUpdate(
+      id,
+      {
+        estimationEffortTable,
+        etlEffortTable,
+      },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "Subproject not found." });
+    }
+
+    res.status(200).json(updated);
+  } catch (err) {
+    console.error("Error updating effort tables:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getEffortTables = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const subProject = await SubProject.findById(id).select(
+      "estimationEffortTable etlEffortTable"
+    );
+
+    if (!subProject) {
+      return res.status(404).json({ message: "SubProject not found." });
+    }
+
+    res.status(200).json({
+      estimationEffortTable: subProject.estimationEffortTable,
+      etlEffortTable: subProject.etlEffortTable,
+    });
+  } catch (err) {
+    console.error("Error fetching effort tables:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export {
   addMasterProject,
   getAllMasterProjects,
@@ -419,4 +470,6 @@ export {
   getSubProjectById,
   updateSubProject,
   deleteSubProject,
+  updateEffortTables,
+  getEffortTables,
 };
