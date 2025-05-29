@@ -1,14 +1,12 @@
 import mongoose from 'mongoose';
 
-const taskTypeSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
-});
-
-export const TaskType = mongoose.model('TaskType', taskTypeSchema);
-
 const workCategorySchema = new mongoose.Schema({
   name: { type: String, required: true },
-  taskType: { type: mongoose.Schema.Types.ObjectId, ref: 'TaskType', required: true },
+  deliveryWorkTypeCategory: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'DeliveryWorkTypeCategory',
+    required: true,
+  },
 });
 
 export const WorkCategory = mongoose.model('WorkCategory', workCategorySchema);

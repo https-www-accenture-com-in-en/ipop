@@ -90,23 +90,25 @@ adminRouter.delete("/master-projects/:id", deleteMasterProject);
 // SubProject Routes
 adminRouter.post("/sub-projects", addSubProject);
 adminRouter.get("/sub-projects", getAllSubProjects);
-adminRouter.get("/sub-projects/:id", getSubProjectsById);
-// adminRouter.get("/sub-projects/:id", getSubProjectById);
+adminRouter.get("/sub-projects/:id", getSubProjectsById); // Note: Was getSubProjectById before, ensure this is intended
 adminRouter.put("/sub-projects/:id", updateSubProject);
 adminRouter.delete("/sub-projects/:id", deleteSubProject);
 
 adminRouter.post("/bulk-project-operations", httpBulkProjectOperations);
 
+//Time Off
 adminRouter.get("/timeoff", httpGetTimeOffCategories);
 adminRouter.post("/timeoff", httpAddTimeOffCategory);
 adminRouter.put("/timeoff/:id", httpUpdateTimeOffCategory);
 adminRouter.delete("/timeoff/:id", httpDeleteTimeOffCategory);
 
+//Cluster
 adminRouter.post("/clusters", httpAddCluster);
 adminRouter.get("/clusters", httpGetCluster);
 adminRouter.put("/clusters/:id", httpUpdateCluster);
 adminRouter.delete("/clusters/:id", httpDeleteCluster);
 
+//Cluster Values
 adminRouter.post("/clustervalues", httpAddClusterValue);
 adminRouter.get("/clustervalues/:clusterId", httpGetClusterValues);
 adminRouter.put("/clustervalues/:id", httpUpdateClusterValue);
@@ -114,50 +116,31 @@ adminRouter.delete("/clustervalues/:id", httpDeleteClusterValue);
 
 adminRouter.post("/bulk-cluster-operations", httpBulkClusterOperations);
 
+//AD Project
 adminRouter.post("/adprojects", httpAddADProject);
 adminRouter.get("/adprojects", httpGetADProject);
 adminRouter.put("/adprojects/:id", httpUpdateADProject);
 adminRouter.delete("/adprojects/:id", httpDeleteADProject);
 
-adminRouter.post("/tasktypes2", workController.httpAddTaskType);
-adminRouter.get("/tasktypes2", workController.httpGetTaskTypes);
-adminRouter.get("/tasktypes2/:id", workController.httpGetTaskTypeById);
-adminRouter.put("/tasktypes2/:id", workController.httpUpdateTaskType);
-adminRouter.delete("/tasktypes2/:id", workController.httpDeleteTaskType);
-
-adminRouter.post("/workcategories", workController.httpAddWorkCategory);
-adminRouter.get("/workcategories", workController.httpGetWorkCategories); // "/workcategories?taskTypeId=..."
+// WorkCategory routes
+adminRouter.get("/workcategories", workController.httpGetWorkCategories); // e.g., "/workcategories?deliveryWorkTypeCategoryId=..."
 adminRouter.get("/workcategories/:id", workController.httpGetWorkCategoryById);
-adminRouter.put("/workcategories/:id", workController.httpUpdateWorkCategory);
-adminRouter.delete(
-  "/workcategories/:id",
-  workController.httpDeleteWorkCategory
-);
 
-adminRouter.post("/worksubcategories", workController.httpAddWorkSubCategory);
-adminRouter.get("/worksubcategories", workController.httpGetWorkSubCategories); // "/worksubcategories?workCategoryId=..."
+// WorkSubCategory routes
+adminRouter.get("/worksubcategories", workController.httpGetWorkSubCategories); // e.g., "/worksubcategories?workCategoryId=..."
 adminRouter.get(
   "/worksubcategories/:id",
   workController.httpGetWorkSubCategoryById
 );
-adminRouter.put(
-  "/worksubcategories/:id",
-  workController.httpUpdateWorkSubCategory
-);
-adminRouter.delete(
-  "/worksubcategories/:id",
-  workController.httpDeleteWorkSubCategory
-);
 
-adminRouter.post("/workitems", workController.httpAddWorkItem);
-adminRouter.get("/workitems", workController.httpGetWorkItems); // "/workitems?workCategoryId=...&workSubCategoryId=..."
+// WorkItem routes
+adminRouter.get("/workitems", workController.httpGetWorkItems); // e.g., "/workitems?workCategoryId=...&workSubCategoryId=..."
 adminRouter.get("/workitems/:id", workController.httpGetWorkItemById);
-adminRouter.put("/workitems/:id", workController.httpUpdateWorkItem);
-adminRouter.delete("/workitems/:id", workController.httpDeleteWorkItem);
 
+// Bulk operations route for WorkCategory, WorkSubCategory, WorkItem
 adminRouter.post(
   "/bulk-work-operations",
   workController.httpBulkWorkOperations
 );
 
-export default adminRouter;
+export default adminRouter; 
