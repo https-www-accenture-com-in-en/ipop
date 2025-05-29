@@ -35,12 +35,13 @@ import {
   deleteSubProject,
   getAllMasterProjects,
   getAllSubProjects,
+  getAllSubProjectsById,
   getMasterProjectById,
   getSubProjectById,
-  getSubProjectsById,
   httpBulkProjectOperations,
   updateMasterProject,
   updateSubProject,
+  updateSubProjectEstimation,
 } from "../controllers/admin/project.controller.js";
 import {
   httpAddCluster,
@@ -99,11 +100,13 @@ adminRouter.delete("/master-projects/:id", deleteMasterProject);
 // SubProject Routes
 adminRouter.post("/sub-projects", addSubProject);
 adminRouter.get("/sub-projects", getAllSubProjects);
-adminRouter.get("/sub-projects/:id", getSubProjectsById); // Note: Was getSubProjectById before, ensure this is intended
+adminRouter.get("/sub-projects/:id", getAllSubProjectsById); // Note: Was getSubProjectById before, ensure this is intended
 adminRouter.put("/sub-projects/:id", updateSubProject);
 adminRouter.delete("/sub-projects/:id", deleteSubProject);
 
 adminRouter.post("/bulk-project-operations", httpBulkProjectOperations);
+adminRouter.get("/sub-projects/:id/estimate", getSubProjectById); // Note: Was getSubProjectById before, ensure this is intended
+adminRouter.patch("/sub-projects/:id/estimate", updateSubProjectEstimation); // Note: Was getSubProjectById before, ensure this is intended
 
 //Time Off
 adminRouter.get("/timeoff", httpGetTimeOffCategories);
@@ -152,4 +155,4 @@ adminRouter.post(
   workController.httpBulkWorkOperations
 );
 
-export default adminRouter; 
+export default adminRouter;

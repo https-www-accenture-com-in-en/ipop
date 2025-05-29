@@ -74,7 +74,7 @@ const getAllSubProjects = async (req, res) => {
 };
 
 // Get SubProject by Master Project ID
-const getSubProjectsById = async (req, res) => {
+const getAllSubProjectsById = async (req, res) => {
   const { id } = req.params;
   const subs = await SubProject.find({ masterProject: id }).populate(
     "masterProject"
@@ -351,6 +351,61 @@ export const httpBulkProjectOperations = async (req, res) => {
   }
 };
 
+// Update SubProject Estimation
+const updateSubProjectEstimation = async (req, res) => {
+  const { id } = req.params; // ID of the SubProject to update
+  const { estimationPersonDays, etlPersonDays } = req.body;
+
+  try {
+    // Validate input
+    if (estimationPersonDays === undefined || etlPersonDays === undefined) {
+      return res.status(400).json({
+        message: "Both estimationPersonDays and etlPersonDays are required.",
+      });
+    }
+    if (typeof estimationPersonDays !== "number" || estimationPersonDays < 1) {
+      return res.status(400).json({
+        message:
+          "estimationPersonDays must be a number greater than or equal to 1.",
+      });
+    }
+    if (typeof etlPersonDays !== "number" || etlPersonDays < 0) {
+      return res.status(400).json({
+        message: "etlPersonDays must be a number greater than or equal to 0.",
+      });
+    }
+
+    const updatedSubProject = await SubProject.findByIdAndUpdate(
+      id,
+      {
+        estimationPersonDays,
+        etlPersonDays,
+      },
+      { new: true, runValidators: true } // new: true returns the updated document, runValidators ensures schema validation
+    ).populate("masterProject");
+
+    if (!updatedSubProject) {
+      return res.status(404).json({ message: "Sub-Project not found" });
+    }
+
+    res.status(200).json(updatedSubProject);
+  } catch (error) {
+    console.error("Error updating sub-project estimation:", error);
+    // Check for Mongoose validation errors
+    if (error.name === "ValidationError") {
+      let errors = {};
+      Object.keys(error.errors).forEach((key) => {
+        errors[key] = error.errors[key].message;
+      });
+      return res.status(400).json({ message: "Validation Error", errors });
+    }
+    res.status(500).json({
+      message: "Server error while updating sub-project",
+      error: error.message,
+    });
+  }
+};
+
 export {
   addMasterProject,
   getAllMasterProjects,
@@ -359,7 +414,8 @@ export {
   deleteMasterProject,
   addSubProject,
   getAllSubProjects,
-  getSubProjectsById,
+  getAllSubProjectsById,
+  updateSubProjectEstimation,
   getSubProjectById,
   updateSubProject,
   deleteSubProject,

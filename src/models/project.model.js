@@ -17,6 +17,16 @@ const subProjectSchema = new mongoose.Schema(
       ref: "MasterProject",
       required: true,
     },
+    estimationPersonDays: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    etlPersonDays: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
   },
   { timestamps: true }
 );
