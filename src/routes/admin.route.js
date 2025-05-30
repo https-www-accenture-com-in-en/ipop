@@ -64,6 +64,7 @@ import {
   httpGetADProject,
   httpUpdateADProject,
   httpDeleteADProject,
+  httpGetAllClusterValues,
 } from "../controllers/admin/cluster.controller.js";
 
 import * as workController from "../controllers/admin/non-ticket-delivery-worktype-category.controller.js";
@@ -72,7 +73,7 @@ const adminRouter = express.Router();
 
 //SCREEN1 MASTER DELIVERY WORK TYPE
 adminRouter.get("/master-work-types", httpGetMasterWT);
-// adminRouter.get("/delivery-work-types", httpGetDeliveryWT);
+adminRouter.get("/delivery-work-types", httpGetDeliveryWT);
 adminRouter.get(
   "/delivery-work-types/:masterWorkTypeId",
   httpGetDeliveryWTByMWT
@@ -142,6 +143,7 @@ adminRouter.delete("/clusters/:id", httpDeleteCluster);
 
 //Cluster Values
 adminRouter.post("/clustervalues", httpAddClusterValue);
+adminRouter.get("/clustervalues", httpGetAllClusterValues);
 adminRouter.get("/clustervalues/:clusterId", httpGetClusterValues);
 adminRouter.put("/clustervalues/:id", httpUpdateClusterValue);
 adminRouter.delete("/clustervalues/:id", httpDeleteClusterValue);
