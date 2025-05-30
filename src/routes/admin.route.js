@@ -97,7 +97,7 @@ adminRouter.patch("/task-types/bulk-edit", httpEditTaskTypes);
 
 //SCREEN 3
 adminRouter.post("/ticket-types", httpCreateTicketType);
-adminRouter.get("/ticket-types", httpGetTicketTypes); // This should be renamed to httpGetTicketTypes
+adminRouter.get("/ticket-types-with-task-types", httpGetTicketTypes); // This should be renamed to httpGetTicketTypes
 
 //SCREEN 4
 adminRouter.post("/ticket-metadata", httpAddMetadata);
