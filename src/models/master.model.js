@@ -6,14 +6,6 @@ const masterWorkTypeSchema = new Schema(
       type: String,
       required: true,
     },
-    uiType: {
-      type: String,
-      // required: true,
-    },
-    sequence: {
-      type: Number,
-      // required: true,
-    },
   },
   { timestamps: true }
 );
@@ -33,10 +25,6 @@ const deliveryWorkTypeSchema = new Schema(
     deliveryWorkTypes: {
       type: String,
       required: true,
-    },
-    sequence: {
-      type: Number,
-      // required: true,
     },
     MasterWorkTypeId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -65,7 +53,6 @@ const uiTypeSchema = new Schema(
     uitype: {
       type: String,
       enum: ["checkbox", "radio", "button"],
-      default: "checkbox",
       required: true,
     },
   },

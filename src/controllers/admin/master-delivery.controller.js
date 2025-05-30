@@ -412,30 +412,22 @@ export const httpGetUITypes = async (req, res) => {
   }
 };
 
-// PATCH /api/uitypes/:id
 export const httpUpdateUIType = async (req, res) => {
   try {
-    const { id } = req.params;
+    const uitypes = await UIType.find();
+
     const { uitype } = req.body;
+    const fetcheduitype = uitypes[0];
 
-    // Optional: validate input manually (already handled by schema though)
-    if (!["checkbox", "radio", "button"].includes(uitype)) {
-      return res.status(400).json({ error: "Invalid uitype value" });
-    }
+    fetcheduitype.uitype = uitype;
 
-    const updated = await UIType.findByIdAndUpdate(
-      id,
-      { uitype },
-      { new: true, runValidators: true }
-    );
+    await fetcheduitype.save();
 
-    if (!updated) {
-      return res.status(404).json({ error: "UIType not found" });
-    }
-
-    res.status(200).json(updated);
+    res
+      .status(200)
+      .json({ message: "UIType updated successfully.", data: fetcheduitype });
   } catch (error) {
-    console.error("Error updating UI type:", error);
-    res.status(500).json({ error: "Server error" });
+    console.error(error);
+    res.status(500).json({ message: "Server error while updating UIType." });
   }
 };
