@@ -8,8 +8,9 @@ const httpBulkUpsertMetadata = async (req, res) => {
 
   const bulkOps = payload
     .map((item) => {
-      let { ticketType, explicitAttributes, implicitAttributes } = item;
-      if (!ticketType) return null;
+      let { taskType, ticketType, explicitAttributes, implicitAttributes } =
+        item;
+      if (!taskType || !ticketType) return null;
 
       // Ensure attributes are in correct format
       if (
@@ -27,7 +28,7 @@ const httpBulkUpsertMetadata = async (req, res) => {
 
       return {
         updateOne: {
-          filter: { ticketType },
+          filter: { taskType, ticketType },
           update: {
             $set: { explicitAttributes, implicitAttributes },
           },
@@ -50,10 +51,13 @@ const httpBulkUpsertMetadata = async (req, res) => {
 };
 
 const httpAddMetadata = async (req, res) => {
-  const { ticketType, explicitAttributes, implicitAttributes } = req.body;
+  let { taskType, ticketType, explicitAttributes, implicitAttributes } =
+    req.body;
 
-  if (!ticketType) {
-    return res.status(400).json({ error: "ticketType is required" });
+  if (!taskType || !ticketType) {
+    return res
+      .status(400)
+      .json({ error: "taskType and ticketType are required" });
   }
 
   if (
@@ -71,7 +75,7 @@ const httpAddMetadata = async (req, res) => {
 
   try {
     const updatedDoc = await TicketMetadataSchema.findOneAndUpdate(
-      { ticketType },
+      { taskType, ticketType },
       {
         $set: {
           explicitAttributes,
