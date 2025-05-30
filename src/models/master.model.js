@@ -8,23 +8,23 @@ const masterWorkTypeSchema = new Schema(
     },
     uiType: {
       type: String,
-      required: true,
+      // required: true,
     },
     sequence: {
       type: Number,
-      required: true,
+      // required: true,
     },
   },
   { timestamps: true }
 );
 
-masterWorkTypeSchema.set("toJSON", {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString();
-    delete returnedObject._id;
-    delete returnedObject.__v;
-  },
-});
+// masterWorkTypeSchema.set("toJSON", {
+//   transform: (document, returnedObject) => {
+//     returnedObject.id = returnedObject._id.toString();
+//     delete returnedObject._id;
+//     delete returnedObject.__v;
+//   },
+// });
 
 const MasterWorkType = mongoose.model("MasterWorkType", masterWorkTypeSchema);
 
@@ -36,7 +36,7 @@ const deliveryWorkTypeSchema = new Schema(
     },
     sequence: {
       type: Number,
-      required: true,
+      // required: true,
     },
     MasterWorkTypeId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -47,17 +47,31 @@ const deliveryWorkTypeSchema = new Schema(
   { timestamps: true }
 );
 
-deliveryWorkTypeSchema.set("toJSON", {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString();
-    delete returnedObject._id;
-    delete returnedObject.__v;
-  },
-});
+// deliveryWorkTypeSchema.set("toJSON", {
+//   transform: (document, returnedObject) => {
+//     returnedObject.id = returnedObject._id.toString();
+//     delete returnedObject._id;
+//     delete returnedObject.__v;
+//   },
+// });
 
 const DeliveryWorkType = mongoose.model(
   "DeliveryWorkType",
   deliveryWorkTypeSchema
 );
 
-export { MasterWorkType, DeliveryWorkType };
+const uiTypeSchema = new Schema(
+  {
+    uitype: {
+      type: String,
+      enum: ["checkbox", "radio", "button"],
+      default: "checkbox",
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
+
+const UIType = mongoose.model("UIType", uiTypeSchema);
+
+export { MasterWorkType, DeliveryWorkType, UIType };

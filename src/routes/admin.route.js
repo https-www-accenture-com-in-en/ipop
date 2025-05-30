@@ -5,6 +5,8 @@ import {
   httpGetMasterWithDeliveryWorkTypes,
   httpCreateMasterDeliveryWT,
   httpEditWorkTypes,
+  httpGetDeliveryWTByMWT,
+  httpBulkWorkTypeOperations,
 } from "../controllers/admin/master-delivery.controller.js";
 import {
   httpGetTaskTypes,
@@ -68,7 +70,15 @@ const adminRouter = express.Router();
 
 //SCREEN1 MASTER DELIVERY WORK TYPE
 adminRouter.get("/master-work-types", httpGetMasterWT);
-adminRouter.get("/delivery-work-types", httpGetDeliveryWT);
+// adminRouter.get("/delivery-work-types", httpGetDeliveryWT);
+adminRouter.get(
+  "/delivery-work-types/:masterWorkTypeId",
+  httpGetDeliveryWTByMWT
+);
+adminRouter.post(
+  "/bulk-master-work-type-operations",
+  httpBulkWorkTypeOperations
+);
 adminRouter.get(
   "/master-work-types-with-delivery",
   httpGetMasterWithDeliveryWorkTypes

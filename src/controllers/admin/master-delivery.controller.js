@@ -1,4 +1,9 @@
-import { MasterWorkType, DeliveryWorkType } from "../../models/master.model.js";
+import mongoose from "mongoose";
+import {
+  MasterWorkType,
+  DeliveryWorkType,
+  UIType,
+} from "../../models/master.model.js";
 
 // @desc    Get all delivery work types
 // @route   GET /api/v1/admin/delivery-work-types
@@ -17,6 +22,19 @@ export const httpGetDeliveryWT = async (req, res) => {
 export const httpGetMasterWT = async (req, res) => {
   try {
     const data = await MasterWorkType.find({}, { masterWorkTypes: 1 });
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("Error fetching master work types:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const httpGetDeliveryWTByMWT = async (req, res) => {
+  try {
+    const { masterWorkTypeId } = req.params;
+    const data = await DeliveryWorkType.find({
+      MasterWorkTypeId: masterWorkTypeId,
+    });
     res.status(200).json(data);
   } catch (error) {
     console.error("Error fetching master work types:", error);
@@ -141,5 +159,283 @@ export const httpEditWorkTypes = async (req, res) => {
   } catch (error) {
     console.error("Error processing updates:", error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const httpBulkWorkTypeOperations = async (req, res) => {
+  // Renamed for clarity:
+  // clusterOps -> masterWorkTypeOps (mwtOps)
+  // cvOps -> deliveryWorkTypeOps (dwtOps)
+  const { MasterWorkTypeId: mwtOps, DeliveryWorkTypeId: dwtOps } = req.body;
+  console.log("Bulk work type operations received:", req.body);
+  const results = {
+    createdMasterWorkTypes: [],
+    createdDeliveryWorkTypes: [],
+    updatedData: { masterWorkTypes: [], deliveryWorkTypes: [] },
+    deletedData: { masterWorkTypeIds: [], deliveryWorkTypeIds: [] },
+    errors: [],
+  };
+  const tempIdToNewIdMap = new Map();
+  const session = await mongoose.startSession();
+
+  try {
+    await session.withTransaction(async () => {
+      // 1. Deletions (DeliveryWorkTypes first due to FK, then MasterWorkTypes)
+      if (dwtOps && dwtOps.delete && dwtOps.delete.length > 0) {
+        const idsToDelete = dwtOps.delete
+          .map((op) => op.id)
+          .filter((id) => mongoose.Types.ObjectId.isValid(id));
+        if (idsToDelete.length > 0) {
+          await DeliveryWorkType.deleteMany(
+            { _id: { $in: idsToDelete } },
+            { session }
+          );
+          results.deletedData.deliveryWorkTypeIds.push(...idsToDelete);
+        }
+      }
+      if (mwtOps && mwtOps.delete && mwtOps.delete.length > 0) {
+        const idsToDelete = mwtOps.delete
+          .map((op) => op.id)
+          .filter((id) => mongoose.Types.ObjectId.isValid(id));
+        if (idsToDelete.length > 0) {
+          // Delete associated DeliveryWorkTypes first
+          await DeliveryWorkType.deleteMany(
+            { MasterWorkTypeId: { $in: idsToDelete } },
+            { session }
+          );
+          await MasterWorkType.deleteMany(
+            { _id: { $in: idsToDelete } },
+            { session }
+          );
+          results.deletedData.masterWorkTypeIds.push(...idsToDelete);
+        }
+      }
+
+      // 2. Creations (MasterWorkTypes first, then DeliveryWorkTypes to resolve FKs)
+      if (mwtOps && mwtOps.create && mwtOps.create.length > 0) {
+        for (const op of mwtOps.create) {
+          const { _id: tempFrontendId, ...mwtDataForDb } = op.data;
+          const newMasterWorkType = new MasterWorkType(mwtDataForDb);
+          await newMasterWorkType.save({ session });
+          tempIdToNewIdMap.set(op.tempId, newMasterWorkType._id.toString());
+          results.createdMasterWorkTypes.push({
+            tempId: op.tempId,
+            newMasterWorkType: newMasterWorkType.toObject(),
+          });
+        }
+      }
+
+      if (dwtOps && dwtOps.create && dwtOps.create.length > 0) {
+        for (const op of dwtOps.create) {
+          const { _id: tempFrontendId, ...dwtDataForDb } = op.data;
+          let masterWorkTypeFk = dwtDataForDb.MasterWorkTypeId; // FK field name
+
+          if (masterWorkTypeFk && tempIdToNewIdMap.has(masterWorkTypeFk)) {
+            dwtDataForDb.MasterWorkTypeId =
+              tempIdToNewIdMap.get(masterWorkTypeFk);
+          } else if (
+            masterWorkTypeFk &&
+            String(masterWorkTypeFk).startsWith("temp_")
+          ) {
+            results.errors.push({
+              type: "CREATE_DWT_ERROR",
+              message: `DeliveryWorkType creation error: Temp MasterWorkTypeId ${masterWorkTypeFk} not resolved.`,
+              item: op,
+            });
+            continue;
+          }
+
+          if (
+            !dwtDataForDb.MasterWorkTypeId ||
+            !mongoose.Types.ObjectId.isValid(dwtDataForDb.MasterWorkTypeId)
+          ) {
+            results.errors.push({
+              type: "CREATE_DWT_ERROR",
+              message: `DeliveryWorkType creation error: Invalid or missing MasterWorkTypeId for ${dwtDataForDb.deliveryWorkTypes}. MasterWorkTypeId was: ${dwtDataForDb.MasterWorkTypeId}`,
+              item: op,
+            });
+            continue;
+          }
+
+          const newDeliveryWorkType = new DeliveryWorkType(dwtDataForDb);
+          await newDeliveryWorkType.save({ session });
+          results.createdDeliveryWorkTypes.push({
+            tempId: op.tempId,
+            newDeliveryWorkType: newDeliveryWorkType.toObject(),
+          });
+        }
+      }
+
+      // 3. Updates
+      if (mwtOps && mwtOps.update && mwtOps.update.length > 0) {
+        for (const op of mwtOps.update) {
+          if (op.id && mongoose.Types.ObjectId.isValid(op.id)) {
+            const { _id, ...updatePayload } = op.data; // _id from payload is ignored for update
+            const updatedMasterWorkType =
+              await MasterWorkType.findByIdAndUpdate(op.id, updatePayload, {
+                new: true,
+                runValidators: true,
+                session,
+              });
+            if (updatedMasterWorkType)
+              results.updatedData.masterWorkTypes.push(
+                updatedMasterWorkType.toObject()
+              );
+            else
+              results.errors.push({
+                type: "UPDATE_MWT_ERROR",
+                message: `MasterWorkType with id ${op.id} not found for update.`,
+                item: op,
+              });
+          } else if (op.id && op.id.startsWith("temp_")) {
+            results.errors.push({
+              type: "UPDATE_MWT_ERROR",
+              message: `Cannot update MasterWorkType with temporary ID ${op.id}. It should have been created.`,
+              item: op,
+            });
+          } else {
+            results.errors.push({
+              type: "UPDATE_MWT_ERROR",
+              message: `Invalid or missing ID for MasterWorkType update. ID was: ${op.id}`,
+              item: op,
+            });
+          }
+        }
+      }
+      if (dwtOps && dwtOps.update && dwtOps.update.length > 0) {
+        for (const op of dwtOps.update) {
+          if (op.id && mongoose.Types.ObjectId.isValid(op.id)) {
+            let {
+              _id,
+              MasterWorkTypeId: masterWorkTypeFk,
+              ...updatePayload
+            } = op.data; // FK field name
+
+            if (masterWorkTypeFk && tempIdToNewIdMap.has(masterWorkTypeFk)) {
+              updatePayload.MasterWorkTypeId =
+                tempIdToNewIdMap.get(masterWorkTypeFk);
+            } else if (
+              masterWorkTypeFk &&
+              String(masterWorkTypeFk).startsWith("temp_")
+            ) {
+              results.errors.push({
+                type: "UPDATE_DWT_ERROR",
+                message: `DeliveryWorkType update error: Temp MasterWorkTypeId ${masterWorkTypeFk} not resolved.`,
+                item: op,
+              });
+              continue;
+            } else if (
+              masterWorkTypeFk &&
+              !mongoose.Types.ObjectId.isValid(masterWorkTypeFk)
+            ) {
+              results.errors.push({
+                type: "UPDATE_DWT_ERROR",
+                message: `DeliveryWorkType update error: Invalid MasterWorkTypeId ${masterWorkTypeFk}.`,
+                item: op,
+              });
+              continue;
+            } else {
+              // If masterWorkTypeFk is a valid ObjectId (not temp) or undefined (not updating FK),
+              // ensure it's set in updatePayload if provided
+              if (masterWorkTypeFk)
+                updatePayload.MasterWorkTypeId = masterWorkTypeFk;
+            }
+
+            const updatedDwt = await DeliveryWorkType.findByIdAndUpdate(
+              op.id,
+              updatePayload,
+              { new: true, runValidators: true, session }
+            );
+            if (updatedDwt)
+              results.updatedData.deliveryWorkTypes.push(updatedDwt.toObject());
+            else
+              results.errors.push({
+                type: "UPDATE_DWT_ERROR",
+                message: `DeliveryWorkType with id ${op.id} not found for update.`,
+                item: op,
+              });
+          } else if (op.id && op.id.startsWith("temp_")) {
+            results.errors.push({
+              type: "UPDATE_DWT_ERROR",
+              message: `Cannot update DeliveryWorkType with temporary ID ${op.id}. It should have been created.`,
+              item: op,
+            });
+          } else {
+            results.errors.push({
+              type: "UPDATE_DWT_ERROR",
+              message: `Invalid or missing ID for DeliveryWorkType update. ID was: ${op.id}`,
+              item: op,
+            });
+          }
+        }
+      }
+    }); // End of transaction
+
+    if (results.errors.length > 0) {
+      console.warn(
+        "Bulk operation completed with errors:",
+        JSON.stringify(results.errors, null, 2)
+      );
+      // It's better to send the whole results object so frontend knows what succeeded/failed
+      res.status(400).json({
+        message: "Bulk operation completed with errors.",
+        details: results,
+      });
+      return;
+    }
+    res.status(200).json(results);
+  } catch (err) {
+    console.error("Bulk operation error (transaction likely aborted):", err);
+    results.errors.push({
+      type: "TRANSACTION_ERROR",
+      message: err.message,
+      stack: err.stack,
+    }); // Add stack in dev
+    // Send the whole results object here too, as some non-transactional errors might have been populated
+    res.status(500).json({
+      error: "Bulk operation failed. Changes likely rolled back.",
+      details: results,
+    });
+  } finally {
+    session.endSession();
+  }
+};
+
+// GET /api/uitypes
+export const httpGetUITypes = async (req, res) => {
+  try {
+    const uitypes = await UIType.find();
+    res.status(200).json(uitypes);
+  } catch (error) {
+    console.error("Error fetching UI types:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// PATCH /api/uitypes/:id
+export const httpUpdateUIType = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { uitype } = req.body;
+
+    // Optional: validate input manually (already handled by schema though)
+    if (!["checkbox", "radio", "button"].includes(uitype)) {
+      return res.status(400).json({ error: "Invalid uitype value" });
+    }
+
+    const updated = await UIType.findByIdAndUpdate(
+      id,
+      { uitype },
+      { new: true, runValidators: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ error: "UIType not found" });
+    }
+
+    res.status(200).json(updated);
+  } catch (error) {
+    console.error("Error updating UI type:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
