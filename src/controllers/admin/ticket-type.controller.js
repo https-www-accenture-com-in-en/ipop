@@ -70,10 +70,20 @@ export const httpCreateTicketType = async (req, res) => {
 
 export const httpGetTicketTypes = async (req, res) => {
   try {
-    const ticketTypes = await TicketType.find({}, { ticketType: 1 });
+    const ticketTypes = await TicketType.find().sort({ sequence: 1 }).populate({
+      path: "deliveryWorkTypeCategoryId",
+      select: "taskType", // only get taskType from the referenced document
+    });
+
+    const response = ticketTypes.map((ticket) => ({
+      id: ticket._id,
+      ticketType: ticket.ticketType,
+      taskType: ticket.deliveryWorkTypeCategoryId?.taskType || null,
+    }));
+
     res.status(200).json({
-      message: "Ticket types fetched successfully.",
-      data: ticketTypes,
+      message: "Ticket types with taskType fetched successfully.",
+      data: response,
     });
   } catch (error) {
     console.error("Error fetching ticket types:", error);
