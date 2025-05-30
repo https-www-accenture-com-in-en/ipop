@@ -8,13 +8,8 @@ import {
 // @desc    Get all delivery work types
 // @route   GET /api/v1/admin/delivery-work-types
 export const httpGetDeliveryWT = async (req, res) => {
-  try {
-    const data = await DeliveryWorkType.find({}, { deliveryWorkTypes: 1 });
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("Error fetching delivery work types:", error);
-    res.status(500).json({ error: error.message });
-  }
+  const data = await DeliveryWorkType.find().populate("MasterWorkTypeId");
+  res.status(200).json(data);
 };
 
 // @desc    Get all master work types
