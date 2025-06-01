@@ -25,7 +25,7 @@ import {
 import {
   httpAddMetadata,
   httpGetMetadata,
-  httpBulkUpsertMetadata,
+  httpBulkTicketMetadata,
 } from "../controllers/admin/metadata.controller.js";
 import {
   httpGetTimeOffCategories,
@@ -107,7 +107,7 @@ adminRouter.get("/ticket-types-with-task-types", httpGetTicketTypes); // This sh
 //SCREEN 4
 adminRouter.post("/ticket-metadata", httpAddMetadata);
 adminRouter.get("/ticket-metadata", httpGetMetadata);
-adminRouter.post("/ticket-metadata/bulk", httpBulkUpsertMetadata);
+adminRouter.post("/ticket-metadata/bulk", httpBulkTicketMetadata);
 
 //Master Project
 adminRouter.post("/master-projects", addMasterProject);

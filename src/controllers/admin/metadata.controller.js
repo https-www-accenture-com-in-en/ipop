@@ -1,52 +1,98 @@
 import { TicketMetadataSchema } from "../../models/metadata.model.js";
+import mongoose from "mongoose";
 
-const httpBulkUpsertMetadata = async (req, res) => {
-  const payload = req.body;
-  if (!Array.isArray(payload)) {
-    return res.status(400).json({ error: "Payload must be an array" });
-  }
-
-  const bulkOps = payload
-    .map((item) => {
-      let { taskType, ticketType, explicitAttributes, implicitAttributes } =
-        item;
-      if (!taskType || !ticketType) return null;
-
-      // Ensure attributes are in correct format
-      if (
-        Array.isArray(explicitAttributes) &&
-        typeof explicitAttributes[0] === "string"
-      ) {
-        explicitAttributes = explicitAttributes.map((name) => ({ name }));
-      }
-      if (
-        Array.isArray(implicitAttributes) &&
-        typeof implicitAttributes[0] === "string"
-      ) {
-        implicitAttributes = implicitAttributes.map((name) => ({ name }));
-      }
-
-      return {
-        updateOne: {
-          filter: { taskType, ticketType },
-          update: {
-            $set: { explicitAttributes, implicitAttributes },
-          },
-          upsert: true,
-        },
-      };
-    })
-    .filter(Boolean);
+const httpBulkTicketMetadata = async (req, res) => {
+  const { create = [], update = [], delete: deleteOps = [] } = req.body;
+  const session = await mongoose.startSession();
+  const results = {
+    created: [],
+    updated: [],
+    deleted: [],
+    errors: [],
+  };
 
   try {
-    if (bulkOps.length === 0) {
-      return res.status(400).json({ error: "No valid items to upsert" });
-    }
-    await TicketMetadataSchema.bulkWrite(bulkOps);
-    return res.status(200).json({ message: "Bulk upsert successful" });
+    await session.withTransaction(async () => {
+      // --- DELETIONS ---
+      if (deleteOps.length) {
+        const idsToDelete = deleteOps
+          .map((op) => op.id)
+          .filter((id) => mongoose.Types.ObjectId.isValid(id));
+        if (idsToDelete.length) {
+          await TicketMetadataSchema.deleteMany(
+            { _id: { $in: idsToDelete } },
+            { session }
+          );
+          results.deleted.push(...idsToDelete);
+        }
+      }
+
+      // --- CREATIONS ---
+      for (const item of create) {
+        try {
+          const doc = new TicketMetadataSchema(item);
+          await doc.save({ session });
+          results.created.push(doc.toObject());
+        } catch (err) {
+          results.errors.push({
+            type: "CREATE_ERROR",
+            item,
+            message: err.message,
+          });
+        }
+      }
+
+      // --- UPDATES ---
+      for (const op of update) {
+        try {
+          const { id, data } = op;
+          if (!mongoose.Types.ObjectId.isValid(id)) {
+            results.errors.push({
+              type: "UPDATE_ERROR",
+              id,
+              message: "Invalid ID",
+            });
+            continue;
+          }
+          const updatedDoc = await TicketMetadataSchema.findByIdAndUpdate(
+            id,
+            { $set: data },
+            { new: true, session, runValidators: true }
+          );
+          if (updatedDoc) {
+            results.updated.push(updatedDoc.toObject());
+          } else {
+            results.errors.push({
+              type: "UPDATE_ERROR",
+              id,
+              message: "Not found",
+            });
+          }
+        } catch (err) {
+          results.errors.push({
+            type: "UPDATE_ERROR",
+            id: op.id,
+            message: err.message,
+          });
+        }
+      }
+
+      if (results.errors.length) {
+        throw new Error("Bulk operation failed, rolling back.");
+      }
+    });
+
+    res.status(200).json(results);
   } catch (err) {
-    console.error("Bulk upsert error:", err);
-    return res.status(500).json({ error: "Internal Server Error" });
+    session.endSession();
+    res.status(500).json({
+      error: "Bulk operation failed. Changes likely rolled back.",
+      details: results.errors.length
+        ? results.errors
+        : [{ message: err.message }],
+    });
+  } finally {
+    session.endSession();
   }
 };
 
@@ -104,4 +150,4 @@ const httpGetMetadata = async (req, res) => {
   }
 };
 
-export { httpAddMetadata, httpGetMetadata, httpBulkUpsertMetadata };
+export { httpAddMetadata, httpGetMetadata, httpBulkTicketMetadata };
