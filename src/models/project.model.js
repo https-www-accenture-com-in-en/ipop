@@ -39,11 +39,91 @@ const subProjectSchema = new mongoose.Schema(
     },
     estimationEffortTable: {
       type: [taskEffortSchema],
-      default: [],
+      default: [
+        {
+          projectTask: "Analysis and Design",
+          distribution: 15,
+          estimatedEffort: 0,
+          burntEffort: 0,
+        },
+        {
+          projectTask: "Build and UnitTesting",
+          distribution: 42,
+          estimatedEffort: 0,
+          burntEffort: 0,
+        },
+        {
+          projectTask: "Integration Testing",
+          distribution: 10,
+          estimatedEffort: 0,
+          burntEffort: 0,
+        },
+        {
+          projectTask: "User Acceptance Testing",
+          distribution: 10,
+          estimatedEffort: 0,
+          burntEffort: 0,
+        },
+        {
+          projectTask: "Cut Over",
+          distribution: 5,
+          estimatedEffort: 0,
+          burntEffort: 0,
+        },
+        {
+          projectTask: "Go Live Support",
+          distribution: 5,
+          estimatedEffort: 0,
+          burntEffort: 0,
+        },
+        {
+          projectTask: "Transport Management",
+          distribution: 5,
+          estimatedEffort: 0,
+          burntEffort: 0,
+        },
+        {
+          projectTask: "NRT",
+          distribution: 3,
+          estimatedEffort: 0,
+          burntEffort: 0,
+        },
+        {
+          projectTask: "PMO Efforts",
+          distribution: 5,
+          estimatedEffort: 0,
+          burntEffort: 0,
+        },
+      ],
     },
     etlEffortTable: {
       type: [taskEffortSchema],
-      default: [],
+      default: [
+        {
+          projectTask: "Data Load",
+          distribution: 35,
+          estimatedEffort: 0,
+          burntEffort: 0,
+        },
+        {
+          projectTask: "Data Extraction",
+          distribution: 30,
+          estimatedEffort: 0,
+          burntEffort: 0,
+        },
+        {
+          projectTask: "Data Transformation",
+          distribution: 15,
+          estimatedEffort: 0,
+          burntEffort: 0,
+        },
+        {
+          projectTask: "Dry Run",
+          distribution: 20,
+          estimatedEffort: 0,
+          burntEffort: 0,
+        },
+      ],
     },
   },
   { timestamps: true }

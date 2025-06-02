@@ -8,10 +8,13 @@ const implicitAttributesSchema = new Schema({
   name: String,
 });
 const ticketMetadataSchema = new Schema({
+  taskType: String,
   ticketType: String,
   explicitAttributes: [explicitAttributesSchema],
   implicitAttributes: [implicitAttributesSchema],
 });
+
+ticketMetadataSchema.index({ taskType: 1, ticketType: 1 }, { unique: true });
 
 const TicketMetadataSchema = mongoose.model(
   "TicketMetadata",

@@ -5,6 +5,10 @@ import {
   httpGetMasterWithDeliveryWorkTypes,
   httpCreateMasterDeliveryWT,
   httpEditWorkTypes,
+  httpGetDeliveryWTByMWT,
+  httpBulkWorkTypeOperations,
+  httpGetUITypes,
+  httpUpdateUIType,
 } from "../controllers/admin/master-delivery.controller.js";
 import {
   httpGetTaskTypes,
@@ -21,7 +25,7 @@ import {
 import {
   httpAddMetadata,
   httpGetMetadata,
-  httpBulkUpsertMetadata,
+  httpBulkTicketMetadata,
 } from "../controllers/admin/metadata.controller.js";
 import {
   httpGetTimeOffCategories,
@@ -60,6 +64,7 @@ import {
   httpGetADProject,
   httpUpdateADProject,
   httpDeleteADProject,
+  httpGetAllClusterValues,
 } from "../controllers/admin/cluster.controller.js";
 
 import * as workController from "../controllers/admin/non-ticket-delivery-worktype-category.controller.js";
@@ -70,11 +75,21 @@ const adminRouter = express.Router();
 adminRouter.get("/master-work-types", httpGetMasterWT);
 adminRouter.get("/delivery-work-types", httpGetDeliveryWT);
 adminRouter.get(
+  "/delivery-work-types/:masterWorkTypeId",
+  httpGetDeliveryWTByMWT
+);
+adminRouter.post(
+  "/bulk-master-work-type-operations",
+  httpBulkWorkTypeOperations
+);
+adminRouter.get(
   "/master-work-types-with-delivery",
   httpGetMasterWithDeliveryWorkTypes
 );
 adminRouter.post("/master-and-delivery-work-types", httpCreateMasterDeliveryWT);
 adminRouter.patch("/work-types/bulk-edit", httpEditWorkTypes);
+adminRouter.get("/uitype", httpGetUITypes);
+adminRouter.patch("/uitype", httpUpdateUIType);
 
 //SCREEN 2 DELIVERY WORK TYPE CATEGORY
 adminRouter.get("/only-task-types", httpGetTaskTypes);
@@ -87,12 +102,12 @@ adminRouter.patch("/task-types/bulk-edit", httpEditTaskTypes);
 
 //SCREEN 3
 adminRouter.post("/ticket-types", httpCreateTicketType);
-adminRouter.get("/ticket-types", httpGetTicketTypes); // This should be renamed to httpGetTicketTypes
+adminRouter.get("/ticket-types-with-task-types", httpGetTicketTypes); // This should be renamed to httpGetTicketTypes
 
 //SCREEN 4
 adminRouter.post("/ticket-metadata", httpAddMetadata);
 adminRouter.get("/ticket-metadata", httpGetMetadata);
-adminRouter.post("/ticket-metadata/bulk", httpBulkUpsertMetadata);
+adminRouter.post("/ticket-metadata/bulk", httpBulkTicketMetadata);
 
 //Master Project
 adminRouter.post("/master-projects", addMasterProject);
@@ -128,6 +143,7 @@ adminRouter.delete("/clusters/:id", httpDeleteCluster);
 
 //Cluster Values
 adminRouter.post("/clustervalues", httpAddClusterValue);
+adminRouter.get("/clustervalues", httpGetAllClusterValues);
 adminRouter.get("/clustervalues/:clusterId", httpGetClusterValues);
 adminRouter.put("/clustervalues/:id", httpUpdateClusterValue);
 adminRouter.delete("/clustervalues/:id", httpDeleteClusterValue);
