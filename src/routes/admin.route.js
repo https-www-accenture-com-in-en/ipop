@@ -13,6 +13,7 @@ import {
 import {
   httpGetTaskTypes,
   httpGetAllWorkTypes,
+  httpGetWorkTypeCategoryWithMWT,
   httpCreateDeliveryWorkTypeCategory,
   httpEditTaskTypes,
 } from "../controllers/admin/delivery-worktype-category.controller.js";
@@ -94,6 +95,10 @@ adminRouter.patch("/uitype", httpUpdateUIType);
 //SCREEN 2 DELIVERY WORK TYPE CATEGORY
 adminRouter.get("/only-task-types", httpGetTaskTypes);
 adminRouter.get("/task-types-with-mwt-dwt", httpGetAllWorkTypes);
+adminRouter.get(
+  "/work-type-categories/master/:masterWorkTypes",
+  httpGetWorkTypeCategoryWithMWT
+);
 adminRouter.post(
   "/delivery-work-type-category",
   httpCreateDeliveryWorkTypeCategory
@@ -177,13 +182,15 @@ adminRouter.post(
   workController.httpBulkWorkOperations
 );
 
+import {
+  httpUpdateWorkItemDetails,
+  httpGetWorkItemDetailsById,
+} from "../controllers/admin/workItemDetails.controller.js";
 
-import { httpUpdateWorkItemDetails, httpGetWorkItemDetailsById } from '../controllers/admin/workItemDetails.controller.js';
-
-adminRouter.get('/workitems/:workItemId/details', httpGetWorkItemDetailsById);
+adminRouter.get("/workitems/:workItemId/details", httpGetWorkItemDetailsById);
 
 // Route to update details of a specific WorkItem (resource levels)
 // Using /workitems/:workItemId/details
-adminRouter.put('/workitems/:workItemId/details', httpUpdateWorkItemDetails);
+adminRouter.put("/workitems/:workItemId/details", httpUpdateWorkItemDetails);
 
 export default adminRouter;

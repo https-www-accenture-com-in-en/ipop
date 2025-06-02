@@ -161,3 +161,42 @@ export const httpEditTaskTypes = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const httpGetWorkTypeCategoryWithMWT = async (req, res) => {
+  try {
+    const { masterWorkTypes } = req.params;
+
+    if (!masterWorkTypes) {
+      return res
+        .status(400)
+        .json({ error: "masterWorkTypes is required in the URL" });
+    }
+
+    const masterWorkType = await MasterWorkType.findOne({ masterWorkTypes });
+
+    if (!masterWorkType) {
+      return res.status(404).json({ error: "MasterWorkType not found" });
+    }
+
+    const deliveryWorkTypes = await DeliveryWorkType.find({
+      MasterWorkTypeId: masterWorkType._id,
+    });
+
+    const deliveryWorkTypesIds = deliveryWorkTypes.map((dw) => dw._id);
+
+    const categories = await DeliveryWorkTypeCategory.find({
+      deliveryWorkTypesId: { $in: deliveryWorkTypesIds },
+    });
+
+    const response = categories.map((cat) => ({
+      id: cat._id,
+      workTypeCategory: cat.workTypeCategory,
+      deliveryWorkTypeId: cat.deliveryWorkTypesId,
+    }));
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Error fetching workTypeCategories:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
