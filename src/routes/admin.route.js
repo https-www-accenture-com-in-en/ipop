@@ -161,4 +161,13 @@ adminRouter.post(
   workController.httpBulkWorkOperations
 );
 
+
+import { httpUpdateWorkItemDetails, httpGetWorkItemDetailsById } from '../controllers/admin/workItemDetails.controller.js';
+
+adminRouter.get('/workitems/:workItemId/details', httpGetWorkItemDetailsById);
+
+// Route to update details of a specific WorkItem (resource levels)
+// Using /workitems/:workItemId/details
+adminRouter.put('/workitems/:workItemId/details', httpUpdateWorkItemDetails);
+
 export default adminRouter;
