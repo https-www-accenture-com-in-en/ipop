@@ -1,4 +1,5 @@
 import { TicketMetadataSchema } from "../../models/metadata.model.js";
+import { TicketType } from "../../models/ticket-types.model.js";
 import mongoose from "mongoose";
 
 const httpBulkTicketMetadata = async (req, res) => {
@@ -30,10 +31,31 @@ const httpBulkTicketMetadata = async (req, res) => {
       // --- CREATIONS ---
       for (const item of create) {
         try {
+          // Find TicketType to set ticketTypeId
+          const categoryDoc = await mongoose
+            .model("DeliveryWorkTypeCategory")
+            .findOne({
+              taskType: item.taskType,
+            });
+          if (!categoryDoc) {
+            throw new Error(
+              "DeliveryWorkTypeCategory not found for taskType: " +
+                item.taskType
+            );
+          }
+          const ticketTypeDoc = await TicketType.findOne({
+            ticketType: item.ticketType,
+            deliveryWorkTypeCategoryId: categoryDoc._id,
+          });
+          if (!ticketTypeDoc) {
+            throw new Error("TicketType not found for metadata creation");
+          }
+          item.ticketTypeId = ticketTypeDoc._id;
           const doc = new TicketMetadataSchema(item);
           await doc.save({ session });
           results.created.push(doc.toObject());
         } catch (err) {
+          console.error("Error creating ticket metadata:", err);
           results.errors.push({
             type: "CREATE_ERROR",
             item,
@@ -54,9 +76,20 @@ const httpBulkTicketMetadata = async (req, res) => {
             });
             continue;
           }
+          // Find TicketType to set ticketTypeId if ticketType/taskType changed
+          let ticketTypeId = data.ticketTypeId;
+          if (data.ticketType && data.taskType) {
+            const ticketTypeDoc = await TicketType.findOne({
+              ticketType: data.ticketType,
+              taskType: data.taskType,
+            });
+            if (ticketTypeDoc) {
+              ticketTypeId = ticketTypeDoc._id;
+            }
+          }
           const updatedDoc = await TicketMetadataSchema.findByIdAndUpdate(
             id,
-            { $set: data },
+            { $set: { ...data, ...(ticketTypeId && { ticketTypeId }) } },
             { new: true, session, runValidators: true }
           );
           if (updatedDoc) {
@@ -84,6 +117,7 @@ const httpBulkTicketMetadata = async (req, res) => {
 
     res.status(200).json(results);
   } catch (err) {
+    console.log(err);
     session.endSession();
     res.status(500).json({
       error: "Bulk operation failed. Changes likely rolled back.",
@@ -120,12 +154,24 @@ const httpAddMetadata = async (req, res) => {
   }
 
   try {
+    // Find TicketType to set ticketTypeId
+    const ticketTypeDoc = await TicketType.findOne({
+      ticketType,
+      taskType,
+    });
+    if (!ticketTypeDoc) {
+      return res
+        .status(400)
+        .json({ error: "TicketType not found for metadata" });
+    }
+
     const updatedDoc = await TicketMetadataSchema.findOneAndUpdate(
       { taskType, ticketType },
       {
         $set: {
           explicitAttributes,
           implicitAttributes,
+          ticketTypeId: ticketTypeDoc._id,
         },
       },
       { new: true, upsert: true }
@@ -136,6 +182,7 @@ const httpAddMetadata = async (req, res) => {
       data: updatedDoc,
     });
   } catch (err) {
+    console.log("Error upserting ticket metadata:", err);
     console.error("Upsert error:", err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
