@@ -9,19 +9,25 @@ export const httpGetWorkItemDetailsById = async (req, res) => {
   }
 
   try {
-    const workItem = await WorkItem.findById(workItemId).lean();
+    const workItem = await WorkItem.findById(workItemId)
+      .populate({
+        path: 'clusterValue', // Populate the 'clusterValue' field in WorkItem
+        populate: {
+          path: 'cluster',    // Further populate the 'cluster' field within 'clusterValue'
+          model: 'Cluster'    // Explicitly provide model name for clarity/safety
+        }
+      })
+      .lean();
 
     if (!workItem) {
       return res.status(404).json({ message: 'WorkItem not found' });
     }
 
-    // Fetch associated resource levels
     const resourceLevels = await WorkItemResourceLevel.find({ workItem: workItemId }).lean();
 
-    // Combine and send
     const detailedWorkItem = {
       ...workItem,
-      resourceLevels: resourceLevels || [] // Ensure resourceLevels is always an array
+      resourceLevels: resourceLevels || [],
     };
 
     res.status(200).json(detailedWorkItem);
@@ -31,25 +37,28 @@ export const httpGetWorkItemDetailsById = async (req, res) => {
   }
 };
 
-// --- Update WorkItem Details (Status, Period, Estimates) ---
 export const httpUpdateWorkItemDetails = async (req, res) => {
   const { workItemId } = req.params;
-  const { active, period, isEstimateBasedOnResourceLevel, resourceLevels } = req.body;
+  // Add clusterValue to destructuring
+  const { active, period, isEstimateBasedOnResourceLevel, resourceLevels, clusterValue } = req.body;
 
   if (!mongoose.Types.ObjectId.isValid(workItemId)) {
     return res.status(400).json({ message: 'Invalid WorkItem ID format' });
   }
 
-  // Validate period against enum
   const periodEnumValues = WorkItem.schema.path('period').enumValues;
   if (period && !periodEnumValues.includes(period)) {
       return res.status(400).json({ message: `Invalid period value. Allowed values are: ${periodEnumValues.join(', ')}` });
   }
 
-  // Validate isEstimateBasedOnResourceLevel against enum
   const estimateTypeEnumValues = WorkItem.schema.path('isEstimateBasedOnResourceLevel').enumValues;
-   if (isEstimateBasedOnResourceLevel && !estimateTypeEnumValues.includes(isEstimateBasedOnResourceLevel)) {
+  if (isEstimateBasedOnResourceLevel && !estimateTypeEnumValues.includes(isEstimateBasedOnResourceLevel)) {
       return res.status(400).json({ message: `Invalid isEstimateBasedOnResourceLevel value. Allowed values are: ${estimateTypeEnumValues.join(', ')}` });
+  }
+
+  // Validate clusterValue if provided (it can be null)
+  if (clusterValue !== null && clusterValue !== undefined && !mongoose.Types.ObjectId.isValid(clusterValue)) {
+      return res.status(400).json({ message: 'Invalid ClusterValue ID format' });
   }
 
   const session = await mongoose.startSession();
@@ -57,7 +66,6 @@ export const httpUpdateWorkItemDetails = async (req, res) => {
     let finalWorkItemData;
 
     await session.withTransaction(async (currentSession) => {
-      // 1. Find the WorkItem
       const workItemToUpdate = await WorkItem.findById(workItemId).session(currentSession);
       if (!workItemToUpdate) {
         const err = new Error('WorkItem not found');
@@ -65,17 +73,17 @@ export const httpUpdateWorkItemDetails = async (req, res) => {
         throw err;
       }
 
-      // 2. Update the WorkItem document's fields
       workItemToUpdate.active = active;
       workItemToUpdate.period = period;
       workItemToUpdate.isEstimateBasedOnResourceLevel = isEstimateBasedOnResourceLevel;
+      // Set clusterValue. If `clusterValue` is not in body, it defaults to current.
+      // If `clusterValue` is explicitly `null` in body, it's set to `null`.
+      workItemToUpdate.clusterValue = clusterValue === undefined ? workItemToUpdate.clusterValue : (clusterValue || null);
       
       await workItemToUpdate.save({ session: currentSession });
 
-      // 3. Delete existing WorkItemResourceLevel entries for this workItem
       await WorkItemResourceLevel.deleteMany({ workItem: workItemId }, { session: currentSession });
 
-      // 4. Create new WorkItemResourceLevel entries if any
       if (resourceLevels && resourceLevels.length > 0) {
         const resourceLevelDocs = resourceLevels.map(rl => {
           if (typeof rl.estimate !== 'number' || isNaN(rl.estimate)) {
@@ -83,14 +91,12 @@ export const httpUpdateWorkItemDetails = async (req, res) => {
             err.statusCode = 400;
             throw err;
           }
-          // Ensure designation and level are null if isEstimateBasedOnResourceLevel is 'No'
           let designation = rl.designation;
           let level = rl.level;
           if (isEstimateBasedOnResourceLevel === 'No') {
               designation = null;
               level = null;
           }
-          // No specific validation for designation/level if 'Yes', relies on schema defaults for now
           return {
             workItem: workItemId,
             designation: designation,
@@ -101,7 +107,15 @@ export const httpUpdateWorkItemDetails = async (req, res) => {
         await WorkItemResourceLevel.insertMany(resourceLevelDocs, { session: currentSession });
       }
 
+      // Fetch the fully updated work item with populated clusterValue for the response
       const fullyUpdatedWorkItem = await WorkItem.findById(workItemId)
+        .populate({
+          path: 'clusterValue',
+          populate: {
+            path: 'cluster',
+            model: 'Cluster'
+          }
+        })
         .session(currentSession)
         .lean();
 
@@ -112,9 +126,7 @@ export const httpUpdateWorkItemDetails = async (req, res) => {
         }
         const newResourceLevels = await WorkItemResourceLevel.find({ workItem: workItemId }).session(currentSession).lean();
         finalWorkItemData = { ...fullyUpdatedWorkItem, resourceLevels: newResourceLevels };
-
-
-    }); // End of transaction
+    });
 
     if (!finalWorkItemData) {
         return res.status(404).json({ message: 'WorkItem details processed, but final data retrieval failed.' });

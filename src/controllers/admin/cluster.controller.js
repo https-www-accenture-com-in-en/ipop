@@ -59,9 +59,10 @@ export const httpGetAllClusterValues = async (req, res) => {
 
 export const httpGetClusterValues = async (req, res) => {
   try {
+    const { clusterId } = req.params;
     const clusterValues = await ClusterValue.find({
-      cluster: req.params.clusterId,
-    });
+      cluster: clusterId,
+    }).populate("cluster");
     res.status(200).json(clusterValues);
   } catch (err) {
     res.status(500).json({ error: err.message });
