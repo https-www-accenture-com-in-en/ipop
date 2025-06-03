@@ -37,11 +37,6 @@ const taskEffortSchema = new mongoose.Schema(
 const ADProjectSchema = new Schema(
   {
     name: { type: String, required: true },
-    cluster: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Cluster",
-      required: true,
-    },
     clusterValue: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "ClusterValue",

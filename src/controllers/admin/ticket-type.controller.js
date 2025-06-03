@@ -1,5 +1,6 @@
 import { TicketType } from "../../models/ticket-types.model.js";
 import { DeliveryWorkTypeCategory } from "../../models/delivery-worktype-category.model.js";
+import { TicketMetadataSchema } from "../../models/metadata.model.js";
 import mongoose from "mongoose";
 
 // Bulk upsert controller for ticket types per task type
@@ -48,15 +49,60 @@ export const httpCreateTicketType = async (req, res) => {
         });
 
         // Upsert incoming ticket types
-        const incomingNames = ticketTypes.map((t) => t.ticketType);
         for (const ticket of ticketTypes) {
           if (!ticket.ticketType || typeof ticket.sequence !== "number") {
             throw new Error(
               `Invalid ticketType object under taskType: ${taskType}`
             );
           }
-          if (existingMap[ticket.ticketType]) {
-            // Update sequence if changed
+
+          // Check if this is a rename (id provided and ticketType changed)
+          if (
+            ticket.id &&
+            existingTickets.some((t) => t._id.equals(ticket.id))
+          ) {
+            const existing = existingTickets.find((t) =>
+              t._id.equals(ticket.id)
+            );
+            if (existing.ticketType !== ticket.ticketType) {
+              console.log(
+                `[RENAME] Renaming ticketTypeId=${ticket.id} from "${existing.ticketType}" to "${ticket.ticketType}"`
+              );
+              // Update ticketType name and sequence
+              await TicketType.updateOne(
+                { _id: ticket.id },
+                {
+                  $set: {
+                    ticketType: ticket.ticketType,
+                    sequence: ticket.sequence,
+                  },
+                }
+              );
+
+              // Log before updating metadata
+              console.log(
+                `[RENAME] Updating TicketMetadataSchema for ticketTypeId=${ticket.id} to ticketType="${ticket.ticketType}"`
+              );
+
+              // Update metadata's ticketType field for this ticketTypeId
+              const metaUpdateResult = await TicketMetadataSchema.updateMany(
+                { ticketTypeId: ticket.id },
+                { $set: { ticketType: ticket.ticketType } }
+              );
+              // Log after updating metadata
+              console.log(
+                `[RENAME] TicketMetadataSchema update result:`,
+                metaUpdateResult
+              );
+            } else {
+              // Only update sequence if name is unchanged
+              await TicketType.updateOne(
+                { _id: ticket.id },
+                { $set: { sequence: ticket.sequence } }
+              );
+            }
+          } else if (existingMap[ticket.ticketType]) {
+            // Update sequence if changed (legacy support)
             await TicketType.updateOne(
               { _id: existingMap[ticket.ticketType]._id },
               { $set: { sequence: ticket.sequence } }
@@ -71,18 +117,29 @@ export const httpCreateTicketType = async (req, res) => {
           }
         }
 
-        // Delete ticket types not in the new list
+        // Delete ticket types not in the new list (by ID, not by name)
+        const incomingIds = ticketTypes
+          .filter((t) => t.id)
+          .map((t) => t.id.toString());
         const toDelete = existingTickets.filter(
-          (t) => !incomingNames.includes(t.ticketType)
+          (t) => !incomingIds.includes(t._id.toString())
         );
         if (toDelete.length) {
+          const toDeleteIds = toDelete.map((t) => t._id);
           await TicketType.deleteMany({
-            _id: { $in: toDelete.map((t) => t._id) },
+            _id: { $in: toDeleteIds },
+          });
+          // Cascade delete metadata by ticketTypeId
+          await TicketMetadataSchema.deleteMany({
+            ticketTypeId: { $in: toDeleteIds },
           });
         }
       }
     });
-
+    console.log(
+      `[SUCCESS] Ticket types upserted successfully for request:`,
+      requestData
+    );
     return res.status(200).json({
       message: "Ticket types upserted successfully.",
     });
