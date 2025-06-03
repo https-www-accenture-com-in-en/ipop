@@ -66,6 +66,10 @@ import {
   httpUpdateADProject,
   httpDeleteADProject,
   httpGetAllClusterValues,
+  getADProjectById,
+  getADEffortTables,
+  updateADEffortTables,
+  updateADProjectEstimation,
 } from "../controllers/admin/cluster.controller.js";
 
 import * as workController from "../controllers/admin/non-ticket-delivery-worktype-category.controller.js";
@@ -160,6 +164,11 @@ adminRouter.post("/adprojects", httpAddADProject);
 adminRouter.get("/adprojects", httpGetADProject);
 adminRouter.put("/adprojects/:id", httpUpdateADProject);
 adminRouter.delete("/adprojects/:id", httpDeleteADProject);
+
+adminRouter.get("/adprojects/:id/estimate", getADProjectById); // Note: Was getSubProjectById before, ensure this is intended
+adminRouter.patch("/adprojects/:id/estimate", updateADProjectEstimation); // Note: Was getSubProjectById before, ensure this is intended
+adminRouter.patch("/adprojects/:id/effort-tables", updateADEffortTables);
+adminRouter.get("/adprojects/:id/effort-tables", getADEffortTables);
 
 // WorkCategory routes
 adminRouter.get("/workcategories", workController.httpGetWorkCategories); // e.g., "/workcategories?deliveryWorkTypeCategoryId=..."

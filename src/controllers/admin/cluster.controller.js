@@ -90,15 +90,6 @@ export const httpDeleteClusterValue = async (req, res) => {
   }
 };
 
-export const httpAddADProject = async (req, res) => {
-  try {
-    const project = await ADProject.create(req.body);
-    res.status(201).json(project);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
 export const httpBulkClusterOperations = async (req, res) => {
   const { clusters: clusterOps, clusterValues: cvOps } = req.body;
   const results = {
@@ -294,6 +285,15 @@ export const httpBulkClusterOperations = async (req, res) => {
   }
 };
 
+export const httpAddADProject = async (req, res) => {
+  const { name, clusterValue } = req.body;
+
+  const newProject = new ADProject({ name, clusterValue });
+  const savedProject = await newProject.save();
+
+  res.status(201).json(savedProject);
+};
+
 export const httpGetADProject = async (req, res) => {
   try {
     const projects = await ADProject.find().populate("cluster clusterValue");
@@ -321,4 +321,103 @@ export const httpDeleteADProject = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+};
+
+export const updateADProjectEstimation = async (req, res) => {
+  const { id } = req.params; // ID of the ADProject to update
+  const { estimationPersonDays, etlPersonDays } = req.body;
+
+  // Validate input
+  if (estimationPersonDays === undefined || etlPersonDays === undefined) {
+    return res.status(400).json({
+      message: "Both estimationPersonDays and etlPersonDays are required.",
+    });
+  }
+
+  if (typeof estimationPersonDays !== "number" || estimationPersonDays < 1) {
+    return res.status(400).json({
+      message:
+        "estimationPersonDays must be a number greater than or equal to 1.",
+    });
+  }
+
+  if (typeof etlPersonDays !== "number" || etlPersonDays < 0) {
+    return res.status(400).json({
+      message: "etlPersonDays must be a number greater than or equal to 0.",
+    });
+  }
+
+  const updatedADProject = await ADProject.findByIdAndUpdate(
+    id,
+    {
+      estimationPersonDays,
+      etlPersonDays,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  ).populate("clusterValue");
+
+  if (!updatedADProject) {
+    return res.status(404).json({ message: "AD Project not found" });
+  }
+
+  res.status(200).json(updatedADProject);
+};
+
+export const updateADEffortTables = async (req, res) => {
+  const { id } = req.params;
+  const { estimationEffortTable, etlEffortTable } = req.body;
+
+  console.log("Updating effort tables for ADProject ID:", id, req.body);
+
+  if (!Array.isArray(estimationEffortTable) || !Array.isArray(etlEffortTable)) {
+    return res.status(400).json({ message: "Both tables must be arrays." });
+  }
+
+  const updated = await ADProject.findByIdAndUpdate(
+    id,
+    {
+      estimationEffortTable,
+      etlEffortTable,
+    },
+    { new: true }
+  );
+
+  if (!updated) {
+    return res.status(404).json({ message: "AD Project not found." });
+  }
+
+  res.status(200).json(updated);
+};
+
+export const getADEffortTables = async (req, res) => {
+  const { id } = req.params;
+
+  const adProject = await ADProject.findById(id).select(
+    "estimationEffortTable etlEffortTable"
+  );
+
+  if (!adProject) {
+    return res.status(404).json({ message: "AD Project not found." });
+  }
+
+  res.status(200).json({
+    estimationEffortTable: adProject.estimationEffortTable,
+    etlEffortTable: adProject.etlEffortTable,
+  });
+};
+
+export const getADProjectById = async (req, res) => {
+  const { id } = req.params;
+  console.log("Fetching AD Project by ID:", id);
+
+  const project = await ADProject.findById(id).populate("clusterValue");
+
+  if (!project) {
+    return res.status(404).json({ message: "AD Project not found" });
+  }
+
+  res.status(200).json(project);
 };
