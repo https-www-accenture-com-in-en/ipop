@@ -49,7 +49,6 @@ export const httpCreateTicketType = async (req, res) => {
         });
 
         // Upsert incoming ticket types
-        const incomingNames = ticketTypes.map((t) => t.ticketType);
         for (const ticket of ticketTypes) {
           if (!ticket.ticketType || typeof ticket.sequence !== "number") {
             throw new Error(
@@ -118,9 +117,12 @@ export const httpCreateTicketType = async (req, res) => {
           }
         }
 
-        // Delete ticket types not in the new list
+        // Delete ticket types not in the new list (by ID, not by name)
+        const incomingIds = ticketTypes
+          .filter((t) => t.id)
+          .map((t) => t.id.toString());
         const toDelete = existingTickets.filter(
-          (t) => !incomingNames.includes(t.ticketType)
+          (t) => !incomingIds.includes(t._id.toString())
         );
         if (toDelete.length) {
           const toDeleteIds = toDelete.map((t) => t._id);
