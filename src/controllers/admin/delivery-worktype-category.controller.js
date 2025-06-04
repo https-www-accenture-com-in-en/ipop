@@ -200,3 +200,99 @@ export const httpGetWorkTypeCategoryWithMWT = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+// @desc    Get all DeliveryWorkTypeCategory with filtering options
+// @route   GET /api/v1/admin/work-types/filter
+export const httpGetAllWithParams = async (req, res) => {
+  const { masterWorkTypes, deliveryWorkTypes, workTypeCategory } = req.query;
+
+  try {
+    // Condition 1: Filter by masterWorkTypes
+    if (masterWorkTypes) {
+      const master = await MasterWorkType.findOne({ masterWorkTypes });
+      if (!master)
+        return res.status(404).json({ message: "Master Work Type not found" });
+
+      const deliveryWorkTypes = await DeliveryWorkType.find({
+        MasterWorkTypeId: master._id,
+      });
+
+      const deliveryWorkTypeData = await Promise.all(
+        deliveryWorkTypes.map(async (dwt) => {
+          const taskTypes = await DeliveryWorkTypeCategory.find({
+            deliveryWorkTypesId: dwt._id,
+          });
+
+          return {
+            id: dwt._id,
+            deliveryWorkTypes: dwt.deliveryWorkTypes,
+            taskTypes: taskTypes.map((t) => ({
+              id: t._id,
+              taskType: t.taskType,
+              workTypeCategory: t.workTypeCategory,
+              sequence: t.sequence,
+            })),
+          };
+        })
+      );
+
+      return res.json([
+        {
+          masterWorkTypes: master.masterWorkTypes,
+          id: master._id,
+          deliveryWorkType: deliveryWorkTypeData,
+        },
+      ]);
+    }
+
+    // Condition 2: Filter by deliveryWorkTypes
+    if (deliveryWorkTypes) {
+      const dwt = await DeliveryWorkType.findOne({ deliveryWorkTypes });
+      if (!dwt)
+        return res
+          .status(404)
+          .json({ message: "Delivery Work Type not found" });
+
+      const taskTypes = await DeliveryWorkTypeCategory.find({
+        deliveryWorkTypesId: dwt._id,
+      });
+
+      return res.json([
+        {
+          deliveryWorkTypes: dwt.deliveryWorkTypes,
+          id: dwt._id,
+          taskTypes: taskTypes.map((t) => ({
+            id: t._id,
+            taskType: t.taskType,
+            workTypeCategory: t.workTypeCategory,
+            sequence: t.sequence,
+          })),
+        },
+      ]);
+    }
+
+    // Condition 3: Filter by workTypeCategory
+    if (workTypeCategory) {
+      const categories = await DeliveryWorkTypeCategory.find(
+        { workTypeCategory },
+        { taskType: 1 } // Only project taskType and _id
+      );
+
+      return res.json({
+        workTypeCategory,
+        taskTypes: categories.map((c) => ({
+          id: c._id,
+          taskType: c.taskType,
+        })),
+      });
+    }
+
+    return res.status(400).json({
+      message:
+        "Please provide one of: masterWorkType, deliveryWorkType, or workTypeCategory",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
