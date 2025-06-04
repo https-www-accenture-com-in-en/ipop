@@ -41,7 +41,7 @@ Backend API for the IPOP application, built with Node.js, Express, and MongoDB.
 
 1. Clone the repository:
     ```sh
-    git clone <repo-url>
+    git clone https://github.com/https-www-accenture-com-in-en/IPOP-Backend.git
     cd IPOP-Backend
     ```
 
