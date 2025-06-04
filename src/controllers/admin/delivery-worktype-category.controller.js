@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { DeliveryWorkTypeCategory } from "../../models/delivery-worktype-category.model.js";
 import { MasterWorkType, DeliveryWorkType } from "../../models/master.model.js";
 
@@ -96,39 +97,140 @@ export const httpGetAllWorkTypes = async (req, res) => {
 // @desc    Create DeliveryWorkTypeCategory
 // @route   POST /api/v1/admin/delivery-work-type-category
 export const httpCreateDeliveryWorkTypeCategory = async (req, res) => {
+  const session = await mongoose.startSession();
   try {
-    const payload = req.body;
-    const result = [];
+    const requestData = req.body;
 
-    for (const item of payload) {
-      const { deliveryWorkTypes, workTypeCategory, taskType, sequence } = item;
+    // Check if request body is an array
+    if (!Array.isArray(requestData) || requestData.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Request body must be a non-empty array." });
+    }
 
-      // Find the corresponding DeliveryWorkType
-      const deliveryWorkTypeDoc = await DeliveryWorkType.findOne({
-        deliveryWorkTypes,
-      });
+    console.log("Received request data:", JSON.stringify(requestData, null, 2)); // Debug log
 
-      if (!deliveryWorkTypeDoc) {
-        return res.status(400).json({
-          error: `DeliveryWorkType '${deliveryWorkTypes}' not found.`,
+    await session.withTransaction(async () => {
+      // Group the incoming data by deliveryWorkTypes to process efficiently
+      const groupedByDeliveryWorkType = {};
+
+      // First, validate all incoming records and group them
+      for (const record of requestData) {
+        const { deliveryWorkTypes, workTypeCategory, taskType, sequence } =
+          record;
+
+        // Validate required fields
+        if (
+          !deliveryWorkTypes ||
+          !workTypeCategory ||
+          !taskType ||
+          typeof sequence !== "number"
+        ) {
+          throw new Error(
+            `Invalid record: All fields (deliveryWorkTypes, workTypeCategory, taskType, sequence) are required. Received: ${JSON.stringify(
+              record
+            )}`
+          );
+        }
+
+        // Group by deliveryWorkTypes
+        if (!groupedByDeliveryWorkType[deliveryWorkTypes]) {
+          groupedByDeliveryWorkType[deliveryWorkTypes] = [];
+        }
+
+        groupedByDeliveryWorkType[deliveryWorkTypes].push({
+          workTypeCategory,
+          taskType,
+          sequence,
         });
       }
 
-      const created = await DeliveryWorkTypeCategory.create({
-        deliveryWorkTypes,
-        workTypeCategory,
-        taskType,
-        sequence,
-        deliveryWorkTypesId: deliveryWorkTypeDoc._id,
-      });
+      // Process each delivery work type group
+      for (const [deliveryWorkTypeName, categories] of Object.entries(
+        groupedByDeliveryWorkType
+      )) {
+        // Find the corresponding DeliveryWorkType document to get the ID
+        const deliveryWorkTypeDoc = await DeliveryWorkType.findOne({
+          deliveryWorkTypes: deliveryWorkTypeName,
+        });
 
-      result.push(created);
-    }
+        if (!deliveryWorkTypeDoc) {
+          throw new Error(
+            `DeliveryWorkType not found for: ${deliveryWorkTypeName}`
+          );
+        }
 
-    res.status(201).json(result);
+        const deliveryWorkTypesId = deliveryWorkTypeDoc._id;
+
+        // Get all existing categories for this deliveryWorkTypesId
+        const existingCategories = await DeliveryWorkTypeCategory.find({
+          deliveryWorkTypesId,
+        });
+
+        // Create a map of existing categories using composite key (workTypeCategory + taskType)
+        const existingMap = {};
+        existingCategories.forEach((category) => {
+          const key = `${category.workTypeCategory}-${category.taskType}`;
+          existingMap[key] = category;
+        });
+
+        // Process incoming categories
+        const incomingKeys = categories.map(
+          (category) => `${category.workTypeCategory}-${category.taskType}`
+        );
+
+        // Upsert categories
+        for (const category of categories) {
+          const key = `${category.workTypeCategory}-${category.taskType}`;
+
+          if (existingMap[key]) {
+            // Update existing category
+            await DeliveryWorkTypeCategory.updateOne(
+              { _id: existingMap[key]._id },
+              {
+                $set: {
+                  deliveryWorkTypes: deliveryWorkTypeName, // Update in case it changed
+                  sequence: category.sequence,
+                },
+              }
+            );
+          } else {
+            // Create new category
+            await DeliveryWorkTypeCategory.create({
+              deliveryWorkTypes: deliveryWorkTypeName,
+              workTypeCategory: category.workTypeCategory,
+              taskType: category.taskType,
+              sequence: category.sequence,
+              deliveryWorkTypesId,
+            });
+          }
+        }
+
+        // Delete categories that are no longer in the incoming data
+        const toDelete = existingCategories.filter((category) => {
+          const key = `${category.workTypeCategory}-${category.taskType}`;
+          return !incomingKeys.includes(key);
+        });
+
+        if (toDelete.length > 0) {
+          await DeliveryWorkTypeCategory.deleteMany({
+            _id: { $in: toDelete.map((category) => category._id) },
+          });
+        }
+      }
+    });
+
+    return res.status(200).json({
+      message: "Delivery work type categories upserted successfully.",
+    });
   } catch (error) {
-    console.error("Error creating DeliveryWorkTypeCategory:", error);
-    res.status(500).json({ error: error.message });
+    console.error("Error upserting delivery work type categories:", error);
+    return res.status(500).json({
+      message: "Internal server error.",
+      error: error.message,
+    });
+  } finally {
+    session.endSession();
   }
 };
 
