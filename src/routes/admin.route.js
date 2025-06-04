@@ -14,6 +14,7 @@ import {
   httpGetTaskTypes,
   httpGetAllWorkTypes,
   httpGetWorkTypeCategoryWithMWT,
+  httpGetAllWithParams,
   httpCreateDeliveryWorkTypeCategory,
   httpEditTaskTypes,
 } from "../controllers/admin/delivery-worktype-category.controller.js";
@@ -103,6 +104,7 @@ adminRouter.get(
   "/work-type-categories/master/:masterWorkTypes",
   httpGetWorkTypeCategoryWithMWT
 );
+adminRouter.get("/work-types/filter", httpGetAllWithParams);
 adminRouter.post(
   "/delivery-work-type-category",
   httpCreateDeliveryWorkTypeCategory
