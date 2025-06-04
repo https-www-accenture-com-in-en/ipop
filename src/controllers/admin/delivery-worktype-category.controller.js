@@ -306,12 +306,13 @@ export const httpGetWorkTypeCategoryWithMWT = async (req, res) => {
 // @desc    Get all DeliveryWorkTypeCategory with filtering options
 // @route   GET /api/v1/admin/work-types/filter
 export const httpGetAllWithParams = async (req, res) => {
-  const { masterWorkTypes, deliveryWorkTypes, workTypeCategory } = req.query;
+  const { masterWorkTypeId, deliveryWorkTypeId, workTypeCategoryId } =
+    req.query;
 
   try {
-    // Condition 1: Filter by masterWorkTypes
-    if (masterWorkTypes) {
-      const master = await MasterWorkType.findOne({ masterWorkTypes });
+    // Condition 1: Filter by masterWorkTypeId
+    if (masterWorkTypeId) {
+      const master = await MasterWorkType.findById(masterWorkTypeId);
       if (!master)
         return res.status(404).json({ message: "Master Work Type not found" });
 
@@ -347,9 +348,9 @@ export const httpGetAllWithParams = async (req, res) => {
       ]);
     }
 
-    // Condition 2: Filter by deliveryWorkTypes
-    if (deliveryWorkTypes) {
-      const dwt = await DeliveryWorkType.findOne({ deliveryWorkTypes });
+    // Condition 2: Filter by deliveryWorkTypeId
+    if (deliveryWorkTypeId) {
+      const dwt = await DeliveryWorkType.findById(deliveryWorkTypeId);
       if (!dwt)
         return res
           .status(404)
@@ -373,25 +374,30 @@ export const httpGetAllWithParams = async (req, res) => {
       ]);
     }
 
-    // Condition 3: Filter by workTypeCategory
-    if (workTypeCategory) {
-      const categories = await DeliveryWorkTypeCategory.find(
-        { workTypeCategory },
-        { taskType: 1 } // Only project taskType and _id
+    // Condition 3: Filter by workTypeCategoryId
+    if (workTypeCategoryId) {
+      const category = await DeliveryWorkTypeCategory.findById(
+        workTypeCategoryId
       );
+      if (!category)
+        return res
+          .status(404)
+          .json({ message: "Work Type Category not found" });
 
       return res.json({
-        workTypeCategory,
-        taskTypes: categories.map((c) => ({
-          id: c._id,
-          taskType: c.taskType,
-        })),
+        workTypeCategoryId: category._id,
+        taskTypes: [
+          {
+            id: category._id,
+            taskType: category.taskType,
+          },
+        ],
       });
     }
 
     return res.status(400).json({
       message:
-        "Please provide one of: masterWorkType, deliveryWorkType, or workTypeCategory",
+        "Please provide one of: masterWorkTypeId, deliveryWorkTypeId, or workTypeCategoryId",
     });
   } catch (error) {
     console.error("Error:", error);
