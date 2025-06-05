@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 // import userRouter from './routes/user.route.js';
 import adminRouter from "./routes/admin.route.js";
+import userRouter from "./routes/user.route.js"; // Uncomment this line if you have a userRouter defined
 import {
   requestLogger,
   unknownEndpoint,
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 
 app.use("/v1/api/admin", adminRouter);
+app.use("/v1/api/user", userRouter); // Uncomment this line if you have a userRouter defined
 
 app.use(unknownEndpoint);
 app.use(errorHandler);
