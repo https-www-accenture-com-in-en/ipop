@@ -197,11 +197,19 @@ import {
   httpUpdateWorkItemDetails,
   httpGetWorkItemDetailsById,
 } from "../controllers/admin/workItemDetails.controller.js";
+import {
+  bulkResourceColumnOperations,
+  getAllResourceColumns,
+} from "../controllers/resource-column.controller.js";
 
 adminRouter.get("/workitems/:workItemId/details", httpGetWorkItemDetailsById);
 
 // Route to update details of a specific WorkItem (resource levels)
 // Using /workitems/:workItemId/details
 adminRouter.put("/workitems/:workItemId/details", httpUpdateWorkItemDetails);
+
+// Resource Column Routes step-14
+adminRouter.get("/resource-columns", getAllResourceColumns);
+adminRouter.post("/bulk-resource-operations", bulkResourceColumnOperations);
 
 export default adminRouter;
