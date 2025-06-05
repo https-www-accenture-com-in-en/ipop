@@ -1,3 +1,4 @@
+import path from "path";
 import express from "express";
 import cors from "cors";
 // import userRouter from './routes/user.route.js';
@@ -15,8 +16,17 @@ app.use(requestLogger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 
+const __dirname = path.resolve();
+
+// Serve static frontend
+app.use(express.static(path.join(__dirname, "./dist")));
+
 app.use("/v1/api/admin", adminRouter);
 app.use("/v1/api/user", userRouter); // Uncomment this line if you have a userRouter defined
+
+app.get("/*name", (req, res) =>
+  res.sendFile(path.resolve(__dirname, "./dist/index.html"))
+);
 
 app.use(unknownEndpoint);
 app.use(errorHandler);
