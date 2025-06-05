@@ -1,7 +1,7 @@
 import http from "http";
-import app from "./app.js"; // Import the app from app.js
-import connectDB from "../db/dbconfig.js"; // Import the database connection function
-import config from "./utils/config.js";
+import app from "./src/app.js"; // Import the app from app.js
+import connectDB from "./db/dbconfig.js"; // Import the database connection function
+import config from "./src/utils/config.js";
 
 const PORT = config.PORT || 5000;
 const server = http.createServer(app);
