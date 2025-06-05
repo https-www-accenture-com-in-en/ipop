@@ -27,7 +27,7 @@ import axios from "axios";
 // };
 
 export const httpGetApprovalDetails = async (req, res) => {
-  const { ticket, action, user } = req.query;
+  const { ticket, action, user, supervisor } = req.query;
 
   if (!ticket || !action || !user) {
     return res.status(400).send("Invalid approval link.");
@@ -39,7 +39,11 @@ export const httpGetApprovalDetails = async (req, res) => {
 
     // 2. Prepare email details
     const emailBody = [
-      `Hi,<br><br>The ticket <b>${ticket}</b> has been <b>${action}d</b> by <b>${user}</b>.<br><br>Thanks,<br>Team`,
+      `Hi,<br><br>The ticket <b>${ticket}</b> has been <b>${action}d</b> by <b>${supervisor}</b>.<br><br>Thanks,<br>Team`,
+    ];
+
+    const teamsContent = [
+      `${user}| ${supervisor} has ${action}d extra hours for the ticket ${ticket}.`,
     ];
     const subject = [`Ticket ${ticket} ${action}d`];
     const toMailId = ["lokesh.dontula@accenture.com"]; // Update as needed
@@ -63,8 +67,28 @@ export const httpGetApprovalDetails = async (req, res) => {
       }
     );
 
+    await axios.post(
+      "http://sendteamsnotification.azurewebsites.net/api/SendTeamsNotification",
+      {
+        TeamIds: teamsContent,
+        Message: [
+          `User ${user} has ${action}d extra hours for the ticket ${ticket}.`,
+        ],
+      },
+
+      {
+        headers: {
+          "x-functions-key":
+            "FSE8UpGQJQnhtekkatwaYxH0JC/PZg9QmT4uIgJwjQlfhBo8jAeqZg==",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
     // 4. Respond back to frontend
-    res.send(`Ticket ${ticket} has been ${action}d by ${user}. Email sent.`);
+    res.send(
+      `Ticket ${ticket} has been ${action}d by ${user}. conformation sent for the same.`
+    );
   } catch (error) {
     console.error("Approval error:", error);
     res.status(500).send("Something went wrong during approval action.");
